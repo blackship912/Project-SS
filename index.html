@@ -1,1 +1,1266 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Project:SS Alpha 0.6</title>
+<style>
+:root{--g:#1f7a45;--g2:#7ecb91;--ink:#17251b;--muted:#7a8780;--bg:#eef5ef;--card:#fff;--danger:#c0392b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+button:active{transform:scale(.96);transition:transform .1s}
+p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
 
+/* ── shell ── */
+.shell{width:min(430px,100%);margin:0 auto;position:relative;height:100dvh;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#f8fbf8;
+  padding:16px 16px 0;padding-top:calc(16px + env(safe-area-inset-top));
+  transition:transform .42s cubic-bezier(.22,.7,.36,1);padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+#homeScreen{transform:translateX(0)}
+#detailScreen{transform:translateX(102%);padding-bottom:calc(116px + env(safe-area-inset-bottom))}
+#favScreen{transform:translateX(102%)}
+#compareScreen{transform:translateX(102%)}
+#settingsScreen{transform:translateX(102%)}
+.shell.to-detail #homeScreen{transform:translateX(-26%)}
+.shell.to-detail #detailScreen{transform:translateX(0)}
+.shell.to-fav #homeScreen{transform:translateX(-26%)}
+.shell.to-fav #favScreen{transform:translateX(0)}
+.shell.to-compare #homeScreen{transform:translateX(-26%)}
+.shell.to-compare #compareScreen{transform:translateX(0)}
+.shell.to-settings #homeScreen{transform:translateX(-26%)}
+.shell.to-settings #settingsScreen{transform:translateX(0)}
+
+/* ── topbar ── */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.brand{display:flex;gap:11px;align-items:center}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 8px 18px rgba(31,122,69,.24);font-size:14px;letter-spacing:-.5px}
+h1{font-size:19px;font-weight:800}
+.sub{font-size:11px;color:var(--g);font-weight:800;letter-spacing:.04em}
+.sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:0}
+.round{border:0;background:#fff;color:var(--g);width:40px;height:40px;border-radius:50%;font-size:18px;box-shadow:0 6px 16px rgba(32,59,41,.1);display:grid;place-items:center}
+.tiny{font-size:11px;color:var(--muted);display:block}
+
+/* ── card ── */
+.card{background:var(--card);border-radius:24px;padding:18px;box-shadow:0 12px 28px rgba(32,59,41,.08);margin-bottom:14px}
+.card-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14.5px;margin:0 0 12px}
+.ctrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.link-btn{border:1.5px solid #cfe6d7;background:#fff;color:var(--g);font-size:12px;font-weight:800;border-radius:999px;padding:6px 13px}
+
+/* ── score hero ── */
+.score-hero{background:linear-gradient(135deg,#fff,#e9f8ee)}
+.score-hero .top{display:flex;justify-content:space-between;align-items:center}
+.score-label{font-size:12px;color:var(--g);font-weight:800;letter-spacing:.02em;margin-bottom:4px}
+.score-num{font-size:44px;font-weight:800;line-height:1}
+.score-num small{font-size:14px;color:var(--muted);font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:800;border-radius:999px;padding:6px 12px;transition:background .25s,color .25s}
+.ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--g) calc(var(--p)*1%),#e3ede5 0);display:grid;place-items:center;flex:none}
+.ring i{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:19px}
+.score-comment{margin-top:12px;font-size:12.5px;line-height:1.75;color:#3c473f}
+.score-substats{margin-top:8px;font-size:11.5px;color:var(--muted)}
+
+/* ── home search/chips ── */
+input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-radius:16px;font-size:15px;outline:none}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;border:0;border-radius:999px;padding:8px 14px;background:#edf2ee;color:#4d5c51;font-weight:700;font-size:12.5px}
+.chip.active{background:var(--g);color:#fff}
+
+/* ── property list card ── */
+.prop-card{display:flex;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.prop-card:active{transform:scale(.98);box-shadow:0 6px 16px rgba(32,59,41,.06)}
+.thumb{width:56px;height:56px;border-radius:16px;flex:none;overflow:hidden;display:grid;place-items:center;font-size:22px;color:#fff;background-size:cover;background-position:center}
+.pc-body{flex:1;min-width:0}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.ptitle{font-size:14.5px;font-weight:800;margin:0 0 2px}
+.addr{font-size:11.5px;color:var(--muted)}
+.sbadge{font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;flex:none}
+.pc-metrics{display:flex;gap:13px;margin-top:8px;font-size:11.5px}
+.pc-metrics b{font-size:13.5px}
+.ptags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ptag{font-size:10.5px;background:#edf7ef;color:var(--g);border-radius:999px;padding:4px 8px}
+.reason-box{margin-top:9px;padding:9px 10px;border-radius:13px;background:#fef0f0;color:#7b2d2d;font-size:11.5px;font-weight:700}
+.fav-heart{position:absolute;right:0;top:0;border:0;background:none;font-size:18px;padding:2px;line-height:1}
+.prop-card{position:relative}
+
+/* ── gallery ── */
+.gallery{border-radius:24px;overflow:hidden;margin-bottom:14px;background:var(--card);box-shadow:0 12px 28px rgba(32,59,41,.08)}
+.gal-empty{height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#f1f7f3}
+.gal-empty-btn{border:0;background:var(--g);color:#fff;border-radius:999px;padding:14px 24px;font-weight:800;font-size:14px;box-shadow:0 10px 22px rgba(31,122,69,.28)}
+.gal-empty p{font-size:12px;color:var(--muted)}
+.gal-vp{position:relative;height:240px;overflow:hidden;background:#1a241c;cursor:pointer}
+.gal-track{display:flex;height:100%;will-change:transform;transition:transform .32s cubic-bezier(.22,.7,.36,1)}
+.gal-slide{flex:none;width:100%;height:100%;background-size:cover;background-position:center;position:relative}
+.gal-slide-tags{position:absolute;bottom:38px;left:10px;display:flex;gap:5px;flex-wrap:wrap;z-index:2}
+.gal-slide-tags span{background:rgba(0,0,0,.5);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:3px 8px;backdrop-filter:blur(4px)}
+.gal-add{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(0,0,0,.44);color:#fff;font-size:16px;display:grid;place-items:center;z-index:3}
+.gal-counter{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.42);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;z-index:3}
+.gal-dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:3;pointer-events:none}
+.gal-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);transition:all .22s}
+.gal-dots span.on{background:#fff;width:16px;border-radius:4px}
+.gal-meta{display:flex;padding:11px 14px;border-top:1px solid #f0f3f0}
+.gal-meta div{flex:1;text-align:center;font-size:11.5px;color:#3c473f}
+.gal-meta div+div{border-left:1px solid #eef2ef}
+.gal-meta b{display:block;font-size:13.5px}
+.gal-tags-area{padding:10px 14px 0}
+.gal-tags-label{font-size:10.5px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.gal-tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.gal-tag-btn{border:1.5px solid #dbe9df;background:#fff;color:#3c473f;border-radius:999px;padding:5px 10px;font-size:11.5px;font-weight:700;transition:all .15s}
+.gal-tag-btn.on{background:var(--g);color:#fff;border-color:var(--g)}
+.gal-custom-row{display:flex;gap:6px}
+.gal-custom-row input{flex:1;border:0;background:#f0f5f1;border-radius:12px;padding:8px 10px;font-size:12.5px;outline:none}
+.gal-custom-row button{border:0;background:#edf7ef;color:var(--g);border-radius:12px;padding:8px 12px;font-weight:800;font-size:12px}
+.gal-memo-area{padding:8px 14px 14px}
+.pm-text{background:#f4f7f5;border-radius:14px;padding:11px 12px;font-size:12.5px;line-height:1.6;display:flex;gap:8px;align-items:flex-start}
+.pm-text p{flex:1}
+.pm-text-actions{display:flex;gap:8px;flex:none}
+.pm-text-actions button{border:0;background:none;color:var(--muted);font-size:11px;font-weight:700}
+.pm-add{width:100%;border:1.5px dashed #cfe6d7;background:#fff;color:var(--g);border-radius:14px;padding:11px;font-weight:800;font-size:12.5px}
+.pm-form-inner{display:flex;gap:8px;align-items:flex-end}
+.pm-form-inner textarea{flex:1;border:0;background:#f0f5f1;border-radius:14px;padding:10px;min-height:60px;outline:none;resize:vertical;font-size:12.5px}
+.mic-btn{width:36px;height:36px;flex:none;border:0;border-radius:50%;background:#edf7ef;color:var(--g);font-size:16px;display:grid;place-items:center}
+.mic-btn.rec{background:#fbe1e1;color:#a23131;animation:micpulse 1s infinite}
+@keyframes micpulse{50%{box-shadow:0 0 0 7px rgba(192,57,43,.15)}}
+.pm-form-btns{display:flex;gap:8px;margin-top:8px}
+.pm-form-btns button{flex:1;border:0;border-radius:12px;padding:10px;font-weight:800;font-size:12.5px}
+.pm-save-btn{background:var(--g);color:#fff}.pm-cancel-btn{background:#eee;color:#555}
+
+/* fullscreen viewer */
+.fs{position:fixed;inset:0;background:#0c130d;z-index:60;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .25s}
+.fs.show{opacity:1;pointer-events:auto}
+.fs-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top))}
+.fs-head button{border:0;background:rgba(255,255,255,.15);color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px}
+.fs-head span{color:#fff;font-weight:700;font-size:13px}
+.fs-body{flex:1;overflow:hidden;position:relative}
+.fs-track{display:flex;height:100%;will-change:transform;transition:transform .3s cubic-bezier(.22,.7,.36,1)}
+.fs-slide{flex:none;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.fs-slide img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .2s}
+.fs-foot{padding:10px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:6px}
+.fs-foot span{background:rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:5px 10px}
+.fs-actions{display:flex;gap:8px;padding:0 16px 10px;justify-content:center}
+.fs-actions button{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700}
+
+/* ── detail quicklinks (swipe mode) ── */
+.ql-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;position:sticky;top:0;z-index:4}
+.ql{border:0;background:#fff;border-radius:18px;padding:11px 4px 10px;box-shadow:0 6px 16px rgba(32,59,41,.07);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:#3c473f;font-weight:700}
+.ql .ico{width:30px;height:30px;border-radius:10px;background:#edf7ef;display:grid;place-items:center;font-size:14px}
+.ql.on{background:var(--g);color:#fff}
+.ql.on .ico{background:rgba(255,255,255,.2)}
+
+/* swipe panels */
+.swipe-outer{overflow:hidden;margin-bottom:14px}
+.swipe-inner{display:flex;will-change:transform;transition:transform .36s cubic-bezier(.22,.7,.36,1)}
+.swipe-panel{width:100%;flex:none;display:flex;flex-direction:column;gap:14px}
+
+/* ── score breakdown ── */
+.radar-wrap{display:flex;justify-content:center;margin-bottom:10px}
+.bd-row{display:grid;grid-template-columns:62px 1fr 36px;align-items:center;gap:8px;font-size:11px;color:#3c473f;margin-bottom:7px}
+.bd-bar{height:7px;border-radius:999px;background:#eef2ef;overflow:hidden}
+.bd-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:999px}
+
+/* ── AI ── */
+.ai-card{background:linear-gradient(135deg,#fff,#eef7f0)}
+.ai-text{font-size:13px;line-height:1.8;color:#3c473f}
+.ai-text.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ai-toggle{display:none;border:0;background:#e7f4eb;color:var(--g);border-radius:13px;padding:9px;width:100%;font-weight:800;font-size:12.5px;margin-top:9px}
+.ai-sub{margin-top:13px}
+.ai-sub .h{font-size:11.5px;font-weight:800;color:var(--g);margin-bottom:5px}
+.ai-sub ul{margin:0;padding-left:18px;font-size:12px;line-height:1.85;color:#3c473f}
+
+/* ── todo ── */
+.todo-row{display:flex;align-items:center;gap:10px;background:#f1f5f2;border-radius:16px;padding:12px 14px;margin-top:9px}
+.todo-circle{width:22px;height:22px;border-radius:50%;border:2px solid #c6d4ca;flex:none;background:#fff;display:grid;place-items:center;font-size:12px;color:transparent}
+.todo-circle.done{background:var(--g);border-color:var(--g);color:#fff}
+.todo-label{flex:1;font-size:13.5px;font-weight:700}
+.todo-row.done .todo-label{color:#9aa6a0;text-decoration:line-through}
+.todo-arr{color:#9aa6a0;font-size:15px}
+.done-toggle{margin-top:11px;background:none;border:0;color:var(--muted);font-size:11.5px;font-weight:700}
+.done-list{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.done-list.open{max-height:500px}
+
+/* ── info grid ── */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.info-cell{background:#f4f7f5;border-radius:16px;padding:10px 6px;text-align:center}
+.info-cell .ico{font-size:15px;margin-bottom:4px}
+.info-cell span{display:block;font-size:10px;color:#657066;margin-bottom:3px}
+.info-cell b{display:block;font-size:12px;line-height:1.3}
+
+/* ── check ── */
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px;font-size:10px;color:#5b6b60}
+.legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.dg{background:var(--g)}.dw{background:#d99a1f}.db{background:#c0392b}.du{background:#9aa6a0}
+.check-btn{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;text-align:left;padding:12px 6px;border-bottom:1px solid #eef2ef;border-radius:14px;transition:background .3s,box-shadow .3s}
+.check-btn:last-child{border-bottom:0}
+.cr-label{font-size:13px;font-weight:700}
+.cr-note{font-size:10.5px;color:#9aa6a0;margin-top:2px}
+.check-btn.hi{background:#fff6da;box-shadow:0 0 0 2px #ffd866 inset;animation:pulse 1s 2}
+@keyframes pulse{50%{transform:scale(1.015)}}
+.badge{font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 10px;flex:none}
+.bg{background:#e2f5e8;color:#14733d}.bw{background:#fdedd2;color:#8a6300}.bb{background:#fbe1e1;color:#a23131}.bu{background:#eef1f4;color:#5b6b74}
+.prog-row{display:flex;align-items:center;gap:10px;margin-top:13px}
+.prog-bar{flex:1;height:8px;border-radius:999px;background:#eef2ef;overflow:hidden}
+.prog-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:999px;transition:width .5s}
+.prog-pct{font-size:12.5px;font-weight:800;color:var(--g)}
+.unconf{margin-top:9px;background:#f7f5ee;border-radius:13px;padding:8px 12px;font-size:11.5px;color:#7a6a2d;font-weight:700;display:flex;justify-content:space-between}
+
+/* ── memo ── */
+.memo-item{background:#f4f7f5;border-radius:16px;padding:12px 13px;margin-bottom:10px;position:relative}
+.memo-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.memo-head b{font-size:10.5px;color:var(--muted)}
+.memo-item p{font-size:13px;line-height:1.6}
+.memo-more-btn{border:0;background:none;color:var(--muted);font-size:16px;font-weight:800;padding:2px 6px}
+.memo-menu{position:absolute;right:10px;top:36px;background:#fff;border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.16);z-index:5;display:none}
+.memo-menu.show{display:block}
+.memo-menu button{display:block;width:110px;border:0;background:#fff;padding:11px 14px;font-size:13px;font-weight:700;text-align:left;color:#243329}
+.memo-menu button.del{color:#a23131}
+.memo-add-btn{width:100%;border:1.5px dashed #cfe6d7;background:#fff;color:var(--g);border-radius:16px;padding:12px;font-weight:800;font-size:13px;margin-bottom:11px}
+.memo-form-wrap{display:none;margin-bottom:12px}
+.memo-form-wrap.open{display:block}
+.memo-form-wrap textarea{width:100%;border:0;background:#f0f5f1;border-radius:16px;padding:12px;resize:vertical;min-height:70px;outline:none;font-size:13px}
+.memo-form-btns{display:flex;gap:8px;margin-top:8px}
+.memo-form-btns button{flex:1;border:0;border-radius:13px;padding:11px;font-weight:800;font-size:12.5px}
+.msave{background:var(--g);color:#fff}.mcancel{background:#eee;color:#555}
+.memo-edit-form textarea{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:10px;min-height:60px;outline:none;font-size:13px;margin-top:6px}
+.memo-edit-btns{display:flex;gap:8px;margin-top:7px}
+.memo-edit-btns button{flex:1;border:0;border-radius:12px;padding:9px;font-weight:800;font-size:12px}
+
+/* ── log ── */
+.log-item{border-left:3px solid var(--g);padding:0 0 15px 13px;margin-left:6px;animation:fin .3s ease}
+.log-item:last-child{padding-bottom:0}
+.log-item b{font-size:11px;color:var(--muted);display:block}
+.log-item p{font-weight:700;margin-top:4px;font-size:13px}
+@keyframes fin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── status fixed bar ── */
+.status-bar{position:fixed;left:50%;transform:translateX(-50%);width:min(398px,calc(100% - 28px));bottom:calc(76px + env(safe-area-inset-bottom));z-index:6;display:none}
+.status-bar button{width:100%;border:0;border-radius:18px;padding:15px;font-weight:800;font-size:14.5px;background:var(--g);color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.15)}
+
+/* ── bottom nav ── */
+.bnav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(13px + env(safe-area-inset-bottom));width:min(398px,calc(100% - 28px));background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-radius:26px;display:flex;align-items:center;justify-content:space-around;padding:8px 6px;box-shadow:0 10px 30px rgba(0,0,0,.13);z-index:10}
+.bnav button{border:0;background:transparent;color:#68746c;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:19px;flex:1;padding:4px 0;transition:color .15s}
+.bnav span{font-size:9px;font-weight:600}
+.bnav .nav-on{color:var(--g);font-weight:800}
+.nav-fab{background:var(--g) !important;color:#fff !important;width:46px;height:46px;border-radius:50%;display:grid !important;place-items:center;font-size:22px;margin-top:-18px;box-shadow:0 8px 18px rgba(31,122,69,.35)}
+.nav-fab span{display:none}
+
+/* ── sheets ── */
+.bd{position:fixed;inset:0;background:rgba(15,30,20,0);pointer-events:none;transition:background .3s;z-index:30}
+.bd.show{background:rgba(15,30,20,.32);pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;width:min(430px,100%);margin:0 auto;background:#fff;border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -16px 40px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .34s cubic-bezier(.22,.7,.36,1);z-index:31;max-height:86vh;overflow-y:auto}
+.sheet.show{transform:translateY(0)}
+.sh-handle{width:38px;height:5px;background:#e1e7e2;border-radius:99px;margin:8px auto 14px}
+.sh-title{font-size:16px;font-weight:800;margin-bottom:12px}
+.sh-opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:#f5f8f6;border-radius:16px;padding:14px;margin:7px 0;font-weight:800;font-size:14px;color:#243329}
+.sh-opt .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.sh-opt.cur{background:#e2f5e8;color:#14733d}
+.sh-cancel{display:block;width:100%;border:0;background:transparent;color:#9aa6a0;font-weight:700;font-size:13.5px;padding:12px;margin-top:2px}
+.reason-zone{max-height:0;overflow:hidden;transition:max-height .3s}
+.reason-zone.open{max-height:180px;margin:6px 0 10px}
+.reason-zone textarea{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:11px;min-height:68px;outline:none;resize:vertical;font-size:13px}
+.reason-confirm{width:100%;border:0;background:var(--g);color:#fff;border-radius:13px;padding:12px;font-weight:800;margin-top:4px}
+
+/* edit wizard */
+.wiz-steps{display:flex;gap:5px;margin-bottom:14px}
+.wiz-steps i{flex:1;height:4px;border-radius:999px;background:#e7ede8;font-style:normal}
+.wiz-steps i.done{background:var(--g)}
+.wiz-step-name{font-size:12.5px;font-weight:800;color:var(--g);margin-bottom:12px}
+.ff{margin-bottom:11px}
+.ff label{display:block;font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:5px}
+.ff input,.ff select{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:11px;outline:none;font-size:14px}
+.wiz-nav{display:flex;gap:10px;margin-top:6px}
+.wiz-nav button{flex:1;border:0;border-radius:16px;padding:14px;font-weight:800;font-size:14px}
+.wiz-back{background:#eef2ef;color:#4d5c51}.wiz-next{background:var(--g);color:#fff}
+
+/* ── compare screen ── */
+.cmp-select-area{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.cmp-select-area::-webkit-scrollbar{display:none}
+.cmp-prop-btn{flex:none;border:2px solid #dbe9df;background:#fff;border-radius:18px;padding:10px 14px;font-size:12px;font-weight:700;color:#3c473f;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.cmp-prop-btn.on{border-color:var(--g);background:#e2f5e8;color:var(--g)}
+.cmp-prop-btn .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.cmp-table-wrap{overflow-x:auto;border-radius:18px;box-shadow:0 12px 28px rgba(32,59,41,.08)}
+.cmp-table{min-width:400px;width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden}
+.cmp-table th{background:#f4f7f5;padding:10px 12px;font-size:11px;font-weight:800;color:var(--muted);text-align:center;white-space:nowrap}
+.cmp-table th:first-child{text-align:left;min-width:90px}
+.cmp-table td{padding:10px 12px;font-size:12.5px;text-align:center;border-top:1px solid #eef2ef;font-weight:700}
+.cmp-table td:first-child{text-align:left;font-size:11.5px;color:var(--muted);font-weight:600}
+.cmp-table td.best{color:var(--g);background:#f0faf3;font-weight:800}
+.cmp-ai{background:linear-gradient(135deg,#fff,#eef7f0);border-radius:20px;padding:16px;margin-bottom:14px}
+.cmp-ai p{font-size:13px;line-height:1.8;color:#3c473f;margin-top:8px}
+.cmp-pick-btn{width:100%;border:0;background:var(--g);color:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:14px;margin-bottom:8px}
+
+/* ── fav screen ── */
+.fav-empty{text-align:center;padding:48px 16px;color:var(--muted)}
+.fav-empty .ico{font-size:48px;margin-bottom:12px}
+.fav-empty p{font-size:14px}
+
+/* ── settings screen ── */
+.settings-section{margin-bottom:22px}
+.settings-section h3{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.06em;margin-bottom:8px;padding-left:4px}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff;font-size:14px;font-weight:700;color:var(--ink)}
+.settings-row:first-of-type{border-radius:18px 18px 0 0}
+.settings-row:last-of-type{border-radius:0 0 18px 18px}
+.settings-row:only-of-type{border-radius:18px}
+.settings-row+.settings-row{border-top:1px solid #f0f3f0}
+.settings-row span{color:var(--muted);font-size:12px;font-weight:600}
+.settings-card{background:#fff;border-radius:18px;box-shadow:0 8px 20px rgba(32,59,41,.07);overflow:hidden;margin-bottom:8px}
+.toggle-switch{width:44px;height:24px;border-radius:999px;border:0;position:relative;cursor:pointer;transition:background .2s}
+.toggle-switch.on{background:var(--g)}.toggle-switch.off{background:#d1d9d3}
+.toggle-switch::after{content:"";position:absolute;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-switch.on::after{left:22px}.toggle-switch.off::after{left:2px}
+.app-info-card{background:linear-gradient(135deg,#fff,#e9f8ee);border-radius:22px;padding:22px;text-align:center;box-shadow:0 12px 28px rgba(32,59,41,.08);margin-bottom:14px}
+.app-info-card .version{font-size:11px;color:var(--muted);margin-top:4px}
+.app-info-card .tagline{font-size:13px;color:#3c473f;margin-top:12px;line-height:1.7}
+.app-info-card .since{font-size:11px;color:var(--muted);margin-top:8px}
+.blueprint-sig{font-size:10px;color:var(--muted);letter-spacing:.06em;margin-top:6px;font-style:italic}
+.dna-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 12px 28px rgba(32,59,41,.08);margin-bottom:14px}
+.dna-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #eef2ef}
+.dna-item:last-child{border-bottom:0}
+.dna-item .num{font-size:13px;font-weight:800;color:var(--g);flex:none;width:20px}
+.dna-item p{font-size:13px;line-height:1.6;color:#3c473f;font-weight:700}
+.dna-item small{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+.theme-row{display:flex;gap:10px;margin-top:8px}
+.theme-dot{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s}
+.theme-dot.sel{border-color:var(--ink);transform:scale(1.15)}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+
+<!-- ====== HOME ====== -->
+<section id="homeScreen" class="screen">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">SS</div>
+      <div><h1>Project:SS</h1><p class="sub">Shonai Score</p></div>
+    </div>
+    <button class="round">☰</button>
+  </header>
+  <section class="card score-hero" id="homeHero"></section>
+  <section class="card">
+    <input class="search" id="search" placeholder="地区・タグ・見送り理由で検索"/>
+    <div class="chips" id="statusChips"></div>
+  </section>
+  <section id="propList"></section>
+</section>
+
+<!-- ====== DETAIL ====== -->
+<section id="detailScreen" class="screen">
+  <header class="sub-head">
+    <button class="round" id="backBtn">←</button>
+    <div style="text-align:center"><span class="tiny">物件カルテ</span><h1 id="dTitle" style="font-size:17px"></h1></div>
+    <button class="round" id="favBtn" title="お気に入り">🤍</button>
+  </header>
+  <div class="gallery" id="gallery"></div>
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+  <div class="ql-wrap" id="qlWrap">
+    <button class="ql" data-pi="0"><span class="ico">🏠</span>基本</button>
+    <button class="ql" data-pi="1"><span class="ico">📋</span>調査</button>
+    <button class="ql" data-pi="2"><span class="ico">📝</span>メモ</button>
+    <button class="ql" data-pi="3"><span class="ico">🕘</span>ログ</button>
+  </div>
+  <section class="card score-hero">
+    <div class="top">
+      <div>
+        <p class="score-label">Shonai Score</p>
+        <p class="score-num"><span id="dScore"></span><small>/100</small></p>
+        <span id="dPill" class="pill"></span>
+      </div>
+      <div class="ring" id="dRing"><i id="dRingNum"></i></div>
+    </div>
+    <p class="score-comment" id="dComment"></p>
+    <p class="score-substats" id="dSub"></p>
+  </section>
+  <section class="card">
+    <p class="card-title">📊 スコア内訳</p>
+    <div class="radar-wrap" id="radar"></div>
+    <div id="bdRows"></div>
+  </section>
+  <section class="card ai-card">
+    <p class="card-title">🤖 AIアドバイス</p>
+    <p class="ai-text clamp" id="aiText"></p>
+    <button class="ai-toggle" id="aiToggle">続きを読む</button>
+    <div class="ai-sub"><p class="h">⭐ 重要ポイント</p><ul id="aiPts"></ul></div>
+    <div class="ai-sub"><p class="h">🔎 次に確認すること</p><ul id="aiNext"></ul></div>
+  </section>
+  <section class="card">
+    <p class="card-title">✅ 次にやること</p>
+    <div id="todoActive"></div>
+    <button class="done-toggle" id="doneToggle">完了済み (<span id="doneCount">0</span>) ▾</button>
+    <div class="done-list" id="doneList"></div>
+  </section>
+
+  <!-- swipe panels -->
+  <div class="swipe-outer" id="swipeOuter">
+    <div class="swipe-inner" id="swipeInner">
+
+      <!-- panel 0: 基本 -->
+      <div class="swipe-panel">
+        <div class="card">
+          <div class="ctrow">
+            <p class="card-title" style="margin:0">🏠 基本情報</p>
+            <button class="link-btn" id="editBtn">編集</button>
+          </div>
+          <div class="info-grid" id="infoGrid"></div>
+        </div>
+      </div>
+
+      <!-- panel 1: 調査 -->
+      <div class="swipe-panel">
+        <div class="card">
+          <p class="card-title">📋 調査チェック</p>
+          <div class="legend"><span><i class="dg"></i>良好</span><span><i class="dw"></i>要確認</span><span><i class="db"></i>問題あり</span><span><i class="du"></i>未確認</span></div>
+          <div id="checkRows"></div>
+          <div class="prog-row">
+            <span style="font-size:12px;font-weight:800;white-space:nowrap">調査完了率</span>
+            <div class="prog-bar"><i id="progFill"></i></div>
+            <span class="prog-pct" id="progPct"></span>
+          </div>
+          <div class="unconf"><span>未確認項目</span><span id="unconfN"></span></div>
+        </div>
+      </div>
+
+      <!-- panel 2: メモ -->
+      <div class="swipe-panel">
+        <div class="card">
+          <p class="card-title">📝 メモ</p>
+          <button class="memo-add-btn" id="memoAddBtn">＋ メモを追加</button>
+          <div class="memo-form-wrap" id="memoFormWrap">
+            <textarea id="memoInput" placeholder="気づいたことを自由に入力..."></textarea>
+            <div class="memo-form-btns">
+              <button class="mcancel" id="memoCancelBtn">キャンセル</button>
+              <button class="msave" id="memoSaveBtn">保存</button>
+            </div>
+          </div>
+          <div id="memoList"></div>
+        </div>
+      </div>
+
+      <!-- panel 3: ログ -->
+      <div class="swipe-panel">
+        <div class="card">
+          <p class="card-title">🕘 ログ（自動記録）</p>
+          <div id="logList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FAVORITES ====== -->
+<section id="favScreen" class="screen">
+  <header class="sub-head">
+    <button class="round" id="favBackBtn">←</button>
+    <div style="text-align:center"><span class="tiny">保存済み</span><h1 style="font-size:17px">お気に入り</h1></div>
+    <div style="width:40px"></div>
+  </header>
+  <div id="favList"></div>
+</section>
+
+<!-- ====== COMPARE ====== -->
+<section id="compareScreen" class="screen">
+  <header class="sub-head">
+    <button class="round" id="cmpBackBtn">←</button>
+    <div style="text-align:center"><span class="tiny">データ比較</span><h1 style="font-size:17px">物件比較</h1></div>
+    <div style="width:40px"></div>
+  </header>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:10px">比較したい物件を選択（最大5件）</p>
+  <div class="cmp-select-area" id="cmpSelectArea"></div>
+  <div id="cmpBody"></div>
+</section>
+
+<!-- ====== SETTINGS ====== -->
+<section id="settingsScreen" class="screen">
+  <header class="sub-head">
+    <button class="round" id="setBackBtn">←</button>
+    <div style="text-align:center"><span class="tiny">カスタマイズ</span><h1 style="font-size:17px">設定</h1></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="app-info-card">
+    <div class="logo" style="margin:0 auto 8px;width:54px;height:54px;font-size:18px">SS</div>
+    <h2 style="font-size:17px">Project:SS</h2>
+    <p class="version">Version Alpha 0.6</p>
+    <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
+    <p class="since">Since 2026.06.30</p>
+    <p class="blueprint-sig">Built with ❤️ using AI · Blueprint Project</p>
+  </div>
+
+  <div class="settings-section">
+    <h3>プロフィール</h3>
+    <div class="settings-card">
+      <div class="settings-row">名前<span>未設定</span></div>
+      <div class="settings-row">投資目標<span>年間CF 100万円</span></div>
+      <div class="settings-row">活動エリア<span>庄内エリア</span></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>テーマカラー</h3>
+    <div class="settings-card" style="padding:14px 16px">
+      <p style="font-size:13px;font-weight:700;margin-bottom:10px">アクセントカラー</p>
+      <div class="theme-row" id="themeRow">
+        <div class="theme-dot sel" data-color="#1f7a45" style="background:#1f7a45"></div>
+        <div class="theme-dot" data-color="#2563a8" style="background:#2563a8"></div>
+        <div class="theme-dot" data-color="#9333ea" style="background:#9333ea"></div>
+        <div class="theme-dot" data-color="#b45309" style="background:#b45309"></div>
+        <div class="theme-dot" data-color="#be123c" style="background:#be123c"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>通知設定</h3>
+    <div class="settings-card">
+      <div class="settings-row">ToDo リマインダー<button class="toggle-switch on" id="toggleTodo"></button></div>
+      <div class="settings-row">スコア変動通知<button class="toggle-switch off" id="toggleScore"></button></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>データ</h3>
+    <div class="settings-card">
+      <div class="settings-row" id="exportBtn" style="cursor:pointer">データエクスポート（JSON）<span>→</span></div>
+      <div class="settings-row">バックアップ（UI）<span>準備中</span></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>Development DNA</h3>
+    <div class="dna-card">
+      <div class="dna-item"><span class="num">①</span><div><p>Forge by building, then refining.</p><small>作りながら研ぐ。完成前に触る。</small></div></div>
+      <div class="dna-item"><span class="num">②</span><div><p>Prototype first.</p><small>設計より先に動かす。</small></div></div>
+      <div class="dna-item"><span class="num">③</span><div><p>Learn by using.</p><small>使うことが最大の学習。</small></div></div>
+      <div class="dna-item"><span class="num">④</span><div><p>Every project becomes a page of Blueprint.</p><small>すべての試みが、自分の地図になる。</small></div></div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /shell -->
+
+<!-- status bar -->
+<div class="status-bar" id="statusBar">
+  <button id="statusBtn">ステータス変更</button>
+</div>
+
+<!-- bottom nav -->
+<nav class="bnav">
+  <button class="nav-on" id="navHome">🏠<span>ホーム</span></button>
+  <button id="navFav">🤍<span>お気に入り</span></button>
+  <button class="nav-fab" id="navAdd">＋<span></span></button>
+  <button id="navCompare">📊<span>比較</span></button>
+  <button id="navSettings">⚙️<span>設定</span></button>
+</nav>
+
+<!-- sheets -->
+<div class="bd" id="sBd"></div>
+<div class="sheet" id="sSheet">
+  <div class="sh-handle"></div><p class="sh-title">ステータス変更</p>
+  <div id="sOpts"></div>
+  <div class="reason-zone" id="rZone">
+    <textarea id="rInput" placeholder="見送り理由を入力（任意）"></textarea>
+    <button class="reason-confirm" id="rConfirm">この内容で見送りにする</button>
+  </div>
+  <button class="sh-cancel" id="sCancelBtn">キャンセル</button>
+</div>
+<div class="bd" id="cBd"></div>
+<div class="sheet" id="cSheet">
+  <div class="sh-handle"></div><p class="sh-title" id="cShTitle">調査項目</p>
+  <div id="cOpts"></div>
+  <button class="sh-cancel" id="cCancelBtn">キャンセル</button>
+</div>
+<div class="bd" id="eBd"></div>
+<div class="sheet" id="eSheet">
+  <div class="sh-handle"></div><p class="sh-title">基本情報を編集</p>
+  <div class="wiz-steps" id="wizProg"></div>
+  <p class="wiz-step-name" id="wizStepName"></p>
+  <div id="wizFields"></div>
+  <div class="wiz-nav">
+    <button class="wiz-back" id="wizBack">戻る</button>
+    <button class="wiz-next" id="wizNext">次へ</button>
+  </div>
+</div>
+
+<!-- fullscreen photo -->
+<div class="fs" id="fsView">
+  <div class="fs-head">
+    <button id="fsClose">✕</button>
+    <span id="fsCounter"></span>
+    <button id="fsAddBtn">＋</button>
+  </div>
+  <div class="fs-body">
+    <div class="fs-track" id="fsTrack"></div>
+  </div>
+  <div class="fs-actions">
+    <button id="fsDelBtn">🗑 この写真を削除</button>
+    <button id="fsPickBtn">📁 別の写真に変更</button>
+  </div>
+  <div class="fs-foot" id="fsFoot"></div>
+</div>
+
+<input type="file" id="fileInputReplace" accept="image/*" style="display:none">
+
+<script>
+/* ─── constants ─── */
+const SM={
+  候補:{e:"🟢",bg:"#dff4e5",fg:"#14733d",dot:"#1f7a45",gr:["#1f7a45","#7ecb91"]},
+  調査中:{e:"🟡",bg:"#fff3d6",fg:"#8a6300",dot:"#d99a1f",gr:["#c98a12","#f3cc6f"]},
+  保留:{e:"🔵",bg:"#e2eefb",fg:"#1d5fa3",dot:"#2f7bd1",gr:["#2f7bd1","#8fc0f3"]},
+  見送り:{e:"⚫",bg:"#ececec",fg:"#5a5a5a",dot:"#8d8d8d",gr:["#8d8d8d","#bcbcbc"]},
+  購入済:{e:"⭐",bg:"#fdf0d8",fg:"#8a5a00",dot:"#d9a528",gr:["#d9a528","#f3d27a"]}
+};
+const SO=["候補","調査中","保留","見送り","購入済"];
+const CK={
+  "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
+  "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
+  "境界":[["未確認","bu"],["境界確定","bg"],["越境なし","bg"],["越境あり","bb"]],
+  "再建築可否":[["未確認","bu"],["可能","bg"],["要調査","bw"],["不可","bb"]],
+  "接道状況":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]],
+  "修繕履歴":[["未確認","bu"],["良好","bg"],["一部修繕済","bw"],["要修繕","bb"]],
+  "給排水設備":[["未確認","bu"],["問題なし","bg"],["老朽化","bw"],["交換済","bg"]],
+  "空室理由":[["未確認","bu"],["判明","bg"],["不明","bw"]],
+  "家賃根拠":[["未確認","bu"],["妥当","bg"],["やや高め","bw"],["やや低め","bw"]],
+  "固定資産税":[["未確認","bu"],["確認済","bg"],["要確認","bw"]],
+  "周辺環境":[["未確認","bu"],["良好","bg"],["騒音あり","bw"],["臭気あり","bw"]],
+  "災害リスク":[["未確認","bu"],["リスクなし","bg"],["浸水域","bb"],["土砂災害域","bb"]],
+  "その他法令":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]]
+};
+function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
+function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
+const PTAGS=["🏠 外観","🛋 リビング","🍳 キッチン","🛁 浴室","🚽 トイレ","🅿 駐車場","🌿 庭","⚡ 設備","📦 その他"];
+const STEPS=[
+  {name:"価格・収益",fields:[{k:"price",l:"価格"},{k:"yieldRate",l:"利回り"},{k:"rent",l:"家賃（満室想定）"},{k:"age",l:"築年数"}]},
+  {name:"建物情報",fields:[{k:"structure",l:"構造"},{k:"occupancy",l:"現況",sel:["賃貸中","空室","空家","自己使用"]},{k:"buildingArea",l:"建物面積"},{k:"landArea",l:"土地面積"},{k:"floorPlan",l:"間取り"}]},
+  {name:"立地・その他",fields:[{k:"parking",l:"駐車場"},{k:"road",l:"接道"},{k:"zoning",l:"用途地域"},{k:"source",l:"情報源"}]}
+];
+
+/* ─── data ─── */
+const props=[
+{id:1,title:"A町 戸建て",address:"山形県鶴岡市○○町",status:"候補",score:88,fav:false,
+ price:"680万円",yieldRate:"12.4%",rent:"70,000円/月",station:"羽前大山駅 徒歩9分",
+ age:"28年（H8年）",structure:"木造",occupancy:"賃貸中",buildingArea:"120.07㎡（36.3坪）",
+ floorPlan:"4LDK",landArea:"198.34㎡（60坪）",parking:"2台",road:"両側4.0m公道",
+ zoning:"第一種住居地域",source:"SUUMO",
+ tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
+ comment:"利回りは12.4%と高水準です。庄内エリアの平均が9〜10%前後であることを考えると、この物件は収益力という点で優位に立っています。ただし、利回りが高い物件には「なぜ安い？」という問いが必要です。修繕履歴と境界確定の2点を確認すれば、判断の精度が大きく上がります。",
+ aiPts:["利回り12.4%は庄内エリア平均より約2〜3pt高く、収益力に優れる","駐車場2台は賃貸需要に直結。ファミリー層を狙いやすい立地条件"],
+ aiNext:["境界確定：仲介に境界確認書の有無を確認。なければ費用見積もりを取得","修繕履歴：屋根・外壁の直近工事履歴を書面で要求。不明なら減額交渉の材料に"],
+ breakdown:[["収益性",18],["立地",16],["建物・管理",14],["法的リスク",12],["流動性",15],["将来性",13]],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"修繕履歴",i:2},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
+ todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",t:"修繕履歴",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
+ memos:[{date:"2026/6/29 21:10",text:"内見時、駐車場の地面に若干の傾斜あり。要再確認。"}],
+ photos:[],
+ logs:[{d:"2026/6/30 10:18",t:"🏠 物件登録"},{d:"2026/6/30 10:32",t:"⭐ Score 76 → 88"},{d:"2026/6/30 10:41",t:"🟢 ステータス変更：調査中 → 候補"}]},
+{id:2,title:"B地区 中古戸建",address:"山形県鶴岡市△△町",status:"調査中",score:72,fav:false,
+ price:"450万円",yieldRate:"10.8%",rent:"55,000円/月",station:"羽前水沢駅 徒歩15分",
+ age:"32年（H6年）",structure:"木造",occupancy:"空室",buildingArea:"95.20㎡（28.8坪）",
+ floorPlan:"3LDK",landArea:"165.00㎡（50坪）",parking:"2台",road:"南側4.0m公道",
+ zoning:"第一種住居地域",source:"SUUMO",
+ tags:["#接道確認","#修繕履歴不明"],reason:null,
+ comment:"450万円という価格は魅力的ですが、3ヶ月の空室が続いている点が気になります。空室が長引いている理由には、①家賃設定が相場より高い、②設備が古い、③競合物件が多い、などが考えられます。まずこの理由を特定することが、投資判断の第一歩です。",
+ aiPts:["450万円の低価格は取得ハードルが低く、初期投資リスクを抑えられる","駅徒歩15分は賃貸では不利になりやすい。駐車場2台が補完要素になる"],
+ aiNext:["空室理由の特定：仲介に過去の問い合わせ状況を確認","シロアリ調査を手配：木造で32年。床下点検は必須"],
+ breakdown:[["収益性",15],["立地",13],["建物・管理",10],["法的リスク",11],["流動性",12],["将来性",11]],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"修繕履歴",i:0},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
+ todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",t:"修繕履歴",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
+ memos:[],photos:[],
+ logs:[{d:"2026/6/24 09:02",t:"🏠 物件登録"},{d:"2026/6/27 18:40",t:"⭐ Score 65 → 72"},{d:"2026/6/29 21:05",t:"🟡 ステータス変更：候補 → 調査中"}]},
+{id:3,title:"C町 空き家",address:"山形県酒田市□□町",status:"見送り",score:54,fav:false,
+ price:"390万円",yieldRate:"14.1%",rent:"50,000円/月",station:"酒田駅 徒歩22分",
+ age:"41年（H15年）",structure:"軽量鉄骨",occupancy:"空家",buildingArea:"88.00㎡（26.6坪）",
+ floorPlan:"3DK",landArea:"140.00㎡（42坪）",parking:"1台",road:"接道義務未確認",
+ zoning:"用途地域外",source:"athome",
+ tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
+ comment:"表面利回り14.1%は数字だけ見ると魅力的ですが、再建築不可物件は「出口戦略」が極めて限られます。売却時に買い手が付きにくく、融資も困難です。この物件から学べる教訓：利回りの高さと投資リスクは別物、という判断力を養う重要な事例です。",
+ aiPts:["再建築不可は致命的。売却・融資の両面で出口が塞がれる","見送り判断は正しい。この経験を次の物件評価の基準として活かすべき"],
+ aiNext:["この物件のリスク項目をチェックリストに追加","同エリアで再建築可の物件を改めて探す"],
+ breakdown:[["収益性",14],["立地",9],["建物・管理",7],["法的リスク",4],["流動性",6],["将来性",6]],
+ checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3},{l:"修繕履歴",i:0}],
+ todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",t:"修繕履歴",done:false}],
+ memos:[{date:"2026/6/20 08:40",text:"床下に蟻害の痕跡あり。解体前提でないと厳しい。"}],
+ photos:[],
+ logs:[{d:"2026/6/18 13:11",t:"🏠 物件登録"},{d:"2026/6/20 08:30",t:"⭐ Score 61 → 54"},{d:"2026/6/22 19:50",t:"⚫ ステータス変更：調査中 → 見送り"}]}
+];
+
+/* ─── helpers ─── */
+let ap=null;
+function now(){const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
+function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");}
+function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc};}
+function bumpScore(p,delta){const b=p.score;p.score=Math.max(0,Math.min(100,p.score+delta));log(p,`⭐ Score ${b} → ${p.score}`);}
+
+/* ─── nav ─── */
+let currentNav="home";
+const shell=document.getElementById("shell");
+function goTo(screen){
+  shell.className="shell";
+  if(screen==="home"){currentNav="home";}
+  else{shell.classList.add("to-"+screen);currentNav=screen;}
+  document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));
+  const navMap={home:"navHome",fav:"navFav",compare:"navCompare",settings:"navSettings"};
+  if(navMap[screen])document.getElementById(navMap[screen]).classList.add("nav-on");
+  document.getElementById("statusBar").style.display="none";
+}
+function goToDetail(p){ap=p;shell.classList.add("to-detail");document.getElementById("detailScreen").scrollTop=0;document.getElementById("statusBar").style.display="";galIdx=0;panelIdx=0;renderDetail(p);updateFavBtn(p);}
+function goBack(){
+  shell.className="shell";
+  document.getElementById("statusBar").style.display="none";
+  setTimeout(()=>renderHome(),350);
+}
+
+document.getElementById("backBtn").addEventListener("click",goBack);
+document.getElementById("favBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
+document.getElementById("cmpBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
+document.getElementById("setBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
+document.getElementById("navHome").addEventListener("click",()=>{if(currentNav!=="home"){goTo("home");renderHome();}});
+document.getElementById("navFav").addEventListener("click",()=>{goTo("fav");renderFav();});
+document.getElementById("navCompare").addEventListener("click",()=>{goTo("compare");renderCompare();});
+document.getElementById("navSettings").addEventListener("click",()=>{goTo("settings");});
+document.getElementById("navAdd").addEventListener("click",()=>{alert("🚧 新規登録機能は開発中です");});
+
+/* ─── home ─── */
+let filterSt="all";
+function renderHome(){renderHero();renderChips();renderList();}
+function renderHero(){
+  const top=[...props].sort((a,b)=>b.score-a.score)[0],m=SM[top.status];
+  const cnt={}; SO.forEach(s=>cnt[s]=0); props.forEach(p=>cnt[p.status]++);
+  document.getElementById("homeHero").innerHTML=`
+    <div class="top"><div>
+      <p class="score-label">注目物件 Shonai Score</p>
+      <p class="score-num">${top.score}<small>/100</small></p>
+      <span class="pill" style="background:${m.bg};color:${m.fg}">${m.e} ${top.status}・${top.title}</span>
+    </div><div class="ring" style="--p:${top.score}"><i>${top.score}</i></div></div>
+    <p class="score-comment">${top.comment}</p>
+    <p class="score-substats">${SO.map(s=>`${s} ${cnt[s]}件`).join(" ・ ")}</p>`;
+}
+function renderChips(){
+  const w=document.getElementById("statusChips");
+  w.innerHTML=[["all","すべて"],...SO.map(s=>[s,s])].map(([k,l])=>`<button class="chip ${k===filterSt?"active":""}" data-f="${k}">${l}</button>`).join("");
+  w.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{filterSt=b.dataset.f;renderChips();renderList();}));
+}
+function renderList(){
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const el=document.getElementById("propList"); el.innerHTML="";
+  props.filter(p=>filterSt==="all"||p.status===filterSt)
+    .filter(p=>JSON.stringify(p).toLowerCase().includes(q))
+    .forEach(p=>{
+      const m=SM[p.status];
+      const div=document.createElement("article"); div.className="card prop-card";
+      const ts=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
+      div.innerHTML=`<div class="thumb" style="${ts}">${p.photos.length?"":"🏠"}</div>
+        <div class="pc-body">
+          <div class="pc-top"><div><p class="ptitle">${p.title}</p><p class="addr">${p.address}</p></div>
+          <span class="sbadge" style="background:${m.bg};color:${m.fg}">${p.status}</span></div>
+          <div class="pc-metrics"><div><b>${p.score}</b>点</div><div><b>${p.price}</b></div><div><b>${p.yieldRate}</b>利回り</div></div>
+          <div class="ptags">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join("")}</div>
+          ${p.reason?`<div class="reason-box">見送り理由：${p.reason}</div>`:""}
+        </div>
+        <button class="fav-heart" data-id="${p.id}" style="color:${p.fav?"#e53e3e":"#ccc"}" title="${p.fav?"お気に入り解除":"お気に入り登録"}">${p.fav?"❤️":"🤍"}</button>`;
+      div.querySelector(".fav-heart").addEventListener("click",e=>{e.stopPropagation();toggleFav(p);renderList();});
+      div.addEventListener("click",()=>goToDetail(p));
+      el.appendChild(div);
+    });
+}
+document.getElementById("search").addEventListener("input",renderList);
+
+/* ─── favorites ─── */
+function toggleFav(p){p.fav=!p.fav;log(p,p.fav?"❤️ お気に入り登録":"💔 お気に入り解除");updateFavBtn(p);}
+function updateFavBtn(p){const b=document.getElementById("favBtn");if(!b)return;b.textContent=p&&p.fav?"❤️":"🤍";}
+function renderFav(){
+  const el=document.getElementById("favList"); el.innerHTML="";
+  const favs=props.filter(p=>p.fav);
+  if(!favs.length){el.innerHTML=`<div class="fav-empty"><div class="ico">🤍</div><p>お気に入り登録した物件がここに表示されます</p></div>`;return;}
+  favs.forEach(p=>{
+    const m=SM[p.status];
+    const div=document.createElement("article"); div.className="card prop-card";
+    const ts=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
+    div.innerHTML=`<div class="thumb" style="${ts}">${p.photos.length?"":"🏠"}</div>
+      <div class="pc-body">
+        <div class="pc-top"><div><p class="ptitle">${p.title}</p><p class="addr">${p.address}</p></div>
+        <span class="sbadge" style="background:${m.bg};color:${m.fg}">${p.status}</span></div>
+        <div class="pc-metrics"><div><b>${p.score}</b>点</div><div><b>${p.price}</b></div><div><b>${p.yieldRate}</b>利回り</div></div>
+      </div>`;
+    div.addEventListener("click",()=>goToDetail(p));
+    el.appendChild(div);
+  });
+}
+document.getElementById("favBtn").addEventListener("click",()=>{if(ap){toggleFav(ap);renderList();}});
+
+/* ─── compare ─── */
+let cmpSel=[];
+function renderCompare(){
+  const area=document.getElementById("cmpSelectArea");
+  area.innerHTML=props.map(p=>{
+    const m=SM[p.status],on=cmpSel.includes(p.id);
+    return `<button class="cmp-prop-btn ${on?"on":""}" data-id="${p.id}"><span class="dot" style="background:${m.dot}"></span>${p.title}</button>`;
+  }).join("");
+  area.querySelectorAll(".cmp-prop-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id=Number(btn.dataset.id);
+      if(cmpSel.includes(id)){cmpSel=cmpSel.filter(x=>x!==id);}
+      else if(cmpSel.length<5){cmpSel.push(id);}
+      renderCompare();
+    });
+  });
+  renderCmpBody();
+}
+function renderCmpBody(){
+  const el=document.getElementById("cmpBody");
+  const sel=props.filter(p=>cmpSel.includes(p.id));
+  if(sel.length<2){el.innerHTML=`<div class="card" style="text-align:center;color:var(--muted);font-size:13px;padding:24px">2件以上選択すると比較表が表示されます</div>`;return;}
+  const rows=[
+    {l:"Score",k:"score",type:"num",higher:true},
+    {l:"価格",k:"price",type:"str"},
+    {l:"利回り",k:"yieldRate",type:"pct",higher:true},
+    {l:"築年数",k:"age",type:"str"},
+    {l:"駐車場",k:"parking",type:"str"},
+    {l:"調査完了率",k:"_pct",type:"num",higher:true},
+    {l:"メモ数",k:"_memos",type:"num",higher:true},
+    {l:"写真数",k:"_photos",type:"num",higher:true},
+    {l:"ステータス",k:"status",type:"str"}
+  ];
+  function getVal(p,row){
+    if(row.k==="_pct")return calcStats(p).pct;
+    if(row.k==="_memos")return p.memos.length;
+    if(row.k==="_photos")return p.photos.length;
+    if(row.k==="score")return p.score;
+    if(row.type==="pct")return parseFloat(p[row.k]);
+    return p[row.k];
+  }
+  const html=`<div class="cmp-table-wrap"><table class="cmp-table">
+    <thead><tr><th>項目</th>${sel.map(p=>`<th>${p.title}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(row=>{
+      const vals=sel.map(p=>getVal(p,row));
+      let bestIdx=-1;
+      if(row.higher!==undefined){
+        const nums=vals.map(v=>typeof v==="number"?v:parseFloat(v)||0);
+        const best=row.higher?Math.max(...nums):Math.min(...nums);
+        bestIdx=nums.indexOf(best);
+      }
+      return`<tr><td>${row.l}</td>${sel.map((p,i)=>{
+        const v=getVal(p,row);
+        const show=row.k==="_pct"?`${v}%`:row.k==="_memos"?`${v}件`:row.k==="_photos"?`${v}枚`:v;
+        return`<td class="${i===bestIdx?"best":""}">${show}</td>`;
+      }).join("")}</tr>`;
+    }).join("")}</tbody>
+  </table></div>`;
+
+  // AI compare comment
+  const top=sel.reduce((a,b)=>a.score>b.score?a:b);
+  const aiComment=`<div class="cmp-ai card">
+    <p class="card-title">🤖 AI比較コメント</p>
+    <p>${top.title}がスコア${top.score}点でトップです。${top.comment.slice(0,60)}…</p>
+    <p style="margin-top:8px;font-size:12px;color:var(--muted)">
+    ${sel.map(p=>{const {pct}=calcStats(p);return `${p.title}：調査${pct}%完了`}).join(" ／ ")}</p>
+  </div>`;
+
+  const pickBtn=`<button class="cmp-pick-btn" id="cmpPickBtn">🏆 ${top.title} を第一候補に設定</button>`;
+  el.innerHTML=html+aiComment+pickBtn;
+  document.getElementById("cmpPickBtn").addEventListener("click",()=>{
+    top.tags=[...new Set([...top.tags,"#第一候補"])];
+    log(top,"🏆 第一候補に設定");
+    alert(`✅ ${top.title} を第一候補に設定しました！`);
+  });
+}
+
+/* ─── detail render ─── */
+let panelIdx=0;
+function radarSVG(bd){
+  const s=170,c=s/2,r=s/2-28,max=20,n=bd.length;
+  const pt=(i,v)=>{const a=(Math.PI*2*i/n)-Math.PI/2,rr=r*(v/max);return[c+rr*Math.cos(a),c+rr*Math.sin(a)];};
+  const poly=bd.map((b,i)=>pt(i,b[1]).join(",")).join(" ");
+  let ax="",lb="",ri="";
+  [.33,.66,1].forEach(f=>{ri+=`<circle cx="${c}" cy="${c}" r="${r*f}" fill="none" stroke="#e3ede5" stroke-width="1"/>`;});
+  bd.forEach((b,i)=>{
+    const[x1,y1]=pt(i,max);ax+=`<line x1="${c}" y1="${c}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#dbe9df" stroke-width="1"/>`;
+    const[lx,ly]=pt(i,max*1.2);lb+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="9" fill="#4d5c51" font-weight="700" text-anchor="middle" dominant-baseline="middle">${b[0]}</text>`;
+  });
+  return`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">${ri}${ax}<polygon points="${poly}" fill="#1f7a45" fill-opacity=".3" stroke="#1f7a45" stroke-width="2"/>${lb}</svg>`;
+}
+
+function renderDetail(p){
+  const m=SM[p.status];
+  document.getElementById("dTitle").textContent=p.title;
+  document.getElementById("dScore").textContent=p.score;
+  document.getElementById("dRingNum").textContent=p.score;
+  document.getElementById("dRing").style.setProperty("--p",p.score);
+  const pill=document.getElementById("dPill");
+  pill.textContent=`${m.e} ${p.status}`;pill.style.background=m.bg;pill.style.color=m.fg;
+  document.getElementById("dComment").textContent=p.comment;
+  document.getElementById("radar").innerHTML=radarSVG(p.breakdown);
+  document.getElementById("bdRows").innerHTML=p.breakdown.map(([l,v])=>`
+    <div class="bd-row"><span>${l}</span><div class="bd-bar"><i style="width:${v/20*100}%"></i></div><span style="text-align:right">${v}/20</span></div>`).join("");
+  renderStats(p);renderAI(p);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);
+  document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");
+  setPanel(panelIdx,false);renderGallery(p);
+}
+
+function renderStats(p){
+  const{pct,unc}=calcStats(p);
+  document.getElementById("dSub").textContent=`情報完成度 ${pct}% ・ 未確認 ${unc}件${p.reason?" ・ 見送り理由："+p.reason:""}`;
+  document.getElementById("progFill").style.width=pct+"%";
+  document.getElementById("progPct").textContent=pct+"%";
+  document.getElementById("unconfN").textContent=unc+"件";
+}
+function renderAI(p){
+  const el=document.getElementById("aiText"),tb=document.getElementById("aiToggle");
+  el.textContent=p.comment;el.classList.add("clamp");
+  document.getElementById("aiPts").innerHTML=p.aiPts.map(t=>`<li>${t}</li>`).join("");
+  document.getElementById("aiNext").innerHTML=p.aiNext.map(t=>`<li>${t}</li>`).join("");
+  requestAnimationFrame(()=>{
+    const over=el.scrollHeight>el.clientHeight+2;
+    tb.style.display=over?"block":"none";
+    if(!over)el.classList.remove("clamp");
+    else tb.textContent="続きを読む";
+  });
+  tb.onclick=()=>{el.classList.toggle("clamp");tb.textContent=el.classList.contains("clamp")?"続きを読む":"閉じる";};
+}
+function renderTodos(p){
+  const act=p.todos.filter(t=>!t.done),dn=p.todos.filter(t=>t.done);
+  document.getElementById("todoActive").innerHTML=act.map(t=>`
+    <div class="todo-row" data-target="${t.t}" data-label="${t.l}">
+      <button class="todo-circle" data-tg="${t.l}">✓</button>
+      <span class="todo-label">${t.l}</span><span class="todo-arr">›</span>
+    </div>`).join("")||`<p style="font-size:12px;color:var(--muted)">未対応のToDoはありません🎉</p>`;
+  document.getElementById("doneCount").textContent=dn.length;
+  document.getElementById("doneList").innerHTML=dn.map(t=>`<div class="todo-row done"><button class="todo-circle done" data-tg="${t.l}">✓</button><span class="todo-label">${t.l}</span></div>`).join("");
+  document.querySelectorAll("#todoActive .todo-label,#todoActive .todo-arr").forEach(el=>{
+    el.addEventListener("click",e=>{
+      const row=e.target.closest(".todo-row");
+      setPanel(1);
+      setTimeout(()=>{
+        document.querySelectorAll(".check-btn").forEach(r=>r.classList.remove("hi"));
+        const cr=document.querySelector(`.check-btn[data-key="${row.dataset.target}"]`);
+        if(cr)cr.classList.add("hi");
+        log(ap,`🧭 次にやること選択：${row.dataset.label}`);
+      },380);
+    });
+  });
+  document.querySelectorAll(".todo-circle").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      const tl=btn.dataset.tg,td=ap.todos.find(x=>x.l===tl);
+      td.done=!td.done;log(ap,td.done?`✅ ToDo完了：${tl}`:`↩️ ToDo再開：${tl}`);renderTodos(ap);
+    });
+  });
+}
+document.getElementById("doneToggle").addEventListener("click",()=>document.getElementById("doneList").classList.toggle("open"));
+
+function renderInfo(p){
+  document.getElementById("infoGrid").innerHTML=[
+    ["¥","価格",p.price],["%","利回り（表面）",p.yieldRate],["🏠","家賃（満室想定）",p.rent],
+    ["📍","所在地",p.address],["🚉","最寄駅・徒歩",p.station],["📅","築年数",p.age],
+    ["🏗️","構造",p.structure],["👤","現況",p.occupancy],["⛰️","土地面積",p.landArea],
+    ["🏢","建物面積",p.buildingArea],["🪟","間取り",p.floorPlan],["🚗","駐車場",p.parking],
+    ["🛣️","接道",p.road],["🏙️","用途地域",p.zoning],["🌐","情報源",p.source]
+  ].map(([ico,l,v])=>`<div class="info-cell"><div class="ico">${ico}</div><span>${l}</span><b>${v}</b></div>`).join("");
+}
+function renderChecks(p){
+  document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
+    const o=ck(c.l)[c.i];
+    return`<button class="check-btn" data-key="${c.l}"><div><p class="cr-label">${c.l}</p><p class="cr-note">タップで変更</p></div><span class="badge ${o[1]}">${o[0]}</span></button>`;
+  }).join("");
+  document.querySelectorAll(".check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
+}
+function renderMemos(p){
+  const el=document.getElementById("memoList");
+  if(!p.memos.length){el.innerHTML=`<p style="font-size:12px;color:var(--muted)">まだメモはありません。</p>`;return;}
+  el.innerHTML=p.memos.map((m,i)=>`
+    <div class="memo-item" id="mi${i}">
+      <div class="memo-head"><b>${m.date}</b><button class="memo-more-btn" data-i="${i}">⋯</button></div>
+      <p id="mt${i}">${m.text}</p>
+      <div class="memo-menu" id="mm${i}">
+        <button data-act="edit" data-i="${i}">✏️ 編集</button>
+        <button data-act="del" data-i="${i}" class="del">🗑 削除</button>
+      </div>
+    </div>`).join("");
+  document.querySelectorAll(".memo-more-btn").forEach(btn=>{
+    btn.addEventListener("click",e=>{e.stopPropagation();const m=document.getElementById("mm"+btn.dataset.i);const was=m.classList.contains("show");document.querySelectorAll(".memo-menu").forEach(x=>x.classList.remove("show"));if(!was)m.classList.add("show");});
+  });
+  document.querySelectorAll(".memo-menu button").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();document.querySelectorAll(".memo-menu").forEach(x=>x.classList.remove("show"));
+      const i=Number(btn.dataset.i),act=btn.dataset.act,p=ap;
+      if(act==="del"){const r=p.memos[i];p.memos.splice(i,1);log(p,`🗑 メモ削除：${r.text.slice(0,16)}…`);renderMemos(p);}
+      else{
+        const textEl=document.getElementById("mt"+i),orig=p.memos[i].text;
+        textEl.outerHTML=`<div class="memo-edit-form"><textarea id="medit${i}">${orig}</textarea><div class="memo-edit-btns"><button class="mcancel" id="mec${i}">キャンセル</button><button class="msave" id="mes${i}">保存</button></div></div>`;
+        document.getElementById("mec"+i).addEventListener("click",()=>renderMemos(p));
+        document.getElementById("mes"+i).addEventListener("click",()=>{const v=document.getElementById("medit"+i).value.trim();if(v&&v!==orig){p.memos[i].text=v;p.memos[i].date=now();log(p,"✏️ メモ編集");}renderMemos(p);});
+      }
+    });
+  });
+  document.addEventListener("click",()=>document.querySelectorAll(".memo-menu").forEach(x=>x.classList.remove("show")),{once:true});
+}
+document.getElementById("memoAddBtn").addEventListener("click",()=>{const f=document.getElementById("memoFormWrap");f.classList.toggle("open");if(f.classList.contains("open"))document.getElementById("memoInput").focus();});
+document.getElementById("memoCancelBtn").addEventListener("click",()=>{document.getElementById("memoInput").value="";document.getElementById("memoFormWrap").classList.remove("open");});
+document.getElementById("memoSaveBtn").addEventListener("click",()=>{const v=document.getElementById("memoInput").value.trim();if(!v)return;ap.memos.unshift({date:now(),text:v});document.getElementById("memoInput").value="";document.getElementById("memoFormWrap").classList.remove("open");renderMemos(ap);log(ap,"📝 メモ追加");});
+
+/* ─── swipe panels ─── */
+function setPanel(idx,animate=true){
+  panelIdx=Math.max(0,Math.min(3,idx));
+  const inner=document.getElementById("swipeInner");
+  const outer=document.getElementById("swipeOuter");
+  inner.style.transition=animate?"transform .36s cubic-bezier(.22,.7,.36,1)":"none";
+  inner.style.transform=`translateX(${-panelIdx*outer.clientWidth}px)`;
+  document.querySelectorAll(".ql").forEach((b,i)=>b.classList.toggle("on",i===panelIdx));
+}
+document.querySelectorAll(".ql").forEach((btn,i)=>btn.addEventListener("click",()=>setPanel(i)));
+window.addEventListener("resize",()=>{if(ap)setPanel(panelIdx,false);});
+
+(()=>{
+  const outer=document.getElementById("swipeOuter");
+  const inner=document.getElementById("swipeInner");
+  let sx=0,drag=false,base=0;
+  outer.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;drag=true;inner.style.transition="none";base=-panelIdx*outer.clientWidth;},{passive:true});
+  outer.addEventListener("touchmove",e=>{if(!drag)return;const dx=e.touches[0].clientX-sx;inner.style.transform=`translateX(${base+dx}px)`;},{passive:true});
+  outer.addEventListener("touchend",e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;Math.abs(dx)>55?(dx<0?setPanel(panelIdx+1):setPanel(panelIdx-1)):setPanel(panelIdx);});
+})();
+
+/* ─── check sheet ─── */
+function openCheckSheet(p,label){
+  document.getElementById("cShTitle").textContent=`調査項目：${label}`;
+  const opts=ck(label),cur=p.checks.find(c=>c.l===label);
+  document.getElementById("cOpts").innerHTML=opts.map((o,i)=>`<button class="sh-opt ${i===cur.i?"cur":""}" data-i="${i}"><span class="dot" style="background:${dotCol(o[1])}"></span>${o[0]}</button>`).join("");
+  document.querySelectorAll("#cOpts .sh-opt").forEach(b=>b.addEventListener("click",()=>{
+    const idx=Number(b.dataset.i);
+    if(idx!==cur.i){const bef=opts[cur.i][0];cur.i=idx;log(p,`🔍 調査変更：${label}：${bef} → ${opts[idx][0]}`);renderChecks(p);renderStats(p);}
+    closeSh("cBd","cSheet");
+  }));
+  openSh("cBd","cSheet");
+}
+document.getElementById("cCancelBtn").addEventListener("click",()=>closeSh("cBd","cSheet"));
+document.getElementById("cBd").addEventListener("click",()=>closeSh("cBd","cSheet"));
+
+/* ─── status sheet ─── */
+function openStatusSheet(){
+  const p=ap;document.getElementById("rZone").classList.remove("open");
+  document.getElementById("sOpts").innerHTML=SO.map(s=>{const m=SM[s];return`<button class="sh-opt ${s===p.status?"cur":""}" data-s="${s}"><span class="dot" style="background:${m.dot}"></span>${m.e} ${s}</button>`;}).join("");
+  document.querySelectorAll("#sOpts .sh-opt").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const s=btn.dataset.s;
+      if(s==="見送り"){document.getElementById("rZone").classList.add("open");document.getElementById("rInput").value=p.reason||"";document.querySelectorAll("#sOpts .sh-opt").forEach(b=>b.classList.toggle("cur",b===btn));return;}
+      applyStatus(p,s,null);closeSh("sBd","sSheet");
+    });
+  });
+  openSh("sBd","sSheet");
+}
+function applyStatus(p,ns,reason){
+  if(ns===p.status&&reason===p.reason)return;
+  const ps=p.status;p.status=ns;p.reason=ns==="見送り"?(reason||p.reason||""):null;
+  const m=SM[ns];log(p,`${m.e} ステータス変更：${ps} → ${ns}`);
+  if(ns==="見送り"&&p.reason)log(p,`📝 見送り理由：${p.reason}`);
+  if(ap===p)renderDetail(p);
+}
+document.getElementById("statusBtn").addEventListener("click",openStatusSheet);
+document.getElementById("sCancelBtn").addEventListener("click",()=>closeSh("sBd","sSheet"));
+document.getElementById("sBd").addEventListener("click",()=>closeSh("sBd","sSheet"));
+document.getElementById("rConfirm").addEventListener("click",()=>{applyStatus(ap,"見送り",document.getElementById("rInput").value.trim());closeSh("sBd","sSheet");});
+
+function openSh(b,s){document.getElementById(b).classList.add("show");document.getElementById(s).classList.add("show");}
+function closeSh(b,s){document.getElementById(b).classList.remove("show");document.getElementById(s).classList.remove("show");}
+
+/* ─── edit wizard ─── */
+let wizStep=0,wizDraft={};
+function openWiz(){wizStep=0;wizDraft={...ap};renderWizStep();openSh("eBd","eSheet");}
+function renderWizStep(){
+  const s=STEPS[wizStep];
+  document.getElementById("wizProg").innerHTML=STEPS.map((_,i)=>`<i class="${i<=wizStep?"done":""}"></i>`).join("");
+  document.getElementById("wizStepName").textContent=`STEP ${wizStep+1}/${STEPS.length}　${s.name}`;
+  document.getElementById("wizFields").innerHTML=s.fields.map(f=>{
+    if(f.sel)return`<div class="ff"><label>${f.l}</label><select id="wf_${f.k}">${f.sel.map(o=>`<option${wizDraft[f.k]===o?" selected":""}>${o}</option>`).join("")}</select></div>`;
+    return`<div class="ff"><label>${f.l}</label><input id="wf_${f.k}" value="${wizDraft[f.k]||""}"></div>`;
+  }).join("");
+  document.getElementById("wizBack").textContent=wizStep===0?"キャンセル":"戻る";
+  document.getElementById("wizNext").textContent=wizStep===STEPS.length-1?"保存する":"次へ";
+
+  // wizard swipe
+  const eSheet=document.getElementById("eSheet");
+  let sx=0,drag=false;
+  eSheet.ontouchstart=e=>{sx=e.touches[0].clientX;drag=true;};
+  eSheet.ontouchmove=null;
+  eSheet.ontouchend=e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>80){if(dx<0&&wizStep<STEPS.length-1){captureWiz();wizStep++;renderWizStep();}else if(dx>0&&wizStep>0){captureWiz();wizStep--;renderWizStep();}}};
+}
+function captureWiz(){STEPS[wizStep].fields.forEach(f=>{const el=document.getElementById("wf_"+f.k);if(el)wizDraft[f.k]=el.value;});}
+document.getElementById("wizBack").addEventListener("click",()=>{if(wizStep===0){closeSh("eBd","eSheet");return;}captureWiz();wizStep--;renderWizStep();});
+document.getElementById("wizNext").addEventListener("click",()=>{
+  captureWiz();
+  if(wizStep<STEPS.length-1){wizStep++;renderWizStep();return;}
+  const p=ap,allF=STEPS.flatMap(s=>s.fields);let changed=0;
+  allF.forEach(f=>{if(p[f.k]!==wizDraft[f.k]){log(p,`✏️ ${f.l}：${p[f.k]} → ${wizDraft[f.k]}`);p[f.k]=wizDraft[f.k];changed++;}});
+  if(changed===0)log(p,"✏️ 基本情報を確認しました");
+  else{const d=Math.floor(Math.random()*5)-1;if(d!==0)bumpScore(p,d);}
+  renderDetail(p);closeSh("eBd","eSheet");
+});
+document.getElementById("eBd").addEventListener("click",()=>closeSh("eBd","eSheet"));
+document.getElementById("editBtn").addEventListener("click",openWiz);
+
+/* ─── gallery ─── */
+let galIdx=0;
+const fileInput=document.getElementById("fileInput");
+const fileInputReplace=document.getElementById("fileInputReplace");
+function triggerPick(){fileInput.click();}
+fileInput.addEventListener("change",e=>{
+  const files=[...e.target.files];if(!files.length)return;
+  let rem=files.length;
+  files.forEach(f=>{const r=new FileReader();r.onload=()=>{ap.photos.push({id:Date.now()+Math.random(),src:r.result,tags:[],memo:""});rem--;if(!rem){log(ap,`📷 写真追加（${files.length}枚）`);galIdx=Math.max(0,ap.photos.length-files.length);renderGallery(ap);}};r.readAsDataURL(f);});
+  fileInput.value="";
+});
+fileInputReplace.addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{ap.photos[galIdx].src=r.result;log(ap,"🔄 写真を変更");renderGallery(ap);fsEl.classList.remove("show");};r.readAsDataURL(f);
+  fileInputReplace.value="";
+});
+
+function renderGallery(p){
+  const el=document.getElementById("gallery");
+  if(!p.photos.length){
+    el.innerHTML=`<div class="gal-empty"><button class="gal-empty-btn" id="galEmptyBtn">＋ 写真を追加</button><p>外観・室内などの写真を登録できます</p></div>`;
+    document.getElementById("galEmptyBtn").addEventListener("click",triggerPick);
+    return;
+  }
+  const n=p.photos.length;
+  el.innerHTML=`
+    <div class="gal-vp" id="galVP">
+      <div class="gal-track" id="galTrack">
+        ${p.photos.map(ph=>`<div class="gal-slide" style="background-image:url(${ph.src})">
+          ${ph.tags.length?`<div class="gal-slide-tags">${ph.tags.map(t=>`<span>${t}</span>`).join("")}</div>`:""}
+        </div>`).join("")}
+      </div>
+      <button class="gal-add" id="galAddBtn">＋</button>
+      ${n>=6?`<span class="gal-counter" id="galCounter">${galIdx+1} / ${n}</span>`:""}
+      <div class="gal-dots">${p.photos.map((_,i)=>`<span class="${i===galIdx?"on":""}"></span>`).join("")}</div>
+    </div>
+    <div class="gal-meta">
+      <div><b>${p.price}</b>価格</div><div><b>${p.yieldRate}</b>利回り</div><div><b>${p.age.split("（")[0]}</b>築年数</div>
+    </div>
+    <div class="gal-tags-area">
+      <p class="gal-tags-label">📷 現在の写真にタグを追加</p>
+      <div class="gal-tags-wrap" id="galTagWrap"></div>
+      <div class="gal-custom-row"><input id="galTagInput" placeholder="タグを自由入力"><button id="galTagAdd">追加</button></div>
+    </div>
+    <div class="gal-memo-area" id="galMemoArea"></div>`;
+
+  document.getElementById("galAddBtn").addEventListener("click",e=>{e.stopPropagation();triggerPick();});
+  document.getElementById("galTagAdd").addEventListener("click",()=>{
+    const v=document.getElementById("galTagInput").value.trim();if(!v)return;
+    toggleTag(p,galIdx,v,true);document.getElementById("galTagInput").value="";
+  });
+
+  const track=document.getElementById("galTrack");
+  const vp=document.getElementById("galVP");
+  function goGal(i,anim=true){
+    galIdx=Math.max(0,Math.min(n-1,i));
+    track.style.transition=anim?"transform .32s cubic-bezier(.22,.7,.36,1)":"none";
+    track.style.transform=`translateX(${-galIdx*100}%)`;
+    document.querySelectorAll("#gallery .gal-dots span").forEach((d,idx)=>d.classList.toggle("on",idx===galIdx));
+    const cnt=document.getElementById("galCounter");if(cnt)cnt.textContent=`${galIdx+1} / ${n}`;
+    renderTagArea(p);renderPhotoMemo(p);
+  }
+  let sx=0,drag=false,base=0;
+  vp.addEventListener("touchstart",e=>{if(e.target.id==="galAddBtn")return;sx=e.touches[0].clientX;drag=true;track.style.transition="none";base=-galIdx*vp.clientWidth;},{passive:true});
+  vp.addEventListener("touchmove",e=>{if(!drag)return;track.style.transform=`translateX(${base+(e.touches[0].clientX-sx)}px)`;},{passive:true});
+  vp.addEventListener("touchend",e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;Math.abs(dx)>50?(dx<0?goGal(galIdx+1):goGal(galIdx-1)):goGal(galIdx);});
+  vp.addEventListener("click",e=>{if(e.target.id==="galAddBtn")return;openFS(p,galIdx);});
+  goGal(galIdx,false);
+}
+
+function renderTagArea(p){
+  const ph=p.photos[galIdx];if(!ph)return;
+  const w=document.getElementById("galTagWrap");
+  w.innerHTML=PTAGS.map(t=>`<button class="gal-tag-btn ${ph.tags.includes(t)?"on":""}" data-t="${t}">${t}</button>`).join("");
+  document.querySelectorAll("#galTagWrap .gal-tag-btn").forEach(btn=>{btn.addEventListener("click",()=>toggleTag(p,galIdx,btn.dataset.t,!ph.tags.includes(btn.dataset.t)));});
+}
+function toggleTag(p,idx,tag,add){
+  const ph=p.photos[idx];
+  if(add){if(!ph.tags.includes(tag)){ph.tags.push(tag);log(p,`🏷️ 写真タグ追加：${tag}`);}}
+  else{ph.tags=ph.tags.filter(t=>t!==tag);log(p,`🏷️ 写真タグ削除：${tag}`);}
+  renderTagArea(p);
+  // update slide tags in place
+  const slides=document.querySelectorAll("#galTrack .gal-slide");
+  if(slides[idx]){const td=slides[idx].querySelector(".gal-slide-tags");if(ph.tags.length){if(td)td.innerHTML=ph.tags.map(t=>`<span>${t}</span>`).join("");else{const d=document.createElement("div");d.className="gal-slide-tags";d.innerHTML=ph.tags.map(t=>`<span>${t}</span>`).join("");slides[idx].appendChild(d);}}else if(td)td.remove();}
+  if(document.getElementById("fsView").classList.contains("show"))renderFsFoot(p,idx);
+}
+function renderPhotoMemo(p){
+  const ph=p.photos[galIdx],area=document.getElementById("galMemoArea");if(!ph||!area)return;
+  if(!ph.memo){
+    area.innerHTML=`<button class="pm-add" id="pmAddBtn">＋ この写真にメモを追加</button>`;
+    document.getElementById("pmAddBtn").addEventListener("click",()=>openPhotoMemoForm(p,""));
+  } else {
+    area.innerHTML=`<div class="pm-text"><p>${ph.memo}</p><div class="pm-text-actions"><button id="pmEdit">編集</button><button id="pmDel">削除</button></div></div>`;
+    document.getElementById("pmEdit").addEventListener("click",()=>openPhotoMemoForm(p,ph.memo));
+    document.getElementById("pmDel").addEventListener("click",()=>{ph.memo="";log(p,"🗑 写真メモ削除");renderPhotoMemo(p);});
+  }
+}
+function openPhotoMemoForm(p,cur){
+  const area=document.getElementById("galMemoArea"),isNew=!cur;
+  area.innerHTML=`<div class="pm-form-inner"><textarea id="pmTa" placeholder="気づきを入力（例：隣家との距離が近い）">${cur}</textarea><button class="mic-btn" id="micBtn">🎤</button></div>
+    <div class="pm-form-btns"><button class="pm-cancel-btn" id="pmCancel">キャンセル</button><button class="pm-save-btn" id="pmSave">保存</button></div>`;
+  document.getElementById("micBtn").addEventListener("click",function(){this.classList.toggle("rec");if(this.classList.contains("rec"))setTimeout(()=>this.classList.remove("rec"),2000);});
+  document.getElementById("pmCancel").addEventListener("click",()=>renderPhotoMemo(p));
+  document.getElementById("pmSave").addEventListener("click",()=>{const v=document.getElementById("pmTa").value.trim();if(v){p.photos[galIdx].memo=v;log(p,isNew?"📝 写真メモ追加":"✏️ 写真メモ編集");}renderPhotoMemo(p);});
+}
+
+/* ─── fullscreen ─── */
+let fsIdx=0;
+const fsEl=document.getElementById("fsView");
+function openFS(p,idx){
+  fsIdx=idx;
+  const track=document.getElementById("fsTrack"),n=p.photos.length;
+  track.innerHTML=p.photos.map(ph=>`<div class="fs-slide"><img src="${ph.src}"/></div>`).join("");
+  track.style.transition="none";track.style.transform=`translateX(${-fsIdx*100}%)`;
+  document.getElementById("fsCounter").textContent=`${fsIdx+1} / ${n}`;
+  renderFsFoot(p,fsIdx);fsEl.classList.add("show");
+
+  const body=fsEl.querySelector(".fs-body");
+  let sx=0,drag=false,base=0;
+  function goFS(i,anim=true){
+    fsIdx=Math.max(0,Math.min(n-1,i));
+    track.style.transition=anim?"transform .3s ease":"none";
+    track.style.transform=`translateX(${-fsIdx*100}%)`;
+    document.getElementById("fsCounter").textContent=`${fsIdx+1} / ${n}`;
+    renderFsFoot(p,fsIdx);galIdx=fsIdx;
+  }
+  body.ontouchstart=e=>{sx=e.touches[0].clientX;drag=true;track.style.transition="none";base=-fsIdx*body.clientWidth;};
+  body.ontouchmove=e=>{if(!drag)return;track.style.transform=`translateX(${base+(e.touches[0].clientX-sx)}px)`;};
+  body.ontouchend=e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;Math.abs(dx)>50?(dx<0?goFS(fsIdx+1):goFS(fsIdx-1)):goFS(fsIdx);};
+}
+function renderFsFoot(p,idx){
+  const ph=p.photos[idx];
+  const tags=ph&&ph.tags.length?ph.tags.map(t=>`<span>${t}</span>`).join(""):`<span style="opacity:.5">タグなし</span>`;
+  const memo=ph&&ph.memo?`<span>📝 ${ph.memo.slice(0,30)}${ph.memo.length>30?"…":""}</span>`:"";
+  document.getElementById("fsFoot").innerHTML=tags+memo;
+}
+document.getElementById("fsClose").addEventListener("click",()=>{fsEl.classList.remove("show");renderGallery(ap);});
+document.getElementById("fsAddBtn").addEventListener("click",triggerPick);
+document.getElementById("fsDelBtn").addEventListener("click",()=>{
+  if(!ap||!ap.photos.length)return;
+  if(!confirm("この写真を削除しますか？"))return;
+  log(ap,"🗑 写真削除");ap.photos.splice(fsIdx,1);fsEl.classList.remove("show");galIdx=Math.max(0,fsIdx-1);renderGallery(ap);
+});
+document.getElementById("fsPickBtn").addEventListener("click",()=>fileInputReplace.click());
+
+/* ─── settings ─── */
+document.getElementById("themeRow").querySelectorAll(".theme-dot").forEach(dot=>{
+  dot.addEventListener("click",()=>{
+    document.querySelectorAll(".theme-dot").forEach(d=>d.classList.remove("sel"));
+    dot.classList.add("sel");
+    document.documentElement.style.setProperty("--g",dot.dataset.color);
+    document.documentElement.style.setProperty("--g2",dot.dataset.color+"99");
+  });
+});
+document.querySelectorAll(".toggle-switch").forEach(sw=>{
+  sw.addEventListener("click",()=>{sw.classList.toggle("on");sw.classList.toggle("off");});
+});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const data=JSON.stringify(props.map(p=>({id:p.id,title:p.title,score:p.score,status:p.status,price:p.price,yieldRate:p.yieldRate})),null,2);
+  const a=document.createElement("a");a.href="data:application/json;charset=utf-8,"+encodeURIComponent(data);a.download="project_ss_export.json";a.click();
+});
+
+/* ─── init ─── */
+renderHome();
+</script>
+</body>
+</html>
