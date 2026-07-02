@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Project:SS Alpha 0.6</title>
+<title>Project:SS Alpha 0.6.1</title>
 <style>
 :root{--g:#1f7a45;--g2:#7ecb91;--ink:#17251b;--muted:#7a8780;--bg:#eef5ef;--card:#fff;--danger:#c0392b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -37,7 +37,13 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
 /* ── topbar ── */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .brand{display:flex;gap:11px;align-items:center}
-.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 8px 18px rgba(31,122,69,.24);font-size:14px;letter-spacing:-.5px}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 8px 18px rgba(31,122,69,.24);font-size:14px;letter-spacing:-.5px;transition:clip-path .3s ease,border-radius .3s ease}
+.logo.shield{border-radius:10px 10px 10px 10px;clip-path:polygon(50% 0%,100% 18%,100% 55%,50% 100%,0% 55%,0% 18%);padding-bottom:3px}
+.logo-toggle-row{display:flex;gap:10px;margin-top:8px}
+.logo-shape-btn{flex:1;border:1.5px solid #e3ede5;background:#fff;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#3c473f}
+.logo-shape-btn.sel{border-color:var(--g);background:#f0faf3;color:var(--g)}
+.logo-shape-preview{width:32px;height:32px;background:linear-gradient(135deg,var(--g),var(--g2));display:grid;place-items:center;color:#fff;font-size:10px;font-weight:800;border-radius:9px}
+.logo-shape-preview.shield{border-radius:7px;clip-path:polygon(50% 0%,100% 18%,100% 55%,50% 100%,0% 55%,0% 18%)}
 h1{font-size:19px;font-weight:800}
 .sub{font-size:11px;color:var(--g);font-weight:800;letter-spacing:.04em}
 .sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:0}
@@ -61,6 +67,12 @@ h1{font-size:19px;font-weight:800}
 .ring i{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:19px}
 .score-comment{margin-top:12px;font-size:12.5px;line-height:1.75;color:#3c473f}
 .score-substats{margin-top:8px;font-size:11.5px;color:var(--muted)}
+.ai-summary-row{display:flex;align-items:flex-start;gap:8px;margin-top:14px;background:#fff;border-radius:16px;padding:12px 13px}
+.ai-summary-ico{font-size:15px;flex:none;line-height:1.4}
+.ai-summary-text{font-size:12.5px;line-height:1.6;color:#3c473f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ai-detail-link{display:block;width:100%;text-align:right;border:0;background:none;color:var(--g);font-weight:800;font-size:12px;padding:8px 4px 0}
+.ai-detail-card-highlight{animation:aiPulse 1.1s ease}
+@keyframes aiPulse{0%,100%{box-shadow:0 12px 28px rgba(32,59,41,.08)}50%{box-shadow:0 0 0 3px #cfe6d7,0 12px 28px rgba(32,59,41,.08)}}
 
 /* ── home search/chips ── */
 input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-radius:16px;font-size:15px;outline:none}
@@ -105,6 +117,18 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .gal-meta div{flex:1;text-align:center;font-size:11.5px;color:#3c473f}
 .gal-meta div+div{border-left:1px solid #eef2ef}
 .gal-meta b{display:block;font-size:13.5px}
+.gal-mode-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px 0}
+.gal-mode-label{font-size:11px;color:var(--muted);font-weight:700}
+.gal-edit-toggle{border:1.5px solid #cfe6d7;background:#fff;color:var(--g);font-size:11.5px;font-weight:800;border-radius:999px;padding:6px 13px;display:flex;align-items:center;gap:5px}
+.gal-edit-toggle.on{background:var(--g);color:#fff;border-color:var(--g)}
+.gal-view-tags{padding:10px 14px 0;display:flex;flex-wrap:wrap;gap:6px}
+.gal-view-tags span{font-size:10.5px;background:#edf7ef;color:var(--g);border-radius:999px;padding:4px 9px;font-weight:700}
+.gal-view-empty{padding:10px 14px 0;font-size:11.5px;color:var(--muted)}
+.gal-edit-panel{max-height:0;overflow:hidden;transition:max-height .38s cubic-bezier(.25,.85,.35,1)}
+.gal-edit-panel.open{max-height:600px}
+.gal-edit-panel-inner{padding-top:6px}
+.gal-edit-actions{display:flex;gap:8px;padding:10px 14px 4px}
+.gal-edit-actions button{flex:1;border:0;border-radius:13px;padding:10px;font-weight:800;font-size:12px;background:#f4f7f5;color:#3c473f}
 .gal-tags-area{padding:10px 14px 0}
 .gal-tags-label{font-size:10.5px;color:var(--muted);font-weight:700;margin-bottom:6px}
 .gal-tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
@@ -151,9 +175,12 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .ql.on .ico{background:rgba(255,255,255,.2)}
 
 /* swipe panels */
-.swipe-outer{overflow:hidden;margin-bottom:14px}
-.swipe-inner{display:flex;will-change:transform;transition:transform .36s cubic-bezier(.22,.7,.36,1)}
+.swipe-outer{overflow:hidden;margin-bottom:8px}
+.swipe-inner{display:flex;will-change:transform;transition:transform .4s cubic-bezier(.25,.85,.35,1)}
 .swipe-panel{width:100%;flex:none;display:flex;flex-direction:column;gap:14px}
+.swipe-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
+.swipe-dots span{width:6px;height:6px;border-radius:50%;background:#d7e2d9;transition:all .25s cubic-bezier(.25,.85,.35,1)}
+.swipe-dots span.on{background:var(--g);width:18px;border-radius:4px}
 
 /* ── score breakdown ── */
 .radar-wrap{display:flex;justify-content:center;margin-bottom:10px}
@@ -245,6 +272,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .bnav .nav-on{color:var(--g);font-weight:800}
 .nav-fab{background:var(--g) !important;color:#fff !important;width:46px;height:46px;border-radius:50%;display:grid !important;place-items:center;font-size:22px;margin-top:-18px;box-shadow:0 8px 18px rgba(31,122,69,.35)}
 .nav-fab span{display:none}
+.bnav .nav-fav-ico{color:#e53e3e}
+.bnav .nav-fav-ico.nav-on{color:#e53e3e}
 
 /* ── sheets ── */
 .bd{position:fixed;inset:0;background:rgba(15,30,20,0);pointer-events:none;transition:background .3s;z-index:30}
@@ -333,7 +362,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <section id="homeScreen" class="screen">
   <header class="topbar">
     <div class="brand">
-      <div class="logo">SS</div>
+      <div class="logo" id="homeLogo">SS</div>
       <div><h1>Project:SS</h1><p class="sub">Shonai Score</p></div>
     </div>
     <button class="round">☰</button>
@@ -356,7 +385,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <div class="gallery" id="gallery"></div>
   <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
   <div class="ql-wrap" id="qlWrap">
-    <button class="ql" data-pi="0"><span class="ico">🏠</span>基本</button>
+    <button class="ql on" data-pi="0"><span class="ico">🏠</span>基本</button>
     <button class="ql" data-pi="1"><span class="ico">📋</span>調査</button>
     <button class="ql" data-pi="2"><span class="ico">📝</span>メモ</button>
     <button class="ql" data-pi="3"><span class="ico">🕘</span>ログ</button>
@@ -370,7 +399,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
       </div>
       <div class="ring" id="dRing"><i id="dRingNum"></i></div>
     </div>
-    <p class="score-comment" id="dComment"></p>
+    <div class="ai-summary-row">
+      <span class="ai-summary-ico">🤖</span>
+      <p class="ai-summary-text" id="aiSummary"></p>
+    </div>
+    <button class="ai-detail-link" id="aiDetailLink">AI詳細を見る →</button>
     <p class="score-substats" id="dSub"></p>
   </section>
   <section class="card">
@@ -378,8 +411,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <div class="radar-wrap" id="radar"></div>
     <div id="bdRows"></div>
   </section>
-  <section class="card ai-card">
-    <p class="card-title">🤖 AIアドバイス</p>
+  <section class="card ai-card" id="aiDetailCard">
+    <p class="card-title">🤖 AIアドバイス（詳細）</p>
     <p class="ai-text clamp" id="aiText"></p>
     <button class="ai-toggle" id="aiToggle">続きを読む</button>
     <div class="ai-sub"><p class="h">⭐ 重要ポイント</p><ul id="aiPts"></ul></div>
@@ -447,6 +480,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
       </div>
     </div>
   </div>
+  <div class="swipe-dots" id="swipeDots">
+    <span class="on"></span><span></span><span></span><span></span>
+  </div>
 </section>
 
 <!-- ====== FAVORITES ====== -->
@@ -480,7 +516,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   </header>
 
   <div class="app-info-card">
-    <div class="logo" style="margin:0 auto 8px;width:54px;height:54px;font-size:18px">SS</div>
+    <div class="logo" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:54px;font-size:18px">SS</div>
     <h2 style="font-size:17px">Project:SS</h2>
     <p class="version">Version Alpha 0.6</p>
     <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
@@ -507,6 +543,18 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
         <div class="theme-dot" data-color="#9333ea" style="background:#9333ea"></div>
         <div class="theme-dot" data-color="#b45309" style="background:#b45309"></div>
         <div class="theme-dot" data-color="#be123c" style="background:#be123c"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>ロゴデザイン <span style="font-weight:600;text-transform:none">（試験実装）</span></h3>
+    <div class="settings-card" style="padding:14px 16px">
+      <p style="font-size:13px;font-weight:700;margin-bottom:2px">SSロゴの形状</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">採用可否は未定です。試しに見比べられます</p>
+      <div class="logo-toggle-row" id="logoShapeRow">
+        <button class="logo-shape-btn sel" data-shape="rounded"><span class="logo-shape-preview">SS</span>角丸（現行）</button>
+        <button class="logo-shape-btn" data-shape="shield"><span class="logo-shape-preview shield">SS</span>盾型（新案）</button>
       </div>
     </div>
   </div>
@@ -548,7 +596,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <!-- bottom nav -->
 <nav class="bnav">
   <button class="nav-on" id="navHome">🏠<span>ホーム</span></button>
-  <button id="navFav">🤍<span>お気に入り</span></button>
+  <button id="navFav" class="nav-fav-ico">❤️<span>お気に入り</span></button>
   <button class="nav-fab" id="navAdd">＋<span></span></button>
   <button id="navCompare">📊<span>比較</span></button>
   <button id="navSettings">⚙️<span>設定</span></button>
@@ -703,10 +751,14 @@ function goTo(screen){
   if(navMap[screen])document.getElementById(navMap[screen]).classList.add("nav-on");
   document.getElementById("statusBar").style.display="none";
 }
-function goToDetail(p){ap=p;shell.classList.add("to-detail");document.getElementById("detailScreen").scrollTop=0;document.getElementById("statusBar").style.display="";galIdx=0;panelIdx=0;renderDetail(p);updateFavBtn(p);}
+function goToDetail(p){ap=p;currentNav="detail";shell.classList.add("to-detail");document.getElementById("detailScreen").scrollTop=0;document.getElementById("statusBar").style.display="";galIdx=0;panelIdx=0;galEditOpen=false;renderDetail(p);updateFavBtn(p);
+  document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));}
 function goBack(){
   shell.className="shell";
+  currentNav="home";
   document.getElementById("statusBar").style.display="none";
+  document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));
+  document.getElementById("navHome").classList.add("nav-on");
   setTimeout(()=>renderHome(),350);
 }
 
@@ -714,7 +766,7 @@ document.getElementById("backBtn").addEventListener("click",goBack);
 document.getElementById("favBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
 document.getElementById("cmpBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
 document.getElementById("setBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
-document.getElementById("navHome").addEventListener("click",()=>{if(currentNav!=="home"){goTo("home");renderHome();}});
+document.getElementById("navHome").addEventListener("click",()=>{if(currentNav!=="home"){goBack();}});
 document.getElementById("navFav").addEventListener("click",()=>{goTo("fav");renderFav();});
 document.getElementById("navCompare").addEventListener("click",()=>{goTo("compare");renderCompare();});
 document.getElementById("navSettings").addEventListener("click",()=>{goTo("settings");});
@@ -888,7 +940,7 @@ function renderDetail(p){
   document.getElementById("dRing").style.setProperty("--p",p.score);
   const pill=document.getElementById("dPill");
   pill.textContent=`${m.e} ${p.status}`;pill.style.background=m.bg;pill.style.color=m.fg;
-  document.getElementById("dComment").textContent=p.comment;
+  document.getElementById("aiSummary").textContent=summarize(p.comment);
   document.getElementById("radar").innerHTML=radarSVG(p.breakdown);
   document.getElementById("bdRows").innerHTML=p.breakdown.map(([l,v])=>`
     <div class="bd-row"><span>${l}</span><div class="bd-bar"><i style="width:${v/20*100}%"></i></div><span style="text-align:right">${v}/20</span></div>`).join("");
@@ -897,6 +949,22 @@ function renderDetail(p){
   setPanel(panelIdx,false);renderGallery(p);
 }
 
+function summarize(text){
+  // Take the first sentence (up to the first 。) as a short AI summary line.
+  const m=text.match(/^[^。]*。?/);
+  let s=m?m[0]:text;
+  if(s.length>42)s=s.slice(0,42)+"…";
+  return s;
+}
+document.getElementById("aiDetailLink").addEventListener("click",()=>{
+  const card=document.getElementById("aiDetailCard");
+  const aiText=document.getElementById("aiText"),tb=document.getElementById("aiToggle");
+  if(aiText.classList.contains("clamp")){aiText.classList.remove("clamp");tb.textContent="閉じる";}
+  card.scrollIntoView({behavior:"smooth",block:"start"});
+  card.classList.remove("ai-detail-card-highlight");
+  void card.offsetWidth;
+  card.classList.add("ai-detail-card-highlight");
+});
 function renderStats(p){
   const{pct,unc}=calcStats(p);
   document.getElementById("dSub").textContent=`情報完成度 ${pct}% ・ 未確認 ${unc}件${p.reason?" ・ 見送り理由："+p.reason:""}`;
@@ -1003,20 +1071,44 @@ function setPanel(idx,animate=true){
   panelIdx=Math.max(0,Math.min(3,idx));
   const inner=document.getElementById("swipeInner");
   const outer=document.getElementById("swipeOuter");
-  inner.style.transition=animate?"transform .36s cubic-bezier(.22,.7,.36,1)":"none";
+  inner.style.transition=animate?"transform .4s cubic-bezier(.25,.85,.35,1)":"none";
   inner.style.transform=`translateX(${-panelIdx*outer.clientWidth}px)`;
   document.querySelectorAll(".ql").forEach((b,i)=>b.classList.toggle("on",i===panelIdx));
+  document.querySelectorAll("#swipeDots span").forEach((d,i)=>d.classList.toggle("on",i===panelIdx));
 }
-document.querySelectorAll(".ql").forEach((btn,i)=>btn.addEventListener("click",()=>setPanel(i)));
+document.querySelectorAll(".ql").forEach(btn=>btn.addEventListener("click",()=>setPanel(Number(btn.dataset.pi))));
 window.addEventListener("resize",()=>{if(ap)setPanel(panelIdx,false);});
 
 (()=>{
   const outer=document.getElementById("swipeOuter");
   const inner=document.getElementById("swipeInner");
-  let sx=0,drag=false,base=0;
-  outer.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;drag=true;inner.style.transition="none";base=-panelIdx*outer.clientWidth;},{passive:true});
-  outer.addEventListener("touchmove",e=>{if(!drag)return;const dx=e.touches[0].clientX-sx;inner.style.transform=`translateX(${base+dx}px)`;},{passive:true});
-  outer.addEventListener("touchend",e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;Math.abs(dx)>55?(dx<0?setPanel(panelIdx+1):setPanel(panelIdx-1)):setPanel(panelIdx);});
+  let sx=0,drag=false,base=0,lastX=0,lastT=0,velocity=0;
+  outer.addEventListener("touchstart",e=>{
+    sx=e.touches[0].clientX;drag=true;inner.style.transition="none";
+    base=-panelIdx*outer.clientWidth;lastX=sx;lastT=Date.now();velocity=0;
+  },{passive:true});
+  outer.addEventListener("touchmove",e=>{
+    if(!drag)return;
+    const x=e.touches[0].clientX,dx=x-sx,t=Date.now();
+    const dt=t-lastT||1;
+    velocity=(x-lastX)/dt;
+    lastX=x;lastT=t;
+    // subtle resistance at the edges for a native-feeling bounce
+    let translate=base+dx;
+    const maxTranslate=0,minTranslate=-(3)*outer.clientWidth;
+    if(translate>maxTranslate)translate=maxTranslate+(translate-maxTranslate)*.35;
+    if(translate<minTranslate)translate=minTranslate+(translate-minTranslate)*.35;
+    inner.style.transform=`translateX(${translate}px)`;
+  },{passive:true});
+  outer.addEventListener("touchend",e=>{
+    if(!drag)return;drag=false;
+    const dx=e.changedTouches[0].clientX-sx;
+    const flick=Math.abs(velocity)>.5;
+    if(Math.abs(dx)>55||flick){
+      const dir=(flick?velocity<0:dx<0)?1:-1;
+      setPanel(panelIdx+dir);
+    } else setPanel(panelIdx);
+  });
 })();
 
 /* ─── check sheet ─── */
@@ -1114,6 +1206,7 @@ fileInputReplace.addEventListener("change",e=>{
   fileInputReplace.value="";
 });
 
+let galEditOpen=false;
 function renderGallery(p){
   const el=document.getElementById("gallery");
   if(!p.photos.length){
@@ -1129,47 +1222,77 @@ function renderGallery(p){
           ${ph.tags.length?`<div class="gal-slide-tags">${ph.tags.map(t=>`<span>${t}</span>`).join("")}</div>`:""}
         </div>`).join("")}
       </div>
-      <button class="gal-add" id="galAddBtn">＋</button>
       ${n>=6?`<span class="gal-counter" id="galCounter">${galIdx+1} / ${n}</span>`:""}
       <div class="gal-dots">${p.photos.map((_,i)=>`<span class="${i===galIdx?"on":""}"></span>`).join("")}</div>
     </div>
     <div class="gal-meta">
       <div><b>${p.price}</b>価格</div><div><b>${p.yieldRate}</b>利回り</div><div><b>${p.age.split("（")[0]}</b>築年数</div>
     </div>
-    <div class="gal-tags-area">
-      <p class="gal-tags-label">📷 現在の写真にタグを追加</p>
-      <div class="gal-tags-wrap" id="galTagWrap"></div>
-      <div class="gal-custom-row"><input id="galTagInput" placeholder="タグを自由入力"><button id="galTagAdd">追加</button></div>
+    <div class="gal-mode-row">
+      <span class="gal-mode-label" id="galViewLabel">写真の閲覧</span>
+      <button class="gal-edit-toggle ${galEditOpen?"on":""}" id="galEditToggle">${galEditOpen?"✓ 編集中":"✎ 写真を編集"}</button>
     </div>
-    <div class="gal-memo-area" id="galMemoArea"></div>`;
+    <div class="gal-view-tags" id="galViewTags"></div>
+    <div class="gal-view-memo" id="galViewMemo"></div>
+    <div class="gal-edit-panel ${galEditOpen?"open":""}" id="galEditPanel">
+      <div class="gal-edit-panel-inner">
+        <div class="gal-edit-actions">
+          <button id="galAddBtn">＋ 写真を追加</button>
+          <button id="galReplaceBtn">🔄 この写真を変更</button>
+        </div>
+        <div class="gal-tags-area">
+          <p class="gal-tags-label">📷 現在の写真にタグを追加</p>
+          <div class="gal-tags-wrap" id="galTagWrap"></div>
+          <div class="gal-custom-row"><input id="galTagInput" placeholder="タグを自由入力"><button id="galTagAdd">追加</button></div>
+        </div>
+        <div class="gal-memo-area" id="galMemoArea"></div>
+      </div>
+    </div>`;
 
   document.getElementById("galAddBtn").addEventListener("click",e=>{e.stopPropagation();triggerPick();});
+  document.getElementById("galReplaceBtn").addEventListener("click",e=>{e.stopPropagation();fileInputReplace.click();});
   document.getElementById("galTagAdd").addEventListener("click",()=>{
     const v=document.getElementById("galTagInput").value.trim();if(!v)return;
     toggleTag(p,galIdx,v,true);document.getElementById("galTagInput").value="";
+  });
+  document.getElementById("galEditToggle").addEventListener("click",e=>{
+    e.stopPropagation();
+    galEditOpen=!galEditOpen;
+    document.getElementById("galEditPanel").classList.toggle("open",galEditOpen);
+    const tb=document.getElementById("galEditToggle");
+    tb.classList.toggle("on",galEditOpen);
+    tb.textContent=galEditOpen?"✓ 編集中":"✎ 写真を編集";
+    document.getElementById("galViewLabel").textContent=galEditOpen?"この写真を編集中":"写真の閲覧";
   });
 
   const track=document.getElementById("galTrack");
   const vp=document.getElementById("galVP");
   function goGal(i,anim=true){
     galIdx=Math.max(0,Math.min(n-1,i));
-    track.style.transition=anim?"transform .32s cubic-bezier(.22,.7,.36,1)":"none";
+    track.style.transition=anim?"transform .34s cubic-bezier(.25,.85,.35,1)":"none";
     track.style.transform=`translateX(${-galIdx*100}%)`;
     document.querySelectorAll("#gallery .gal-dots span").forEach((d,idx)=>d.classList.toggle("on",idx===galIdx));
     const cnt=document.getElementById("galCounter");if(cnt)cnt.textContent=`${galIdx+1} / ${n}`;
-    renderTagArea(p);renderPhotoMemo(p);
+    renderViewTags(p);renderTagArea(p);renderPhotoMemo(p);
   }
   let sx=0,drag=false,base=0;
-  vp.addEventListener("touchstart",e=>{if(e.target.id==="galAddBtn")return;sx=e.touches[0].clientX;drag=true;track.style.transition="none";base=-galIdx*vp.clientWidth;},{passive:true});
+  vp.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;drag=true;track.style.transition="none";base=-galIdx*vp.clientWidth;},{passive:true});
   vp.addEventListener("touchmove",e=>{if(!drag)return;track.style.transform=`translateX(${base+(e.touches[0].clientX-sx)}px)`;},{passive:true});
   vp.addEventListener("touchend",e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;Math.abs(dx)>50?(dx<0?goGal(galIdx+1):goGal(galIdx-1)):goGal(galIdx);});
-  vp.addEventListener("click",e=>{if(e.target.id==="galAddBtn")return;openFS(p,galIdx);});
+  vp.addEventListener("click",()=>openFS(p,galIdx));
   goGal(galIdx,false);
 }
 
+function renderViewTags(p){
+  const ph=p.photos[galIdx];if(!ph)return;
+  const tagsEl=document.getElementById("galViewTags"),memoEl=document.getElementById("galViewMemo");
+  if(!tagsEl||!memoEl)return;
+  tagsEl.innerHTML=ph.tags.length?ph.tags.map(t=>`<span>${t}</span>`).join(""):"";
+  memoEl.innerHTML=ph.memo?`<p class="gal-view-empty" style="color:#3c473f">📝 ${ph.memo}</p>`:"";
+}
 function renderTagArea(p){
   const ph=p.photos[galIdx];if(!ph)return;
-  const w=document.getElementById("galTagWrap");
+  const w=document.getElementById("galTagWrap");if(!w)return;
   w.innerHTML=PTAGS.map(t=>`<button class="gal-tag-btn ${ph.tags.includes(t)?"on":""}" data-t="${t}">${t}</button>`).join("");
   document.querySelectorAll("#galTagWrap .gal-tag-btn").forEach(btn=>{btn.addEventListener("click",()=>toggleTag(p,galIdx,btn.dataset.t,!ph.tags.includes(btn.dataset.t)));});
 }
@@ -1177,7 +1300,7 @@ function toggleTag(p,idx,tag,add){
   const ph=p.photos[idx];
   if(add){if(!ph.tags.includes(tag)){ph.tags.push(tag);log(p,`🏷️ 写真タグ追加：${tag}`);}}
   else{ph.tags=ph.tags.filter(t=>t!==tag);log(p,`🏷️ 写真タグ削除：${tag}`);}
-  renderTagArea(p);
+  renderTagArea(p);renderViewTags(p);
   // update slide tags in place
   const slides=document.querySelectorAll("#galTrack .gal-slide");
   if(slides[idx]){const td=slides[idx].querySelector(".gal-slide-tags");if(ph.tags.length){if(td)td.innerHTML=ph.tags.map(t=>`<span>${t}</span>`).join("");else{const d=document.createElement("div");d.className="gal-slide-tags";d.innerHTML=ph.tags.map(t=>`<span>${t}</span>`).join("");slides[idx].appendChild(d);}}else if(td)td.remove();}
@@ -1191,7 +1314,7 @@ function renderPhotoMemo(p){
   } else {
     area.innerHTML=`<div class="pm-text"><p>${ph.memo}</p><div class="pm-text-actions"><button id="pmEdit">編集</button><button id="pmDel">削除</button></div></div>`;
     document.getElementById("pmEdit").addEventListener("click",()=>openPhotoMemoForm(p,ph.memo));
-    document.getElementById("pmDel").addEventListener("click",()=>{ph.memo="";log(p,"🗑 写真メモ削除");renderPhotoMemo(p);});
+    document.getElementById("pmDel").addEventListener("click",()=>{ph.memo="";log(p,"🗑 写真メモ削除");renderPhotoMemo(p);renderViewTags(p);});
   }
 }
 function openPhotoMemoForm(p,cur){
@@ -1200,7 +1323,7 @@ function openPhotoMemoForm(p,cur){
     <div class="pm-form-btns"><button class="pm-cancel-btn" id="pmCancel">キャンセル</button><button class="pm-save-btn" id="pmSave">保存</button></div>`;
   document.getElementById("micBtn").addEventListener("click",function(){this.classList.toggle("rec");if(this.classList.contains("rec"))setTimeout(()=>this.classList.remove("rec"),2000);});
   document.getElementById("pmCancel").addEventListener("click",()=>renderPhotoMemo(p));
-  document.getElementById("pmSave").addEventListener("click",()=>{const v=document.getElementById("pmTa").value.trim();if(v){p.photos[galIdx].memo=v;log(p,isNew?"📝 写真メモ追加":"✏️ 写真メモ編集");}renderPhotoMemo(p);});
+  document.getElementById("pmSave").addEventListener("click",()=>{const v=document.getElementById("pmTa").value.trim();if(v){p.photos[galIdx].memo=v;log(p,isNew?"📝 写真メモ追加":"✏️ 写真メモ編集");}renderPhotoMemo(p);renderViewTags(p);});
 }
 
 /* ─── fullscreen ─── */
@@ -1243,6 +1366,15 @@ document.getElementById("fsDelBtn").addEventListener("click",()=>{
 document.getElementById("fsPickBtn").addEventListener("click",()=>fileInputReplace.click());
 
 /* ─── settings ─── */
+document.getElementById("logoShapeRow").querySelectorAll(".logo-shape-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".logo-shape-btn").forEach(b=>b.classList.remove("sel"));
+    btn.classList.add("sel");
+    const isShield=btn.dataset.shape==="shield";
+    document.getElementById("homeLogo").classList.toggle("shield",isShield);
+    document.getElementById("settingsLogo").classList.toggle("shield",isShield);
+  });
+});
 document.getElementById("themeRow").querySelectorAll(".theme-dot").forEach(dot=>{
   dot.addEventListener("click",()=>{
     document.querySelectorAll(".theme-dot").forEach(d=>d.classList.remove("sel"));
