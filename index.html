@@ -21,7 +21,7 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
   padding:16px 16px 0;padding-top:calc(16px + env(safe-area-inset-top));
   transition:transform .42s cubic-bezier(.22,.7,.36,1);padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 #homeScreen{transform:translateX(0)}
-#detailScreen{transform:translateX(102%);padding-bottom:calc(116px + env(safe-area-inset-bottom))}
+#detailScreen{transform:translateX(102%)}
 #favScreen{transform:translateX(102%)}
 #compareScreen{transform:translateX(102%)}
 #settingsScreen{transform:translateX(102%)}
@@ -100,14 +100,16 @@ h1{font-size:19px;font-weight:800}
 .score-label{font-size:12px;color:var(--g);font-weight:800;letter-spacing:.02em;margin-bottom:4px}
 .score-num{font-size:44px;font-weight:800;line-height:1}
 .score-num small{font-size:14px;color:var(--muted);font-weight:700}
-.pill{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:800;border-radius:999px;padding:6px 12px;transition:background .25s,color .25s}
+.pill{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:800;border-radius:999px;padding:6px 12px;transition:background .25s,color .25s,transform .12s;cursor:pointer}
+.pill:active{transform:scale(.95)}
+.pill .pill-caret{font-size:9px;opacity:.75;margin-left:1px}
 .ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--g) calc(var(--p)*1%),#e3ede5 0);display:grid;place-items:center;flex:none}
 .ring i{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:19px}
 .score-comment{margin-top:12px;font-size:12.5px;line-height:1.75;color:#3c473f}
 .score-substats{margin-top:8px;font-size:11.5px;color:var(--muted)}
 .ai-summary-row{display:flex;align-items:flex-start;gap:8px;margin-top:14px;background:#fff;border-radius:16px;padding:12px 13px}
 .ai-summary-ico{font-size:15px;flex:none;line-height:1.4}
-.ai-summary-text{font-size:12.5px;line-height:1.6;color:#3c473f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ai-summary-text{font-size:12.5px;line-height:1.6;color:#3c473f;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .ai-detail-link{display:block;width:100%;text-align:right;border:0;background:none;color:var(--g);font-weight:800;font-size:12px;padding:8px 4px 0}
 
 /* ── home search/chips ── */
@@ -249,7 +251,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 
 /* ── todo ── */
 .todo-row{display:flex;align-items:center;gap:10px;background:#f1f5f2;border-radius:16px;padding:12px 14px;margin-top:9px}
-.todo-circle{width:22px;height:22px;border-radius:50%;border:2px solid #c6d4ca;flex:none;background:#fff;display:grid;place-items:center;font-size:12px;color:transparent}
+.todo-circle{width:22px;height:22px;border-radius:50%;border:2px solid #c6d4ca;flex:none;background:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;color:#d3dad4;transition:all .15s}
 .todo-circle.done{background:var(--g);border-color:var(--g);color:#fff}
 .todo-label{flex:1;font-size:13.5px;font-weight:700}
 .todo-row.done .todo-label{color:#9aa6a0;text-decoration:line-through}
@@ -310,10 +312,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .log-item b{font-size:11px;color:var(--muted);display:block}
 .log-item p{font-weight:700;margin-top:4px;font-size:13px}
 @keyframes fin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── status fixed bar ── */
-.status-bar{position:fixed;left:50%;transform:translateX(-50%);width:min(398px,calc(100% - 28px));bottom:calc(76px + env(safe-area-inset-bottom));z-index:6;display:none}
-.status-bar button{width:100%;border:0;border-radius:18px;padding:15px;font-weight:800;font-size:14.5px;background:var(--g);color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.15)}
 
 /* ── bottom nav ── */
 .bnav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(13px + env(safe-area-inset-bottom));width:min(398px,calc(100% - 28px));background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-radius:26px;display:flex;align-items:center;justify-content:space-around;padding:8px 6px;box-shadow:0 10px 30px rgba(0,0,0,.13);z-index:10}
@@ -426,7 +424,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <section id="homeScreen" class="screen">
   <header class="topbar">
     <div class="brand">
-      <div class="logo" id="homeLogo"><span>SS</span></div>
+      <div class="logo shield" id="homeLogo"><span>SS</span></div>
       <div><h1>Project:SS</h1><p class="sub">Shonai Score</p></div>
     </div>
     <button class="round" id="homeMenuBtn">☰</button>
@@ -453,9 +451,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <button class="ql" data-pi="1"><span class="ico">📋</span>調査</button>
     <button class="ql" data-pi="2"><span class="ico">📝</span>メモ</button>
     <button class="ql" data-pi="3"><span class="ico">🕘</span>ログ</button>
-  </div>
-  <div class="swipe-dots swipe-dots-top" id="swipeDotsTop">
-    <span class="on"></span><span></span><span></span><span></span>
   </div>
   <section class="card score-hero">
     <div class="top">
@@ -486,6 +481,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   </section>
 
   <!-- swipe panels -->
+  <div class="swipe-dots swipe-dots-top" id="swipeDotsTop">
+    <span class="on"></span><span></span><span></span><span></span>
+  </div>
   <div class="swipe-outer" id="swipeOuter">
     <div class="swipe-inner" id="swipeInner">
 
@@ -576,7 +574,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   </header>
 
   <div class="app-info-card">
-    <div class="logo" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:60px;font-size:19px"><span>SS</span></div>
+    <div class="logo shield" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:60px;font-size:19px"><span>SS</span></div>
     <h2 style="font-size:17px">Project:SS</h2>
     <p class="version">Version Alpha 0.6.2</p>
     <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
@@ -611,10 +609,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <h3>ロゴデザイン <span style="font-weight:600;text-transform:none">（試験実装）</span></h3>
     <div class="settings-card" style="padding:14px 16px">
       <p style="font-size:13px;font-weight:700;margin-bottom:2px">SSロゴの見え方</p>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Ver.1.2 UX Prototype のロゴ（Design Reference）を基準に、内側の白ラインの見せ方だけ見比べられます</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Ver.1.2 UX Prototype のロゴ（Design Reference）を基準にした、二重ライン強調版を採用しています</p>
       <div class="logo-toggle-row" id="logoShapeRow">
-        <button class="logo-shape-btn sel" data-shape="rounded"><span class="logo-shape-preview"><span>SS</span></span>標準ライン</button>
-        <button class="logo-shape-btn" data-shape="shield"><span class="logo-shape-preview shield"><span>SS</span></span>二重ライン強調</button>
+        <button class="logo-shape-btn" data-shape="rounded"><span class="logo-shape-preview"><span>SS</span></span>標準ライン</button>
+        <button class="logo-shape-btn sel" data-shape="shield"><span class="logo-shape-preview shield"><span>SS</span></span>二重ライン強調（採用中）</button>
       </div>
     </div>
   </div>
@@ -647,11 +645,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 </section>
 
 </div><!-- /shell -->
-
-<!-- status bar -->
-<div class="status-bar" id="statusBar">
-  <button id="statusBtn">ステータス変更</button>
-</div>
 
 <!-- bottom nav -->
 <nav class="bnav">
@@ -752,8 +745,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
       <button class="ai-modal-close" id="aiModalClose">✕</button>
     </div>
     <div class="ai-modal-body">
-      <p class="ai-text clamp" id="aiText"></p>
-      <button class="ai-toggle" id="aiToggle">続きを読む</button>
+      <p class="ai-text" id="aiText"></p>
       <div class="ai-sub"><p class="h">⭐ 重要ポイント</p><ul id="aiPts"></ul></div>
       <div class="ai-sub"><p class="h">🔎 次に確認すること</p><ul id="aiNext"></ul></div>
     </div>
@@ -893,6 +885,7 @@ function bumpScore(p,delta){const b=p.score;p.score=Math.max(0,Math.min(100,p.sc
 
 /* ─── nav ─── */
 let currentNav="home";
+let detailReturnTo="home"; // remembers which screen to return to when leaving the detail view
 const shell=document.getElementById("shell");
 function goTo(screen){
   shell.className="shell";
@@ -901,17 +894,28 @@ function goTo(screen){
   document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));
   const navMap={home:"navHome",fav:"navFav",compare:"navCompare",settings:"navSettings"};
   if(navMap[screen])document.getElementById(navMap[screen]).classList.add("nav-on");
-  document.getElementById("statusBar").style.display="none";
 }
-function goToDetail(p){ap=p;currentNav="detail";shell.classList.add("to-detail");document.getElementById("detailScreen").scrollTop=0;document.getElementById("statusBar").style.display="";galIdx=0;panelIdx=0;galEditOpen=false;renderDetail(p);updateFavBtn(p);
-  document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));}
-function goBack(){
+function goToDetail(p,fromScreen){
+  // Always reset every transition class first (same rule as goTo()) so the
+  // previous screen's "to-*" class can never remain stacked underneath.
+  detailReturnTo=fromScreen||currentNav||"home";
+  if(detailReturnTo==="detail")detailReturnTo="home"; // safety fallback, should not happen
+  ap=p;currentNav="detail";
   shell.className="shell";
-  currentNav="home";
-  document.getElementById("statusBar").style.display="none";
+  shell.classList.add("to-detail");
+  document.getElementById("detailScreen").scrollTop=0;
+  galIdx=0;panelIdx=0;galEditOpen=false;
+  renderDetail(p);updateFavBtn(p);
   document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));
-  document.getElementById("navHome").classList.add("nav-on");
-  setTimeout(()=>renderHome(),350);
+}
+function goBack(){
+  // Return to whichever screen the detail view was opened from.
+  const target=detailReturnTo||"home";
+  goTo(target);
+  if(target==="home")setTimeout(()=>renderHome(),350);
+  else if(target==="fav")renderFav();
+  else if(target==="compare")renderCompare();
+  // settings screen needs no re-render
 }
 
 document.getElementById("backBtn").addEventListener("click",goBack);
@@ -940,7 +944,7 @@ function renderHero(){
     <p class="score-comment">${top.comment}</p>
     <p class="score-substats">${SO.map(s=>`${s} ${cnt[s]}件`).join(" ・ ")}</p>`;
   hero.style.cursor="pointer";
-  hero.onclick=()=>goToDetail(top);
+  hero.onclick=()=>goToDetail(top,"home");
 }
 function renderChips(){
   const w=document.getElementById("statusChips");
@@ -966,7 +970,7 @@ function renderList(){
         </div>
         <button class="fav-heart" data-id="${p.id}" style="color:${p.fav?"#e53e3e":"#ccc"}" title="${p.fav?"お気に入り解除":"お気に入り登録"}">${p.fav?"❤️":"🤍"}</button>`;
       div.querySelector(".fav-heart").addEventListener("click",e=>{e.stopPropagation();toggleFav(p);renderList();});
-      div.addEventListener("click",()=>goToDetail(p));
+      div.addEventListener("click",()=>goToDetail(p,"home"));
       el.appendChild(div);
     });
 }
@@ -989,7 +993,7 @@ function renderFav(){
         <span class="sbadge" style="background:${m.bg};color:${m.fg}">${p.status}</span></div>
         <div class="pc-metrics"><div><b>${p.score}</b>点</div><div><b>${p.price}</b></div><div><b>${p.yieldRate}</b>利回り</div></div>
       </div>`;
-    div.addEventListener("click",()=>goToDetail(p));
+    div.addEventListener("click",()=>goToDetail(p,"fav"));
     el.appendChild(div);
   });
 }
@@ -1107,8 +1111,8 @@ function renderDetail(p){
   document.getElementById("dRingNum").textContent=p.score;
   document.getElementById("dRing").style.setProperty("--p",p.score);
   const pill=document.getElementById("dPill");
-  pill.textContent=`${m.e} ${p.status}`;pill.style.background=m.bg;pill.style.color=m.fg;
-  document.getElementById("aiSummary").textContent=summarize(p.comment);
+  pill.innerHTML=`${m.e} ${p.status}<span class="pill-caret">▾</span>`;pill.style.background=m.bg;pill.style.color=m.fg;
+  document.getElementById("aiSummary").textContent=p.comment;
   document.getElementById("radar").innerHTML=radarSVG(p.breakdown);
   document.getElementById("bdRows").innerHTML=p.breakdown.map(([l,v])=>`
     <div class="bd-row"><span>${l}</span><div class="bd-bar"><i style="width:${v/20*100}%"></i></div><span style="text-align:right">${v}/20</span></div>`).join("");
@@ -1117,25 +1121,11 @@ function renderDetail(p){
   setPanel(panelIdx,false);renderGallery(p);
 }
 
-function summarize(text){
-  // Take the first sentence (up to the first 。) as a short AI summary line.
-  const m=text.match(/^[^。]*。?/);
-  let s=m?m[0]:text;
-  if(s.length>42)s=s.slice(0,42)+"…";
-  return s;
-}
 /* ─── AI detail modal ─── */
 const aiModalBd=document.getElementById("aiModalBd");
 let aiModalScrollY=0;
 function openAiModal(){
-  const aiText=document.getElementById("aiText"),tb=document.getElementById("aiToggle");
-  aiText.classList.add("clamp");
-  requestAnimationFrame(()=>{
-    const over=aiText.scrollHeight>aiText.clientHeight+2;
-    tb.style.display=over?"block":"none";
-    if(!over)aiText.classList.remove("clamp");
-    else tb.textContent="続きを読む";
-  });
+  // The modal always shows the full text from the start.
   aiModalScrollY=document.getElementById("detailScreen").scrollTop;
   aiModalBd.classList.add("show");
 }
@@ -1155,17 +1145,10 @@ function renderStats(p){
   document.getElementById("unconfN").textContent=unc+"件";
 }
 function renderAI(p){
-  const el=document.getElementById("aiText"),tb=document.getElementById("aiToggle");
-  el.textContent=p.comment;el.classList.add("clamp");
+  const el=document.getElementById("aiText");
+  el.textContent=p.comment;
   document.getElementById("aiPts").innerHTML=p.aiPts.map(t=>`<li>${t}</li>`).join("");
   document.getElementById("aiNext").innerHTML=p.aiNext.map(t=>`<li>${t}</li>`).join("");
-  requestAnimationFrame(()=>{
-    const over=el.scrollHeight>el.clientHeight+2;
-    tb.style.display=over?"block":"none";
-    if(!over)el.classList.remove("clamp");
-    else tb.textContent="続きを読む";
-  });
-  tb.onclick=()=>{el.classList.toggle("clamp");tb.textContent=el.classList.contains("clamp")?"続きを読む":"閉じる";};
 }
 function renderTodos(p){
   const act=p.todos.filter(t=>!t.done),dn=p.todos.filter(t=>t.done);
@@ -1259,9 +1242,16 @@ function setPanel(idx,animate=true,{scroll=false}={}){
   document.querySelectorAll("#swipeDots span").forEach((d,i)=>d.classList.toggle("on",i===panelIdx));
   document.querySelectorAll("#swipeDotsTop span").forEach((d,i)=>d.classList.toggle("on",i===panelIdx));
   if(scroll){
-    // give the user a clear sense of "having jumped" to the section
+    // Account for the sticky quicklinks bar so the destination heading
+    // lands just below it, instead of being hidden underneath.
     requestAnimationFrame(()=>{
-      outer.scrollIntoView({behavior:"smooth",block:"start"});
+      const scroller=document.getElementById("detailScreen");
+      const qlWrap=document.getElementById("qlWrap");
+      const stickyOffset=qlWrap?qlWrap.getBoundingClientRect().height+14:0;
+      const scrollerTop=scroller.getBoundingClientRect().top;
+      const targetTop=outer.getBoundingClientRect().top;
+      const delta=(targetTop-scrollerTop)-stickyOffset;
+      scroller.scrollTo({top:scroller.scrollTop+delta,behavior:"smooth"});
     });
   }
 }
@@ -1337,7 +1327,7 @@ function applyStatus(p,ns,reason){
   if(ns==="見送り"&&p.reason)log(p,`📝 見送り理由：${p.reason}`);
   if(ap===p)renderDetail(p);
 }
-document.getElementById("statusBtn").addEventListener("click",openStatusSheet);
+document.getElementById("dPill").addEventListener("click",openStatusSheet);
 document.getElementById("sCancelBtn").addEventListener("click",()=>closeSh("sBd","sSheet"));
 document.getElementById("sBd").addEventListener("click",()=>closeSh("sBd","sSheet"));
 document.getElementById("rConfirm").addEventListener("click",()=>{applyStatus(ap,"見送り",document.getElementById("rInput").value.trim());closeSh("sBd","sSheet");});
@@ -1541,7 +1531,18 @@ function triggerPick(){fileInput.click();}
 fileInput.addEventListener("change",e=>{
   const files=[...e.target.files];if(!files.length)return;
   let rem=files.length;
-  files.forEach(f=>{const r=new FileReader();r.onload=()=>{ap.photos.push({id:Date.now()+Math.random(),src:r.result,tags:[],memo:""});rem--;if(!rem){log(ap,`📷 写真追加（${files.length}枚）`);galIdx=Math.max(0,ap.photos.length-files.length);renderGallery(ap);}};r.readAsDataURL(f);});
+  const wasFsOpen=fsEl.classList.contains("show");
+  const insertAt=ap.photos.length;
+  files.forEach(f=>{const r=new FileReader();r.onload=()=>{ap.photos.push({id:Date.now()+Math.random(),src:r.result,tags:[],memo:""});rem--;if(!rem){
+    log(ap,`📷 写真追加（${files.length}枚）`);
+    galIdx=Math.max(0,ap.photos.length-files.length);
+    if(wasFsOpen){
+      // keep the fullscreen viewer open and reflect the newly added photos immediately
+      openFS(ap,insertAt);
+    } else {
+      renderGallery(ap);
+    }
+  }};r.readAsDataURL(f);});
   fileInput.value="";
 });
 fileInputReplace.addEventListener("change",e=>{
