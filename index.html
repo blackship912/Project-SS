@@ -44,14 +44,20 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
   clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
 }
 .logo::before{
-  content:"";position:absolute;inset:3px;
+  content:"";position:absolute;inset:0;
+  background:#fff;
+  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
+  transform:scale(.86);
+}
+.logo::after{
+  content:"";position:absolute;inset:0;
   background:var(--g);
   clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
-  box-shadow:0 0 0 1.4px #fff inset;
+  transform:scale(.79);
 }
 .logo span{position:relative;z-index:1}
-.logo.shield{box-shadow:none}
-.logo.shield::before{box-shadow:0 0 0 1.4px #fff inset,0 0 0 4px var(--g) inset,0 0 0 5.4px #fff inset}
+.logo.shield::before{transform:scale(.82)}
+.logo.shield::after{transform:scale(.72)}
 .logo-toggle-row{display:flex;gap:10px;margin-top:8px}
 .logo-shape-btn{flex:1;border:1.5px solid #e3ede5;background:#fff;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#3c473f}
 .logo-shape-btn.sel{border-color:var(--g);background:#f0faf3;color:var(--g)}
@@ -62,12 +68,18 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
   clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
 }
 .logo-shape-preview::before{
-  content:"";position:absolute;inset:2.5px;background:var(--g);
+  content:"";position:absolute;inset:0;background:#fff;
   clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
-  box-shadow:0 0 0 1.2px #fff inset;
+  transform:scale(.84);
+}
+.logo-shape-preview::after{
+  content:"";position:absolute;inset:0;background:var(--g);
+  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
+  transform:scale(.76);
 }
 .logo-shape-preview span{position:relative;z-index:1}
-.logo-shape-preview.shield::before{box-shadow:0 0 0 1.2px #fff inset,0 0 0 3.4px var(--g) inset,0 0 0 4.6px #fff inset}
+.logo-shape-preview.shield::before{transform:scale(.80)}
+.logo-shape-preview.shield::after{transform:scale(.69)}
 h1{font-size:19px;font-weight:800}
 .sub{font-size:11px;color:var(--g);font-weight:800;letter-spacing:.04em}
 .sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:0}
