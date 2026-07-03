@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Project:SS Alpha 0.6.1</title>
+<title>Project:SS Alpha 0.6.2</title>
 <style>
 :root{--g:#1f7a45;--g2:#7ecb91;--ink:#17251b;--muted:#7a8780;--bg:#eef5ef;--card:#fff;--danger:#c0392b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -37,13 +37,37 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
 /* ── topbar ── */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .brand{display:flex;gap:11px;align-items:center}
-.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 8px 18px rgba(31,122,69,.24);font-size:14px;letter-spacing:-.5px;transition:clip-path .3s ease,border-radius .3s ease}
-.logo.shield{border-radius:10px 10px 10px 10px;clip-path:polygon(50% 0%,100% 18%,100% 55%,50% 100%,0% 55%,0% 18%);padding-bottom:3px}
+.logo{
+  width:44px;height:50px;position:relative;
+  background:var(--g);color:#fff;font-weight:800;
+  display:grid;place-items:center;font-size:15px;letter-spacing:-.3px;
+  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
+}
+.logo::before{
+  content:"";position:absolute;inset:3px;
+  background:var(--g);
+  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
+  box-shadow:0 0 0 1.4px #fff inset;
+}
+.logo span{position:relative;z-index:1}
+.logo.shield{box-shadow:none}
+.logo.shield::before{box-shadow:0 0 0 1.4px #fff inset,0 0 0 4px var(--g) inset,0 0 0 5.4px #fff inset}
 .logo-toggle-row{display:flex;gap:10px;margin-top:8px}
 .logo-shape-btn{flex:1;border:1.5px solid #e3ede5;background:#fff;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#3c473f}
 .logo-shape-btn.sel{border-color:var(--g);background:#f0faf3;color:var(--g)}
-.logo-shape-preview{width:32px;height:32px;background:linear-gradient(135deg,var(--g),var(--g2));display:grid;place-items:center;color:#fff;font-size:10px;font-weight:800;border-radius:9px}
-.logo-shape-preview.shield{border-radius:7px;clip-path:polygon(50% 0%,100% 18%,100% 55%,50% 100%,0% 55%,0% 18%)}
+.logo-shape-preview{
+  width:30px;height:34px;position:relative;
+  background:var(--g);display:grid;place-items:center;
+  color:#fff;font-size:11px;font-weight:800;
+  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
+}
+.logo-shape-preview::before{
+  content:"";position:absolute;inset:2.5px;background:var(--g);
+  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
+  box-shadow:0 0 0 1.2px #fff inset;
+}
+.logo-shape-preview span{position:relative;z-index:1}
+.logo-shape-preview.shield::before{box-shadow:0 0 0 1.2px #fff inset,0 0 0 3.4px var(--g) inset,0 0 0 4.6px #fff inset}
 h1{font-size:19px;font-weight:800}
 .sub{font-size:11px;color:var(--g);font-weight:800;letter-spacing:.04em}
 .sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:0}
@@ -58,6 +82,8 @@ h1{font-size:19px;font-weight:800}
 
 /* ── score hero ── */
 .score-hero{background:linear-gradient(135deg,#fff,#e9f8ee)}
+#homeHero{transition:transform .15s,box-shadow .15s}
+#homeHero:active{transform:scale(.98)}
 .score-hero .top{display:flex;justify-content:space-between;align-items:center}
 .score-label{font-size:12px;color:var(--g);font-weight:800;letter-spacing:.02em;margin-bottom:4px}
 .score-num{font-size:44px;font-weight:800;line-height:1}
@@ -71,8 +97,6 @@ h1{font-size:19px;font-weight:800}
 .ai-summary-ico{font-size:15px;flex:none;line-height:1.4}
 .ai-summary-text{font-size:12.5px;line-height:1.6;color:#3c473f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ai-detail-link{display:block;width:100%;text-align:right;border:0;background:none;color:var(--g);font-weight:800;font-size:12px;padding:8px 4px 0}
-.ai-detail-card-highlight{animation:aiPulse 1.1s ease}
-@keyframes aiPulse{0%,100%{box-shadow:0 12px 28px rgba(32,59,41,.08)}50%{box-shadow:0 0 0 3px #cfe6d7,0 12px 28px rgba(32,59,41,.08)}}
 
 /* ── home search/chips ── */
 input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-radius:16px;font-size:15px;outline:none}
@@ -181,6 +205,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .swipe-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
 .swipe-dots span{width:6px;height:6px;border-radius:50%;background:#d7e2d9;transition:all .25s cubic-bezier(.25,.85,.35,1)}
 .swipe-dots span.on{background:var(--g);width:18px;border-radius:4px}
+.swipe-dots-top{margin:2px 0 12px}
 
 /* ── score breakdown ── */
 .radar-wrap{display:flex;justify-content:center;margin-bottom:10px}
@@ -196,6 +221,19 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .ai-sub{margin-top:13px}
 .ai-sub .h{font-size:11.5px;font-weight:800;color:var(--g);margin-bottom:5px}
 .ai-sub ul{margin:0;padding-left:18px;font-size:12px;line-height:1.85;color:#3c473f}
+
+/* AI detail modal */
+.ai-modal-bd{position:fixed;inset:0;background:rgba(15,30,20,0);pointer-events:none;transition:background .3s;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px}
+.ai-modal-bd.show{background:rgba(15,30,20,.45);pointer-events:auto}
+.ai-modal{width:min(390px,100%);max-height:80vh;background:#fff;border-radius:26px;box-shadow:0 24px 60px rgba(0,0,0,.28);display:flex;flex-direction:column;transform:scale(.92) translateY(10px);opacity:0;transition:transform .28s cubic-bezier(.25,.85,.35,1),opacity .28s ease}
+.ai-modal-bd.show .ai-modal{transform:scale(1) translateY(0);opacity:1}
+.ai-modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 10px;flex:none}
+.ai-modal-head p{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
+.ai-modal-close{border:0;background:#f1f5f2;color:#5b6b60;width:32px;height:32px;border-radius:50%;font-size:15px;display:grid;place-items:center;flex:none}
+.ai-modal-body{overflow-y:auto;padding:6px 18px 22px;-webkit-overflow-scrolling:touch}
+.ai-modal-body .ai-text{font-size:13.5px}
+.ai-modal-body .ai-sub .h{font-size:12px}
+.ai-modal-body .ai-sub ul{font-size:12.5px}
 
 /* ── todo ── */
 .todo-row{display:flex;align-items:center;gap:10px;background:#f1f5f2;border-radius:16px;padding:12px 14px;margin-top:9px}
@@ -280,12 +318,17 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .bd.show{background:rgba(15,30,20,.32);pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;width:min(430px,100%);margin:0 auto;background:#fff;border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -16px 40px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .34s cubic-bezier(.22,.7,.36,1);z-index:31;max-height:86vh;overflow-y:auto}
 .sheet.show{transform:translateY(0)}
-.sh-handle{width:38px;height:5px;background:#e1e7e2;border-radius:99px;margin:8px auto 14px}
+.sh-handle{width:38px;height:5px;background:#e1e7e2;border-radius:99px;margin:8px auto 14px;cursor:pointer}
 .sh-title{font-size:16px;font-weight:800;margin-bottom:12px}
 .sh-opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:#f5f8f6;border-radius:16px;padding:14px;margin:7px 0;font-weight:800;font-size:14px;color:#243329}
 .sh-opt .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .sh-opt.cur{background:#e2f5e8;color:#14733d}
 .sh-cancel{display:block;width:100%;border:0;background:transparent;color:#9aa6a0;font-weight:700;font-size:13.5px;padding:12px;margin-top:2px}
+.hi-body{font-size:13px;line-height:1.85;color:#3c473f;padding:2px 2px 14px}
+.hi-body p+p{margin-top:10px}
+.hi-body .hi-item{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid #eef2ef}
+.hi-body .hi-item:last-child{border-bottom:0}
+.hi-body .hi-item b{color:var(--g);flex:none}
 .reason-zone{max-height:0;overflow:hidden;transition:max-height .3s}
 .reason-zone.open{max-height:180px;margin:6px 0 10px}
 .reason-zone textarea{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:11px;min-height:68px;outline:none;resize:vertical;font-size:13px}
@@ -293,15 +336,22 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 
 /* edit wizard */
 .wiz-steps{display:flex;gap:5px;margin-bottom:14px}
-.wiz-steps i{flex:1;height:4px;border-radius:999px;background:#e7ede8;font-style:normal}
+.wiz-steps i{flex:1;height:4px;border-radius:999px;background:#e7ede8;font-style:normal;transition:background .25s}
 .wiz-steps i.done{background:var(--g)}
 .wiz-step-name{font-size:12.5px;font-weight:800;color:var(--g);margin-bottom:12px}
 .ff{margin-bottom:11px}
 .ff label{display:block;font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:5px}
 .ff input,.ff select{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:11px;outline:none;font-size:14px}
+.ff-numeric-row{display:flex;gap:8px}
+.ff-numeric-row input{flex:1.4;min-width:0}
+.ff-numeric-row select{flex:1;min-width:0}
+.ff-other-input{margin-top:6px}
 .wiz-nav{display:flex;gap:10px;margin-top:6px}
 .wiz-nav button{flex:1;border:0;border-radius:16px;padding:14px;font-weight:800;font-size:14px}
 .wiz-back{background:#eef2ef;color:#4d5c51}.wiz-next{background:var(--g);color:#fff}
+.wiz-swipe-outer{overflow:hidden}
+.wiz-swipe-inner{display:flex;will-change:transform;transition:transform .4s cubic-bezier(.25,.85,.35,1)}
+.wiz-swipe-panel{width:100%;flex:none;box-sizing:border-box;padding-right:2px}
 
 /* ── compare screen ── */
 .cmp-select-area{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
@@ -318,6 +368,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .cmp-table td.best{color:var(--g);background:#f0faf3;font-weight:800}
 .cmp-ai{background:linear-gradient(135deg,#fff,#eef7f0);border-radius:20px;padding:16px;margin-bottom:14px}
 .cmp-ai p{font-size:13px;line-height:1.8;color:#3c473f;margin-top:8px}
+.cmp-ai .cmp-ai-text.clamp{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.cmp-ai-toggle{display:none;border:0;background:#e7f4eb;color:var(--g);border-radius:13px;padding:9px;width:100%;font-weight:800;font-size:12.5px;margin-top:10px}
 .cmp-pick-btn{width:100%;border:0;background:var(--g);color:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:14px;margin-bottom:8px}
 
 /* ── fav screen ── */
@@ -362,10 +414,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <section id="homeScreen" class="screen">
   <header class="topbar">
     <div class="brand">
-      <div class="logo" id="homeLogo">SS</div>
+      <div class="logo" id="homeLogo"><span>SS</span></div>
       <div><h1>Project:SS</h1><p class="sub">Shonai Score</p></div>
     </div>
-    <button class="round">☰</button>
+    <button class="round" id="homeMenuBtn">☰</button>
   </header>
   <section class="card score-hero" id="homeHero"></section>
   <section class="card">
@@ -390,6 +442,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <button class="ql" data-pi="2"><span class="ico">📝</span>メモ</button>
     <button class="ql" data-pi="3"><span class="ico">🕘</span>ログ</button>
   </div>
+  <div class="swipe-dots swipe-dots-top" id="swipeDotsTop">
+    <span class="on"></span><span></span><span></span><span></span>
+  </div>
   <section class="card score-hero">
     <div class="top">
       <div>
@@ -410,13 +465,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <p class="card-title">📊 スコア内訳</p>
     <div class="radar-wrap" id="radar"></div>
     <div id="bdRows"></div>
-  </section>
-  <section class="card ai-card" id="aiDetailCard">
-    <p class="card-title">🤖 AIアドバイス（詳細）</p>
-    <p class="ai-text clamp" id="aiText"></p>
-    <button class="ai-toggle" id="aiToggle">続きを読む</button>
-    <div class="ai-sub"><p class="h">⭐ 重要ポイント</p><ul id="aiPts"></ul></div>
-    <div class="ai-sub"><p class="h">🔎 次に確認すること</p><ul id="aiNext"></ul></div>
   </section>
   <section class="card">
     <p class="card-title">✅ 次にやること</p>
@@ -516,9 +564,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   </header>
 
   <div class="app-info-card">
-    <div class="logo" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:54px;font-size:18px">SS</div>
+    <div class="logo" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:60px;font-size:19px"><span>SS</span></div>
     <h2 style="font-size:17px">Project:SS</h2>
-    <p class="version">Version Alpha 0.6</p>
+    <p class="version">Version Alpha 0.6.2</p>
     <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
     <p class="since">Since 2026.06.30</p>
     <p class="blueprint-sig">Built with ❤️ using AI · Blueprint Project</p>
@@ -550,11 +598,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <div class="settings-section">
     <h3>ロゴデザイン <span style="font-weight:600;text-transform:none">（試験実装）</span></h3>
     <div class="settings-card" style="padding:14px 16px">
-      <p style="font-size:13px;font-weight:700;margin-bottom:2px">SSロゴの形状</p>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">採用可否は未定です。試しに見比べられます</p>
+      <p style="font-size:13px;font-weight:700;margin-bottom:2px">SSロゴの見え方</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Ver.1.2 UX Prototype のロゴ（Design Reference）を基準に、内側の白ラインの見せ方だけ見比べられます</p>
       <div class="logo-toggle-row" id="logoShapeRow">
-        <button class="logo-shape-btn sel" data-shape="rounded"><span class="logo-shape-preview">SS</span>角丸（現行）</button>
-        <button class="logo-shape-btn" data-shape="shield"><span class="logo-shape-preview shield">SS</span>盾型（新案）</button>
+        <button class="logo-shape-btn sel" data-shape="rounded"><span class="logo-shape-preview"><span>SS</span></span>標準ライン</button>
+        <button class="logo-shape-btn" data-shape="shield"><span class="logo-shape-preview shield"><span>SS</span></span>二重ライン強調</button>
       </div>
     </div>
   </div>
@@ -621,14 +669,48 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 </div>
 <div class="bd" id="eBd"></div>
 <div class="sheet" id="eSheet">
-  <div class="sh-handle"></div><p class="sh-title">基本情報を編集</p>
+  <div class="sh-handle" id="eHandle"></div><p class="sh-title">基本情報を編集</p>
   <div class="wiz-steps" id="wizProg"></div>
   <p class="wiz-step-name" id="wizStepName"></p>
-  <div id="wizFields"></div>
+  <div class="wiz-swipe-outer" id="wizSwipeOuter">
+    <div class="wiz-swipe-inner" id="wizSwipeInner"></div>
+  </div>
   <div class="wiz-nav">
     <button class="wiz-back" id="wizBack">戻る</button>
     <button class="wiz-next" id="wizNext">次へ</button>
   </div>
+</div>
+
+<!-- unsaved-changes confirm sheet -->
+<div class="bd" id="uBd"></div>
+<div class="sheet" id="uSheet">
+  <div class="sh-handle"></div>
+  <p class="sh-title">変更内容を保存しますか？</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 4px">編集中の内容がまだ保存されていません。</p>
+  <button class="sh-opt cur" id="uSaveBtn"><span class="dot" style="background:var(--g)"></span>保存する</button>
+  <button class="sh-opt" id="uDiscardBtn"><span class="dot" style="background:#c0392b"></span>破棄して閉じる</button>
+  <button class="sh-cancel" id="uCancelBtn">キャンセル</button>
+</div>
+
+<!-- home hamburger menu sheet -->
+<div class="bd" id="hmBd"></div>
+<div class="sheet" id="hmSheet">
+  <div class="sh-handle"></div>
+  <p class="sh-title">メニュー</p>
+  <button class="sh-opt" data-info="blueprint"><span class="dot" style="background:var(--g)"></span>📘 Blueprint情報</button>
+  <button class="sh-opt" data-info="about"><span class="dot" style="background:var(--g)"></span>ℹ️ Project:SSについて</button>
+  <button class="sh-opt" data-info="dna"><span class="dot" style="background:var(--g)"></span>🧬 Development DNA</button>
+  <button class="sh-opt" data-info="version"><span class="dot" style="background:var(--g)"></span>🔖 バージョン情報</button>
+  <button class="sh-cancel" id="hmCancelBtn">閉じる</button>
+</div>
+
+<!-- home hamburger menu: info detail sheet -->
+<div class="bd" id="hiBd"></div>
+<div class="sheet" id="hiSheet">
+  <div class="sh-handle"></div>
+  <p class="sh-title" id="hiTitle"></p>
+  <div class="hi-body" id="hiBody"></div>
+  <button class="sh-cancel" id="hiCloseBtn">閉じる</button>
 </div>
 
 <!-- fullscreen photo -->
@@ -649,6 +731,22 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 </div>
 
 <input type="file" id="fileInputReplace" accept="image/*" style="display:none">
+
+<!-- AI detail modal -->
+<div class="ai-modal-bd" id="aiModalBd">
+  <div class="ai-modal" id="aiModal">
+    <div class="ai-modal-head">
+      <p>🤖 AIアドバイス（詳細）</p>
+      <button class="ai-modal-close" id="aiModalClose">✕</button>
+    </div>
+    <div class="ai-modal-body">
+      <p class="ai-text clamp" id="aiText"></p>
+      <button class="ai-toggle" id="aiToggle">続きを読む</button>
+      <div class="ai-sub"><p class="h">⭐ 重要ポイント</p><ul id="aiPts"></ul></div>
+      <div class="ai-sub"><p class="h">🔎 次に確認すること</p><ul id="aiNext"></ul></div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ─── constants ─── */
@@ -678,11 +776,53 @@ const CK={
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
 const PTAGS=["🏠 外観","🛋 リビング","🍳 キッチン","🛁 浴室","🚽 トイレ","🅿 駐車場","🌿 庭","⚡ 設備","📦 その他"];
+const UNIT_OPTIONS={
+  price:["万円","円"],
+  yieldRate:["%"],
+  rent:["円/月","万円/月"],
+  age:["年"],
+  buildingArea:["㎡","坪"],
+  landArea:["㎡","坪"],
+  parking:["台"],
+  station:["分"]
+};
 const STEPS=[
-  {name:"価格・収益",fields:[{k:"price",l:"価格"},{k:"yieldRate",l:"利回り"},{k:"rent",l:"家賃（満室想定）"},{k:"age",l:"築年数"}]},
-  {name:"建物情報",fields:[{k:"structure",l:"構造"},{k:"occupancy",l:"現況",sel:["賃貸中","空室","空家","自己使用"]},{k:"buildingArea",l:"建物面積"},{k:"landArea",l:"土地面積"},{k:"floorPlan",l:"間取り"}]},
-  {name:"立地・その他",fields:[{k:"parking",l:"駐車場"},{k:"road",l:"接道"},{k:"zoning",l:"用途地域"},{k:"source",l:"情報源"}]}
+  {name:"価格・収益",fields:[
+    {k:"price",l:"価格",numeric:true},
+    {k:"yieldRate",l:"利回り",numeric:true},
+    {k:"rent",l:"家賃（満室想定）",numeric:true},
+    {k:"age",l:"築年数",numeric:true}
+  ]},
+  {name:"建物情報",fields:[
+    {k:"structure",l:"構造",sel:["木造","軽量鉄骨","重量鉄骨","RC造","SRC造"],allowOther:true},
+    {k:"occupancy",l:"現況",sel:["賃貸中","空室","空家","自己使用"]},
+    {k:"buildingArea",l:"建物面積",numeric:true},
+    {k:"landArea",l:"土地面積",numeric:true},
+    {k:"floorPlan",l:"間取り",sel:["1K","1DK","1LDK","2DK","2LDK","3DK","3LDK","4DK","4LDK","5LDK以上"],allowOther:true}
+  ]},
+  {name:"立地・その他",fields:[
+    {k:"parking",l:"駐車場",numeric:true},
+    {k:"road",l:"接道"},
+    {k:"zoning",l:"用途地域",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
+    {k:"source",l:"情報源",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","レインズ","その他"],allowOther:true}
+  ]}
 ];
+
+function parseNumericField(value){
+  const v=String(value||"");
+  const m=v.match(/^([\d,]+(?:\.\d+)?)/);
+  if(!m)return{num:"",unit:"",suffix:v};
+  const num=m[1];
+  const rest=v.slice(num.length);
+  // unit = leading run of unit-like characters (letters/symbols before any space or parenthesis)
+  const um=rest.match(/^([^\s（(]*)/);
+  const unit=um?um[1]:"";
+  const suffix=rest.slice(unit.length);
+  return{num,unit,suffix};
+}
+function buildNumericValue(num,unit,suffix){
+  return `${num}${unit}${suffix||""}`;
+}
 
 /* ─── data ─── */
 const props=[
@@ -778,7 +918,8 @@ function renderHome(){renderHero();renderChips();renderList();}
 function renderHero(){
   const top=[...props].sort((a,b)=>b.score-a.score)[0],m=SM[top.status];
   const cnt={}; SO.forEach(s=>cnt[s]=0); props.forEach(p=>cnt[p.status]++);
-  document.getElementById("homeHero").innerHTML=`
+  const hero=document.getElementById("homeHero");
+  hero.innerHTML=`
     <div class="top"><div>
       <p class="score-label">注目物件 Shonai Score</p>
       <p class="score-num">${top.score}<small>/100</small></p>
@@ -786,6 +927,8 @@ function renderHero(){
     </div><div class="ring" style="--p:${top.score}"><i>${top.score}</i></div></div>
     <p class="score-comment">${top.comment}</p>
     <p class="score-substats">${SO.map(s=>`${s} ${cnt[s]}件`).join(" ・ ")}</p>`;
+  hero.style.cursor="pointer";
+  hero.onclick=()=>goToDetail(top);
 }
 function renderChips(){
   const w=document.getElementById("statusChips");
@@ -901,9 +1044,11 @@ function renderCmpBody(){
 
   // AI compare comment
   const top=sel.reduce((a,b)=>a.score>b.score?a:b);
+  const cmpFullText=`${top.title}がスコア${top.score}点でトップです。${top.comment}`;
   const aiComment=`<div class="cmp-ai card">
     <p class="card-title">🤖 AI比較コメント</p>
-    <p>${top.title}がスコア${top.score}点でトップです。${top.comment.slice(0,60)}…</p>
+    <p class="cmp-ai-text clamp" id="cmpAiText">${cmpFullText}</p>
+    <button class="cmp-ai-toggle" id="cmpAiToggle">続きを読む</button>
     <p style="margin-top:8px;font-size:12px;color:var(--muted)">
     ${sel.map(p=>{const {pct}=calcStats(p);return `${p.title}：調査${pct}%完了`}).join(" ／ ")}</p>
   </div>`;
@@ -914,6 +1059,17 @@ function renderCmpBody(){
     top.tags=[...new Set([...top.tags,"#第一候補"])];
     log(top,"🏆 第一候補に設定");
     alert(`✅ ${top.title} を第一候補に設定しました！`);
+  });
+  const cmpAiText=document.getElementById("cmpAiText"),cmpAiToggle=document.getElementById("cmpAiToggle");
+  requestAnimationFrame(()=>{
+    const over=cmpAiText.scrollHeight>cmpAiText.clientHeight+2;
+    cmpAiToggle.style.display=over?"block":"none";
+    if(!over)cmpAiText.classList.remove("clamp");
+    else cmpAiToggle.textContent="続きを読む";
+  });
+  cmpAiToggle.addEventListener("click",()=>{
+    cmpAiText.classList.toggle("clamp");
+    cmpAiToggle.textContent=cmpAiText.classList.contains("clamp")?"続きを読む":"閉じる";
   });
 }
 
@@ -956,15 +1112,29 @@ function summarize(text){
   if(s.length>42)s=s.slice(0,42)+"…";
   return s;
 }
-document.getElementById("aiDetailLink").addEventListener("click",()=>{
-  const card=document.getElementById("aiDetailCard");
+/* ─── AI detail modal ─── */
+const aiModalBd=document.getElementById("aiModalBd");
+let aiModalScrollY=0;
+function openAiModal(){
   const aiText=document.getElementById("aiText"),tb=document.getElementById("aiToggle");
-  if(aiText.classList.contains("clamp")){aiText.classList.remove("clamp");tb.textContent="閉じる";}
-  card.scrollIntoView({behavior:"smooth",block:"start"});
-  card.classList.remove("ai-detail-card-highlight");
-  void card.offsetWidth;
-  card.classList.add("ai-detail-card-highlight");
-});
+  aiText.classList.add("clamp");
+  requestAnimationFrame(()=>{
+    const over=aiText.scrollHeight>aiText.clientHeight+2;
+    tb.style.display=over?"block":"none";
+    if(!over)aiText.classList.remove("clamp");
+    else tb.textContent="続きを読む";
+  });
+  aiModalScrollY=document.getElementById("detailScreen").scrollTop;
+  aiModalBd.classList.add("show");
+}
+function closeAiModal(){
+  aiModalBd.classList.remove("show");
+  // restore original scroll position in the detail screen
+  document.getElementById("detailScreen").scrollTop=aiModalScrollY;
+}
+document.getElementById("aiDetailLink").addEventListener("click",openAiModal);
+document.getElementById("aiModalClose").addEventListener("click",closeAiModal);
+aiModalBd.addEventListener("click",e=>{ if(e.target===aiModalBd)closeAiModal(); });
 function renderStats(p){
   const{pct,unc}=calcStats(p);
   document.getElementById("dSub").textContent=`情報完成度 ${pct}% ・ 未確認 ${unc}件${p.reason?" ・ 見送り理由："+p.reason:""}`;
@@ -997,7 +1167,7 @@ function renderTodos(p){
   document.querySelectorAll("#todoActive .todo-label,#todoActive .todo-arr").forEach(el=>{
     el.addEventListener("click",e=>{
       const row=e.target.closest(".todo-row");
-      setPanel(1);
+      setPanel(1,true,{scroll:true});
       setTimeout(()=>{
         document.querySelectorAll(".check-btn").forEach(r=>r.classList.remove("hi"));
         const cr=document.querySelector(`.check-btn[data-key="${row.dataset.target}"]`);
@@ -1067,7 +1237,7 @@ document.getElementById("memoCancelBtn").addEventListener("click",()=>{document.
 document.getElementById("memoSaveBtn").addEventListener("click",()=>{const v=document.getElementById("memoInput").value.trim();if(!v)return;ap.memos.unshift({date:now(),text:v});document.getElementById("memoInput").value="";document.getElementById("memoFormWrap").classList.remove("open");renderMemos(ap);log(ap,"📝 メモ追加");});
 
 /* ─── swipe panels ─── */
-function setPanel(idx,animate=true){
+function setPanel(idx,animate=true,{scroll=false}={}){
   panelIdx=Math.max(0,Math.min(3,idx));
   const inner=document.getElementById("swipeInner");
   const outer=document.getElementById("swipeOuter");
@@ -1075,9 +1245,18 @@ function setPanel(idx,animate=true){
   inner.style.transform=`translateX(${-panelIdx*outer.clientWidth}px)`;
   document.querySelectorAll(".ql").forEach((b,i)=>b.classList.toggle("on",i===panelIdx));
   document.querySelectorAll("#swipeDots span").forEach((d,i)=>d.classList.toggle("on",i===panelIdx));
+  document.querySelectorAll("#swipeDotsTop span").forEach((d,i)=>d.classList.toggle("on",i===panelIdx));
+  if(scroll){
+    // give the user a clear sense of "having jumped" to the section
+    requestAnimationFrame(()=>{
+      outer.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  }
 }
-document.querySelectorAll(".ql").forEach(btn=>btn.addEventListener("click",()=>setPanel(Number(btn.dataset.pi))));
-window.addEventListener("resize",()=>{if(ap)setPanel(panelIdx,false);});
+document.querySelectorAll(".ql").forEach(btn=>btn.addEventListener("click",()=>{
+  setPanel(Number(btn.dataset.pi),true,{scroll:true});
+}));
+window.addEventListener("resize",()=>{if(ap)setPanel(panelIdx,false);if(document.getElementById("eSheet").classList.contains("show"))goWizStep(wizStep,false);});
 
 (()=>{
   const outer=document.getElementById("swipeOuter");
@@ -1155,39 +1334,192 @@ function openSh(b,s){document.getElementById(b).classList.add("show");document.g
 function closeSh(b,s){document.getElementById(b).classList.remove("show");document.getElementById(s).classList.remove("show");}
 
 /* ─── edit wizard ─── */
-let wizStep=0,wizDraft={};
-function openWiz(){wizStep=0;wizDraft={...ap};renderWizStep();openSh("eBd","eSheet");}
-function renderWizStep(){
-  const s=STEPS[wizStep];
+let wizStep=0,wizDraft={},wizOriginal={};
+const OTHER_VALUE="__other__";
+
+function fieldHtml(f){
+  const cur=wizDraft[f.k]||"";
+  if(f.numeric){
+    const{num,unit,suffix}=parseNumericField(cur);
+    const units=UNIT_OPTIONS[f.k]||[];
+    const unitKnown=units.includes(unit);
+    const unitOptsHtml=units.map(u=>`<option${u===unit?" selected":""}>${u}</option>`).join("")
+      +`<option value="${OTHER_VALUE}"${!unitKnown&&unit?" selected":""}>その他・手入力</option>`;
+    return`<div class="ff">
+      <label>${f.l}</label>
+      <div class="ff-numeric-row">
+        <input id="wf_${f.k}_num" inputmode="decimal" pattern="[0-9.,]*" placeholder="数値" value="${num}">
+        <select id="wf_${f.k}_unit">${unitOptsHtml}</select>
+      </div>
+      ${!unitKnown&&unit?`<input class="ff-other-input" id="wf_${f.k}_unit_other" placeholder="単位を入力（例：万円）" value="${unit}">`:""}
+    </div>`;
+  }
+  if(f.sel){
+    const known=f.sel.includes(cur);
+    const optsHtml=f.sel.map(o=>`<option${o===cur?" selected":""}>${o}</option>`).join("")
+      +(f.allowOther?`<option value="${OTHER_VALUE}"${!known&&cur?" selected":""}>その他・手入力</option>`:"");
+    return`<div class="ff">
+      <label>${f.l}</label>
+      <select id="wf_${f.k}">${optsHtml}</select>
+      ${f.allowOther&&!known&&cur?`<input class="ff-other-input" id="wf_${f.k}_other" placeholder="${f.l}を入力" value="${cur}">`:""}
+    </div>`;
+  }
+  return`<div class="ff"><label>${f.l}</label><input id="wf_${f.k}" value="${cur}"></div>`;
+}
+
+function bindFieldEvents(f){
+  if(f.numeric){
+    const unitSel=document.getElementById(`wf_${f.k}_unit`);
+    if(unitSel)unitSel.addEventListener("change",()=>{
+      captureWiz();renderWizPanels(false);
+    });
+    return;
+  }
+  if(f.sel&&f.allowOther){
+    const sel=document.getElementById(`wf_${f.k}`);
+    if(sel)sel.addEventListener("change",()=>{
+      captureWiz();renderWizPanels(false);
+    });
+  }
+}
+
+function openWiz(){
+  wizStep=0;
+  wizDraft={...ap};
+  wizOriginal={...ap};
+  renderWizProgress();
+  renderWizPanels(true);
+  openSh("eBd","eSheet");
+}
+function renderWizProgress(){
   document.getElementById("wizProg").innerHTML=STEPS.map((_,i)=>`<i class="${i<=wizStep?"done":""}"></i>`).join("");
-  document.getElementById("wizStepName").textContent=`STEP ${wizStep+1}/${STEPS.length}　${s.name}`;
-  document.getElementById("wizFields").innerHTML=s.fields.map(f=>{
-    if(f.sel)return`<div class="ff"><label>${f.l}</label><select id="wf_${f.k}">${f.sel.map(o=>`<option${wizDraft[f.k]===o?" selected":""}>${o}</option>`).join("")}</select></div>`;
-    return`<div class="ff"><label>${f.l}</label><input id="wf_${f.k}" value="${wizDraft[f.k]||""}"></div>`;
-  }).join("");
+  document.getElementById("wizStepName").textContent=`STEP ${wizStep+1}/${STEPS.length}　${STEPS[wizStep].name}`;
   document.getElementById("wizBack").textContent=wizStep===0?"キャンセル":"戻る";
   document.getElementById("wizNext").textContent=wizStep===STEPS.length-1?"保存する":"次へ";
-
-  // wizard swipe
-  const eSheet=document.getElementById("eSheet");
-  let sx=0,drag=false;
-  eSheet.ontouchstart=e=>{sx=e.touches[0].clientX;drag=true;};
-  eSheet.ontouchmove=null;
-  eSheet.ontouchend=e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>80){if(dx<0&&wizStep<STEPS.length-1){captureWiz();wizStep++;renderWizStep();}else if(dx>0&&wizStep>0){captureWiz();wizStep--;renderWizStep();}}};
 }
-function captureWiz(){STEPS[wizStep].fields.forEach(f=>{const el=document.getElementById("wf_"+f.k);if(el)wizDraft[f.k]=el.value;});}
-document.getElementById("wizBack").addEventListener("click",()=>{if(wizStep===0){closeSh("eBd","eSheet");return;}captureWiz();wizStep--;renderWizStep();});
-document.getElementById("wizNext").addEventListener("click",()=>{
+function renderWizPanels(rebuild){
+  const inner=document.getElementById("wizSwipeInner");
+  if(rebuild){
+    inner.innerHTML=STEPS.map(s=>`<div class="wiz-swipe-panel">${s.fields.map(fieldHtml).join("")}</div>`).join("");
+  } else {
+    // refresh only the current panel's fields (used after a select changes to show/hide "other" input)
+    const panel=inner.children[wizStep];
+    if(panel)panel.innerHTML=STEPS[wizStep].fields.map(fieldHtml).join("");
+  }
+  STEPS.forEach(s=>s.fields.forEach(bindFieldEvents));
+  goWizStep(wizStep,false);
+}
+function goWizStep(idx,animate=true){
+  wizStep=Math.max(0,Math.min(STEPS.length-1,idx));
+  const inner=document.getElementById("wizSwipeInner");
+  const outer=document.getElementById("wizSwipeOuter");
+  inner.style.transition=animate?"transform .4s cubic-bezier(.25,.85,.35,1)":"none";
+  inner.style.transform=`translateX(${-wizStep*outer.clientWidth}px)`;
+  renderWizProgress();
+}
+function captureWiz(){
+  STEPS.forEach(step=>step.fields.forEach(f=>{
+    if(f.numeric){
+      const numEl=document.getElementById(`wf_${f.k}_num`);
+      const unitEl=document.getElementById(`wf_${f.k}_unit`);
+      if(!numEl||!unitEl)return;
+      let unit=unitEl.value;
+      if(unit===OTHER_VALUE){
+        const otherEl=document.getElementById(`wf_${f.k}_unit_other`);
+        unit=otherEl?otherEl.value:"";
+      }
+      const{suffix}=parseNumericField(wizDraft[f.k]);
+      wizDraft[f.k]=buildNumericValue(numEl.value,unit,suffix);
+      return;
+    }
+    if(f.sel&&f.allowOther){
+      const sel=document.getElementById(`wf_${f.k}`);
+      if(!sel)return;
+      if(sel.value===OTHER_VALUE){
+        const otherEl=document.getElementById(`wf_${f.k}_other`);
+        wizDraft[f.k]=otherEl?otherEl.value:"";
+      } else {
+        wizDraft[f.k]=sel.value;
+      }
+      return;
+    }
+    const el=document.getElementById("wf_"+f.k);
+    if(el)wizDraft[f.k]=el.value;
+  }));
+}
+function wizHasChanges(){
   captureWiz();
-  if(wizStep<STEPS.length-1){wizStep++;renderWizStep();return;}
+  const allF=STEPS.flatMap(s=>s.fields);
+  return allF.some(f=>(wizDraft[f.k]||"")!==(wizOriginal[f.k]||""));
+}
+function saveWiz(){
+  captureWiz();
   const p=ap,allF=STEPS.flatMap(s=>s.fields);let changed=0;
   allF.forEach(f=>{if(p[f.k]!==wizDraft[f.k]){log(p,`✏️ ${f.l}：${p[f.k]} → ${wizDraft[f.k]}`);p[f.k]=wizDraft[f.k];changed++;}});
   if(changed===0)log(p,"✏️ 基本情報を確認しました");
   else{const d=Math.floor(Math.random()*5)-1;if(d!==0)bumpScore(p,d);}
-  renderDetail(p);closeSh("eBd","eSheet");
+  renderDetail(p);
+  closeSh("eBd","eSheet");
+}
+document.getElementById("wizBack").addEventListener("click",()=>{
+  if(wizStep===0){attemptCloseWiz();return;}
+  captureWiz();goWizStep(wizStep-1);
 });
-document.getElementById("eBd").addEventListener("click",()=>closeSh("eBd","eSheet"));
+document.getElementById("wizNext").addEventListener("click",()=>{
+  captureWiz();
+  if(wizStep<STEPS.length-1){goWizStep(wizStep+1);return;}
+  saveWiz();
+});
 document.getElementById("editBtn").addEventListener("click",openWiz);
+
+/* wizard swipe: finger-following drag, like the photo gallery */
+(()=>{
+  const outer=document.getElementById("wizSwipeOuter");
+  const inner=document.getElementById("wizSwipeInner");
+  let sx=0,drag=false,base=0,moved=false;
+  outer.addEventListener("touchstart",e=>{
+    if(e.target.closest("input,select,textarea"))return;
+    sx=e.touches[0].clientX;drag=true;moved=false;inner.style.transition="none";base=-wizStep*outer.clientWidth;
+  },{passive:true});
+  outer.addEventListener("touchmove",e=>{
+    if(!drag)return;
+    const dx=e.touches[0].clientX-sx;
+    if(Math.abs(dx)>6)moved=true;
+    inner.style.transform=`translateX(${base+dx}px)`;
+  },{passive:true});
+  outer.addEventListener("touchend",e=>{
+    if(!drag)return;drag=false;
+    if(!moved)return;
+    const dx=e.changedTouches[0].clientX-sx;
+    captureWiz();
+    if(Math.abs(dx)>55){ dx<0?goWizStep(wizStep+1):goWizStep(wizStep-1); }
+    else goWizStep(wizStep);
+  });
+})();
+
+/* ─── close handle: tap or swipe-down to close, with unsaved-changes confirmation ─── */
+function attemptCloseWiz(){
+  if(wizHasChanges()){
+    openSh("uBd","uSheet");
+  } else {
+    closeSh("eBd","eSheet");
+  }
+}
+document.getElementById("eBd").addEventListener("click",attemptCloseWiz);
+(()=>{
+  const handle=document.getElementById("eHandle");
+  let sy=0,drag=false;
+  handle.addEventListener("click",attemptCloseWiz);
+  handle.addEventListener("touchstart",e=>{sy=e.touches[0].clientY;drag=true;},{passive:true});
+  handle.addEventListener("touchend",e=>{
+    if(!drag)return;drag=false;
+    const dy=e.changedTouches[0].clientY-sy;
+    if(dy>24)attemptCloseWiz();
+  });
+})();
+document.getElementById("uSaveBtn").addEventListener("click",()=>{closeSh("uBd","uSheet");saveWiz();});
+document.getElementById("uDiscardBtn").addEventListener("click",()=>{closeSh("uBd","uSheet");closeSh("eBd","eSheet");});
+document.getElementById("uCancelBtn").addEventListener("click",()=>closeSh("uBd","uSheet"));
 
 /* ─── gallery ─── */
 let galIdx=0;
@@ -1230,7 +1562,7 @@ function renderGallery(p){
     </div>
     <div class="gal-mode-row">
       <span class="gal-mode-label" id="galViewLabel">写真の閲覧</span>
-      <button class="gal-edit-toggle ${galEditOpen?"on":""}" id="galEditToggle">${galEditOpen?"✓ 編集中":"✎ 写真を編集"}</button>
+      <button class="gal-edit-toggle ${galEditOpen?"on":""}" id="galEditToggle">${galEditOpen?"✓ 保存":"✎ 写真を編集"}</button>
     </div>
     <div class="gal-view-tags" id="galViewTags"></div>
     <div class="gal-view-memo" id="galViewMemo"></div>
@@ -1257,12 +1589,15 @@ function renderGallery(p){
   });
   document.getElementById("galEditToggle").addEventListener("click",e=>{
     e.stopPropagation();
-    galEditOpen=!galEditOpen;
-    document.getElementById("galEditPanel").classList.toggle("open",galEditOpen);
-    const tb=document.getElementById("galEditToggle");
-    tb.classList.toggle("on",galEditOpen);
-    tb.textContent=galEditOpen?"✓ 編集中":"✎ 写真を編集";
-    document.getElementById("galViewLabel").textContent=galEditOpen?"この写真を編集中":"写真の閲覧";
+    if(galEditOpen){
+      // "保存" tapped: confirm changes are already applied live, just exit edit mode
+      galEditOpen=false;
+      log(p,"✅ 写真編集を保存して閉じました");
+      renderGallery(p);
+      return;
+    }
+    galEditOpen=true;
+    renderGallery(p);
   });
 
   const track=document.getElementById("galTrack");
@@ -1275,11 +1610,29 @@ function renderGallery(p){
     const cnt=document.getElementById("galCounter");if(cnt)cnt.textContent=`${galIdx+1} / ${n}`;
     renderViewTags(p);renderTagArea(p);renderPhotoMemo(p);
   }
-  let sx=0,drag=false,base=0;
-  vp.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;drag=true;track.style.transition="none";base=-galIdx*vp.clientWidth;},{passive:true});
-  vp.addEventListener("touchmove",e=>{if(!drag)return;track.style.transform=`translateX(${base+(e.touches[0].clientX-sx)}px)`;},{passive:true});
-  vp.addEventListener("touchend",e=>{if(!drag)return;drag=false;const dx=e.changedTouches[0].clientX-sx;Math.abs(dx)>50?(dx<0?goGal(galIdx+1):goGal(galIdx-1)):goGal(galIdx);});
-  vp.addEventListener("click",()=>openFS(p,galIdx));
+  let sx=0,sy=0,drag=false,base=0,moved=false,handledByTouch=false;
+  vp.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;drag=true;moved=false;track.style.transition="none";base=-galIdx*vp.clientWidth;},{passive:true});
+  vp.addEventListener("touchmove",e=>{
+    if(!drag)return;
+    const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;
+    if(Math.abs(dx)>6||Math.abs(dy)>6)moved=true;
+    track.style.transform=`translateX(${base+dx}px)`;
+  },{passive:true});
+  vp.addEventListener("touchend",e=>{
+    if(!drag)return;drag=false;
+    handledByTouch=true;
+    setTimeout(()=>{handledByTouch=false;},400);
+    const dx=e.changedTouches[0].clientX-sx;
+    if(!moved||Math.abs(dx)<6){
+      // treat as a tap: open fullscreen viewer
+      goGal(galIdx);
+      openFS(p,galIdx);
+      return;
+    }
+    Math.abs(dx)>50?(dx<0?goGal(galIdx+1):goGal(galIdx-1)):goGal(galIdx);
+  });
+  // Fallback for non-touch environments (desktop preview, etc.)
+  vp.addEventListener("click",()=>{ if(!handledByTouch&&!moved) openFS(p,galIdx); });
   goGal(galIdx,false);
 }
 
@@ -1364,6 +1717,51 @@ document.getElementById("fsDelBtn").addEventListener("click",()=>{
   log(ap,"🗑 写真削除");ap.photos.splice(fsIdx,1);fsEl.classList.remove("show");galIdx=Math.max(0,fsIdx-1);renderGallery(ap);
 });
 document.getElementById("fsPickBtn").addEventListener("click",()=>fileInputReplace.click());
+
+/* ─── home hamburger menu ─── */
+const HOME_MENU_INFO={
+  blueprint:{
+    title:"📘 Blueprint情報",
+    body:`<p><b style="color:var(--g)">📘 Blueprint Project</b></p>
+      <p>"Forge by building, then refining." — 作りながら研ぐ、という開発姿勢の総称です。</p>
+      <p>Project:SS はこの Blueprint Project の一環として、実際に触れる試作を積み重ねながら磨き上げています。</p>
+      <p style="color:var(--muted);font-size:11.5px">Since 2026.06.30</p>`
+  },
+  about:{
+    title:"ℹ️ Project:SSについて",
+    body:`<p>Project:SS は、地方中古戸建て投資の物件評価・調査・学習ログを行うアプリです。</p>
+      <p>良い物件を探すだけでなく、見送った物件も経験値として蓄積することを大切にしています。</p>
+      <p><b style="color:var(--g)">コンセプト：</b>自分が戦うための武器を、自分で鍛える。</p>`
+  },
+  dna:{
+    title:"🧬 Development DNA",
+    body:`<div class="hi-item"><b>①</b><div>Forge by building, then refining.<br><span style="color:var(--muted);font-size:11.5px">作りながら研ぐ。完成前に触る。</span></div></div>
+      <div class="hi-item"><b>②</b><div>Prototype first.<br><span style="color:var(--muted);font-size:11.5px">設計より先に動かす。</span></div></div>
+      <div class="hi-item"><b>③</b><div>Learn by using.<br><span style="color:var(--muted);font-size:11.5px">使うことが最大の学習。</span></div></div>
+      <div class="hi-item"><b>④</b><div>Every project becomes a page of Blueprint.<br><span style="color:var(--muted);font-size:11.5px">すべての試みが、自分の地図になる。</span></div></div>`
+  },
+  version:{
+    title:"🔖 バージョン情報",
+    body:`<p><b style="color:var(--g)">Project:SS</b> Version Alpha 0.6.2</p>
+      <p style="color:var(--muted);font-size:11.5px">Built with ❤️ using AI · Blueprint Project</p>
+      <p>今回のアップデートでは、クイックリンクの挙動改善、写真の閲覧/編集の分離、AI詳細のモーダル表示化、基本情報編集の入力改善などを行いました。</p>`
+  }
+};
+document.getElementById("homeMenuBtn").addEventListener("click",()=>openSh("hmBd","hmSheet"));
+document.getElementById("hmCancelBtn").addEventListener("click",()=>closeSh("hmBd","hmSheet"));
+document.getElementById("hmBd").addEventListener("click",()=>closeSh("hmBd","hmSheet"));
+document.querySelectorAll("#hmSheet .sh-opt").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const info=HOME_MENU_INFO[btn.dataset.info];
+    if(!info)return;
+    closeSh("hmBd","hmSheet");
+    document.getElementById("hiTitle").textContent=info.title;
+    document.getElementById("hiBody").innerHTML=info.body;
+    openSh("hiBd","hiSheet");
+  });
+});
+document.getElementById("hiCloseBtn").addEventListener("click",()=>closeSh("hiBd","hiSheet"));
+document.getElementById("hiBd").addEventListener("click",()=>closeSh("hiBd","hiSheet"));
 
 /* ─── settings ─── */
 document.getElementById("logoShapeRow").querySelectorAll(".logo-shape-btn").forEach(btn=>{
