@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Project:SS Alpha 0.6.2</title>
+<title>Project:SS Alpha 0.6.3</title>
 <style>
-:root{--g:#1f7a45;--g2:#7ecb91;--ink:#17251b;--muted:#7a8780;--bg:#eef5ef;--card:#fff;--danger:#c0392b}
+:root{--g:#1f7a45;--g2:#7ecb91;--ink:#17251b;--muted:#7a8780;--bg:#F6FAF8;--card:#FFFEFC;--danger:#c0392b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
@@ -17,7 +17,7 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
 
 /* ── shell ── */
 .shell{width:min(430px,100%);margin:0 auto;position:relative;height:100dvh;overflow:hidden}
-.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#f8fbf8;
+.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);
   padding:16px 16px 0;padding-top:calc(16px + env(safe-area-inset-top));
   transition:transform .42s cubic-bezier(.22,.7,.36,1);padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 #homeScreen{transform:translateX(0)}
@@ -207,7 +207,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 
 /* ── detail quicklinks (swipe mode) ── */
 .ql-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;position:sticky;top:0;z-index:4}
-.ql{border:0;background:#fff;border-radius:18px;padding:11px 4px 10px;box-shadow:0 6px 16px rgba(32,59,41,.07);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:#3c473f;font-weight:700}
+.ql{border:0;background:var(--card);border-radius:18px;padding:11px 4px 10px;box-shadow:0 6px 16px rgba(32,59,41,.07);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;color:#3c473f;font-weight:700}
 .ql .ico{width:30px;height:30px;border-radius:10px;background:#edf7ef;display:grid;place-items:center;font-size:14px}
 .ql.on{background:var(--g);color:#fff}
 .ql.on .ico{background:rgba(255,255,255,.2)}
@@ -239,7 +239,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 /* AI detail modal */
 .ai-modal-bd{position:fixed;inset:0;background:rgba(15,30,20,0);pointer-events:none;transition:background .3s;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px}
 .ai-modal-bd.show{background:rgba(15,30,20,.45);pointer-events:auto}
-.ai-modal{width:min(390px,100%);max-height:80vh;background:#fff;border-radius:26px;box-shadow:0 24px 60px rgba(0,0,0,.28);display:flex;flex-direction:column;transform:scale(.92) translateY(10px);opacity:0;transition:transform .28s cubic-bezier(.25,.85,.35,1),opacity .28s ease}
+.ai-modal{width:min(390px,100%);max-height:80vh;background:var(--card);border-radius:26px;box-shadow:0 24px 60px rgba(0,0,0,.28);display:flex;flex-direction:column;transform:scale(.92) translateY(10px);opacity:0;transition:transform .28s cubic-bezier(.25,.85,.35,1),opacity .28s ease}
 .ai-modal-bd.show .ai-modal{transform:scale(1) translateY(0);opacity:1}
 .ai-modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 10px;flex:none}
 .ai-modal-head p{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
@@ -326,13 +326,18 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 /* ── sheets ── */
 .bd{position:fixed;inset:0;background:rgba(15,30,20,0);pointer-events:none;transition:background .3s;z-index:30}
 .bd.show{background:rgba(15,30,20,.32);pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;width:min(430px,100%);margin:0 auto;background:#fff;border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -16px 40px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .34s cubic-bezier(.22,.7,.36,1);z-index:31;max-height:86vh;overflow-y:auto}
+#hiBd{z-index:32;background:rgba(15,30,20,0)}
+#hiBd.show{background:rgba(15,30,20,0);pointer-events:auto}
+#hiSheet{z-index:33}
+.sheet{position:fixed;left:0;right:0;bottom:0;width:min(430px,100%);margin:0 auto;background:var(--card);border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -16px 40px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .34s cubic-bezier(.22,.7,.36,1);z-index:31;max-height:86vh;overflow-y:auto}
 .sheet.show{transform:translateY(0)}
 .sh-handle{width:38px;height:5px;background:#e1e7e2;border-radius:99px;margin:8px auto 14px;cursor:pointer}
 .sh-title{font-size:16px;font-weight:800;margin-bottom:12px}
 .sh-opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:#f5f8f6;border-radius:16px;padding:14px;margin:7px 0;font-weight:800;font-size:14px;color:#243329}
 .sh-opt .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .sh-opt.cur{background:#e2f5e8;color:#14733d}
+.sh-opt.pa-danger{background:#fbe9e9;color:#a23131}
+.pa-divider{height:1px;background:#eef2ef;margin:10px 4px}
 .sh-cancel{display:block;width:100%;border:0;background:transparent;color:#9aa6a0;font-weight:700;font-size:13.5px;padding:12px;margin-top:2px}
 .hi-body{font-size:13px;line-height:1.85;color:#3c473f;padding:2px 2px 14px}
 .hi-body p+p{margin-top:10px}
@@ -366,11 +371,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 /* ── compare screen ── */
 .cmp-select-area{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
 .cmp-select-area::-webkit-scrollbar{display:none}
-.cmp-prop-btn{flex:none;border:2px solid #dbe9df;background:#fff;border-radius:18px;padding:10px 14px;font-size:12px;font-weight:700;color:#3c473f;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.cmp-prop-btn{flex:none;border:2px solid #dbe9df;background:var(--card);border-radius:18px;padding:10px 14px;font-size:12px;font-weight:700;color:#3c473f;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .cmp-prop-btn.on{border-color:var(--g);background:#e2f5e8;color:var(--g)}
 .cmp-prop-btn .dot{width:8px;height:8px;border-radius:50%;flex:none}
 .cmp-table-wrap{overflow-x:auto;border-radius:18px;box-shadow:0 12px 28px rgba(32,59,41,.08)}
-.cmp-table{min-width:400px;width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden}
+.cmp-table{min-width:400px;width:100%;border-collapse:collapse;background:var(--card);border-radius:18px;overflow:hidden}
 .cmp-table th{background:#f4f7f5;padding:10px 12px;font-size:11px;font-weight:800;color:var(--muted);text-align:center;white-space:nowrap}
 .cmp-table th:first-child{text-align:left;min-width:90px}
 .cmp-table td{padding:10px 12px;font-size:12.5px;text-align:center;border-top:1px solid #eef2ef;font-weight:700}
@@ -390,13 +395,13 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 /* ── settings screen ── */
 .settings-section{margin-bottom:22px}
 .settings-section h3{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.06em;margin-bottom:8px;padding-left:4px}
-.settings-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff;font-size:14px;font-weight:700;color:var(--ink)}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--card);font-size:14px;font-weight:700;color:var(--ink)}
 .settings-row:first-of-type{border-radius:18px 18px 0 0}
 .settings-row:last-of-type{border-radius:0 0 18px 18px}
 .settings-row:only-of-type{border-radius:18px}
 .settings-row+.settings-row{border-top:1px solid #f0f3f0}
 .settings-row span{color:var(--muted);font-size:12px;font-weight:600}
-.settings-card{background:#fff;border-radius:18px;box-shadow:0 8px 20px rgba(32,59,41,.07);overflow:hidden;margin-bottom:8px}
+.settings-card{background:var(--card);border-radius:18px;box-shadow:0 8px 20px rgba(32,59,41,.07);overflow:hidden;margin-bottom:8px}
 .toggle-switch{width:44px;height:24px;border-radius:999px;border:0;position:relative;cursor:pointer;transition:background .2s}
 .toggle-switch.on{background:var(--g)}.toggle-switch.off{background:#d1d9d3}
 .toggle-switch::after{content:"";position:absolute;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
@@ -406,7 +411,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .app-info-card .tagline{font-size:13px;color:#3c473f;margin-top:12px;line-height:1.7}
 .app-info-card .since{font-size:11px;color:var(--muted);margin-top:8px}
 .blueprint-sig{font-size:10px;color:var(--muted);letter-spacing:.06em;margin-top:6px;font-style:italic}
-.dna-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 12px 28px rgba(32,59,41,.08);margin-bottom:14px}
+.dna-card{background:var(--card);border-radius:20px;padding:18px;box-shadow:0 12px 28px rgba(32,59,41,.08);margin-bottom:14px}
 .dna-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #eef2ef}
 .dna-item:last-child{border-bottom:0}
 .dna-item .num{font-size:13px;font-weight:800;color:var(--g);flex:none;width:20px}
@@ -576,7 +581,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <div class="app-info-card">
     <div class="logo shield" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:60px;font-size:19px"><span>SS</span></div>
     <h2 style="font-size:17px">Project:SS</h2>
-    <p class="version">Version Alpha 0.6.2</p>
+    <p class="version">Version Alpha 0.6.3</p>
     <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
     <p class="since">Since 2026.06.30</p>
     <p class="blueprint-sig">Built with ❤️ using AI · Blueprint Project</p>
@@ -700,7 +705,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <!-- home hamburger menu sheet -->
 <div class="bd" id="hmBd"></div>
 <div class="sheet" id="hmSheet">
-  <div class="sh-handle"></div>
+  <div class="sh-handle" id="hmHandle"></div>
   <p class="sh-title">メニュー</p>
   <button class="sh-opt" data-info="blueprint"><span class="dot" style="background:var(--g)"></span>📘 Blueprint情報</button>
   <button class="sh-opt" data-info="about"><span class="dot" style="background:var(--g)"></span>ℹ️ Project:SSについて</button>
@@ -712,10 +717,36 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <!-- home hamburger menu: info detail sheet -->
 <div class="bd" id="hiBd"></div>
 <div class="sheet" id="hiSheet">
-  <div class="sh-handle"></div>
+  <div class="sh-handle" id="hiHandle"></div>
   <p class="sh-title" id="hiTitle"></p>
   <div class="hi-body" id="hiBody"></div>
   <button class="sh-cancel" id="hiCloseBtn">閉じる</button>
+</div>
+
+<!-- photo change/delete action sheet (shared by the normal edit panel) -->
+<div class="bd" id="paBd"></div>
+<div class="sheet" id="paSheet">
+  <div class="sh-handle" id="paHandle"></div>
+  <p class="sh-title">この写真を変更</p>
+  <button class="sh-opt" id="paLibraryBtn"><span class="dot" style="background:var(--g)"></span>🖼️ 写真ライブラリ</button>
+  <button class="sh-opt" id="paCameraBtn"><span class="dot" style="background:var(--g)"></span>📷 写真を撮る</button>
+  <button class="sh-opt" id="paFilesBtn"><span class="dot" style="background:var(--g)"></span>📁 ファイルを選択</button>
+  <div class="pa-divider"></div>
+  <button class="sh-opt pa-danger" id="paDeleteBtn"><span class="dot" style="background:var(--danger)"></span>🗑 この写真を削除</button>
+  <button class="sh-cancel" id="paCancelBtn">キャンセル</button>
+</div>
+
+<!-- new property registration sheet -->
+<div class="bd" id="npBd"></div>
+<div class="sheet" id="npSheet">
+  <div class="sh-handle" id="npHandle"></div>
+  <p class="sh-title">新しい物件を追加</p>
+  <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px">
+    未入力の項目があっても登録できます。あとから編集できます。
+  </p>
+  <div id="npFields"></div>
+  <button class="modal-save" id="npSaveBtn" style="width:100%;border:0;background:var(--g);color:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:14px;margin-top:6px">この内容で登録する</button>
+  <button class="sh-cancel" id="npCancelBtn">キャンセル</button>
 </div>
 
 <!-- fullscreen photo -->
@@ -810,6 +841,17 @@ const STEPS=[
     {k:"zoning",l:"用途地域",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
     {k:"source",l:"情報源",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","レインズ","その他"],allowOther:true}
   ]}
+];
+
+/* ─── new property registration form ───
+   Reuses the same field-rendering logic (fieldHtml) as the edit wizard, via a
+   separate draft object (npDraft) so the two forms never interfere with each other.
+*/
+const NEW_PROPERTY_FIELDS=[
+  {k:"title",l:"物件名"},
+  {k:"address",l:"住所"},
+  {k:"status",l:"ステータス",sel:["候補","調査中","保留","見送り","購入済"]},
+  ...STEPS.flatMap(s=>s.fields)
 ];
 
 function parseNumericField(value){
@@ -922,11 +964,101 @@ document.getElementById("backBtn").addEventListener("click",goBack);
 document.getElementById("favBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
 document.getElementById("cmpBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
 document.getElementById("setBackBtn").addEventListener("click",()=>{goTo("home");renderHome();});
-document.getElementById("navHome").addEventListener("click",()=>{if(currentNav!=="home"){goBack();}});
+document.getElementById("navHome").addEventListener("click",()=>{
+  // The bottom-nav Home button always jumps straight to Home, regardless of
+  // which screen we're currently on. It must never depend on detailReturnTo,
+  // which is only meant for the detail screen's own back button.
+  if(currentNav!=="home"){goTo("home");renderHome();}
+});
 document.getElementById("navFav").addEventListener("click",()=>{goTo("fav");renderFav();});
 document.getElementById("navCompare").addEventListener("click",()=>{goTo("compare");renderCompare();});
 document.getElementById("navSettings").addEventListener("click",()=>{goTo("settings");});
-document.getElementById("navAdd").addEventListener("click",()=>{alert("🚧 新規登録機能は開発中です");});
+/* ─── new property registration ─── */
+function createBlankProperty(){
+  const nextId=props.length?Math.max(...props.map(p=>p.id))+1:1;
+  return{
+    id:nextId,title:"",address:"",status:"候補",score:50,fav:false,
+    price:"",yieldRate:"",rent:"",station:"",
+    age:"",structure:"",occupancy:"",buildingArea:"",
+    floorPlan:"",landArea:"",parking:"",road:"",
+    zoning:"",source:"",
+    tags:[],reason:null,
+    comment:"まだAIコメントがありません。基本情報や調査チェックを入力すると、より詳しい評価が表示されるようになります。",
+    aiPts:["まずは基本情報を入力してみましょう"],
+    aiNext:["調査チェックを進めてみましょう"],
+    breakdown:[["収益性",10],["立地",10],["建物・管理",10],["法的リスク",10],["流動性",10],["将来性",10]],
+    checks:Object.keys(CK).map(l=>({l,i:0})),
+    todos:[],
+    memos:[],
+    photos:[],
+    logs:[{d:now(),t:"🏠 物件登録"}]
+  };
+}
+
+let npDraft=null;
+function openNewPropertySheet(){
+  npDraft=createBlankProperty();
+  renderNpFields();
+  openSh("npBd","npSheet");
+}
+function renderNpFields(){
+  document.getElementById("npFields").innerHTML=NEW_PROPERTY_FIELDS.map(f=>fieldHtml(f,npDraft)).join("");
+  NEW_PROPERTY_FIELDS.forEach(f=>{
+    if(f.numeric){
+      const unitSel=document.getElementById(`wf_${f.k}_unit`);
+      if(unitSel)unitSel.addEventListener("change",()=>{captureNpFields();renderNpFields();});
+    } else if(f.sel&&f.allowOther){
+      const sel=document.getElementById(`wf_${f.k}`);
+      if(sel)sel.addEventListener("change",()=>{captureNpFields();renderNpFields();});
+    }
+  });
+}
+function captureNpFields(){
+  NEW_PROPERTY_FIELDS.forEach(f=>{
+    if(f.numeric){
+      const numEl=document.getElementById(`wf_${f.k}_num`);
+      const unitEl=document.getElementById(`wf_${f.k}_unit`);
+      if(!numEl||!unitEl)return;
+      let unit=unitEl.value;
+      if(unit===OTHER_VALUE){
+        const otherEl=document.getElementById(`wf_${f.k}_unit_other`);
+        unit=otherEl?otherEl.value:"";
+      }
+      const{suffix}=parseNumericField(npDraft[f.k]);
+      npDraft[f.k]=numEl.value?buildNumericValue(numEl.value,unit,suffix):"";
+      return;
+    }
+    if(f.sel&&f.allowOther){
+      const sel=document.getElementById(`wf_${f.k}`);
+      if(!sel)return;
+      if(sel.value===OTHER_VALUE){
+        const otherEl=document.getElementById(`wf_${f.k}_other`);
+        npDraft[f.k]=otherEl?otherEl.value:"";
+      } else {
+        npDraft[f.k]=sel.value;
+      }
+      return;
+    }
+    const el=document.getElementById("wf_"+f.k);
+    if(el)npDraft[f.k]=el.value;
+  });
+}
+function saveNewProperty(){
+  captureNpFields();
+  if(!npDraft.title.trim())npDraft.title="無題の物件";
+  props.push(npDraft);
+  closeSh("npBd","npSheet");
+  // Refresh the home list/hero in the background so it's correct once the
+  // person eventually returns to Home, then go straight to the new
+  // property's detail screen (skipping a flash of the Home screen).
+  renderHome();
+  goToDetail(npDraft,"home");
+}
+document.getElementById("navAdd").addEventListener("click",openNewPropertySheet);
+document.getElementById("npCancelBtn").addEventListener("click",()=>closeSh("npBd","npSheet"));
+document.getElementById("npBd").addEventListener("click",()=>closeSh("npBd","npSheet"));
+bindHandleClose("npHandle",()=>closeSh("npBd","npSheet"));
+document.getElementById("npSaveBtn").addEventListener("click",saveNewProperty);
 
 /* ─── home ─── */
 let filterSt="all";
@@ -1188,7 +1320,7 @@ function renderInfo(p){
     ["🏗️","構造",p.structure],["👤","現況",p.occupancy],["⛰️","土地面積",p.landArea],
     ["🏢","建物面積",p.buildingArea],["🪟","間取り",p.floorPlan],["🚗","駐車場",p.parking],
     ["🛣️","接道",p.road],["🏙️","用途地域",p.zoning],["🌐","情報源",p.source]
-  ].map(([ico,l,v])=>`<div class="info-cell"><div class="ico">${ico}</div><span>${l}</span><b>${v}</b></div>`).join("");
+  ].map(([ico,l,v])=>`<div class="info-cell"><div class="ico">${ico}</div><span>${l}</span><b${v?"":' style="color:#bcc4bf"'}>${v||"未入力"}</b></div>`).join("");
 }
 function renderChecks(p){
   document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
@@ -1339,8 +1471,8 @@ function closeSh(b,s){document.getElementById(b).classList.remove("show");docume
 let wizStep=0,wizDraft={},wizOriginal={};
 const OTHER_VALUE="__other__";
 
-function fieldHtml(f){
-  const cur=wizDraft[f.k]||"";
+function fieldHtml(f,draft){
+  const cur=draft[f.k]||"";
   if(f.numeric){
     const{num,unit,suffix}=parseNumericField(cur);
     const units=UNIT_OPTIONS[f.k]||[];
@@ -1402,11 +1534,11 @@ function renderWizProgress(){
 function renderWizPanels(rebuild){
   const inner=document.getElementById("wizSwipeInner");
   if(rebuild){
-    inner.innerHTML=STEPS.map(s=>`<div class="wiz-swipe-panel">${s.fields.map(fieldHtml).join("")}</div>`).join("");
+    inner.innerHTML=STEPS.map(s=>`<div class="wiz-swipe-panel">${s.fields.map(f=>fieldHtml(f,wizDraft)).join("")}</div>`).join("");
   } else {
     // refresh only the current panel's fields (used after a select changes to show/hide "other" input)
     const panel=inner.children[wizStep];
-    if(panel)panel.innerHTML=STEPS[wizStep].fields.map(fieldHtml).join("");
+    if(panel)panel.innerHTML=STEPS[wizStep].fields.map(f=>fieldHtml(f,wizDraft)).join("");
   }
   STEPS.forEach(s=>s.fields.forEach(bindFieldEvents));
   goWizStep(wizStep,false);
@@ -1507,18 +1639,21 @@ function attemptCloseWiz(){
     closeSh("eBd","eSheet");
   }
 }
-document.getElementById("eBd").addEventListener("click",attemptCloseWiz);
-(()=>{
-  const handle=document.getElementById("eHandle");
+/* ─── reusable handle: tap or swipe-down triggers a given close callback ─── */
+function bindHandleClose(handleId,closeCallback){
+  const handle=document.getElementById(handleId);
   let sy=0,drag=false;
-  handle.addEventListener("click",attemptCloseWiz);
+  handle.addEventListener("click",closeCallback);
   handle.addEventListener("touchstart",e=>{sy=e.touches[0].clientY;drag=true;},{passive:true});
   handle.addEventListener("touchend",e=>{
     if(!drag)return;drag=false;
     const dy=e.changedTouches[0].clientY-sy;
-    if(dy>24)attemptCloseWiz();
+    if(dy>24)closeCallback();
   });
-})();
+}
+
+document.getElementById("eBd").addEventListener("click",attemptCloseWiz);
+bindHandleClose("eHandle",attemptCloseWiz);
 document.getElementById("uSaveBtn").addEventListener("click",()=>{closeSh("uBd","uSheet");saveWiz();});
 document.getElementById("uDiscardBtn").addEventListener("click",()=>{closeSh("uBd","uSheet");closeSh("eBd","eSheet");});
 document.getElementById("uCancelBtn").addEventListener("click",()=>closeSh("uBd","uSheet"));
@@ -1595,7 +1730,7 @@ function renderGallery(p){
     </div>`;
 
   document.getElementById("galAddBtn").addEventListener("click",e=>{e.stopPropagation();triggerPick();});
-  document.getElementById("galReplaceBtn").addEventListener("click",e=>{e.stopPropagation();fileInputReplace.click();});
+  document.getElementById("galReplaceBtn").addEventListener("click",e=>{e.stopPropagation();openPhotoActionSheet(p,galIdx,{closeFullscreenAfter:false});});
   document.getElementById("galTagAdd").addEventListener("click",()=>{
     const v=document.getElementById("galTagInput").value.trim();if(!v)return;
     toggleTag(p,galIdx,v,true);document.getElementById("galTagInput").value="";
@@ -1722,14 +1857,56 @@ function renderFsFoot(p,idx){
   const memo=ph&&ph.memo?`<span>📝 ${ph.memo.slice(0,30)}${ph.memo.length>30?"…":""}</span>`:"";
   document.getElementById("fsFoot").innerHTML=tags+memo;
 }
+/* ─── shared photo delete logic (used by both fullscreen and the normal edit panel) ─── */
+function deletePhotoAt(p,idx,{closeFullscreen=false}={}){
+  if(!p||!p.photos.length||idx<0||idx>=p.photos.length)return false;
+  if(!confirm("この写真を削除しますか？"))return false;
+  log(p,"🗑 写真削除");
+  p.photos.splice(idx,1);
+  const newIdx=Math.max(0,Math.min(idx,p.photos.length-1));
+  galIdx=newIdx;
+  if(closeFullscreen)fsEl.classList.remove("show");
+  renderGallery(p);
+  return true;
+}
+
 document.getElementById("fsClose").addEventListener("click",()=>{fsEl.classList.remove("show");renderGallery(ap);});
 document.getElementById("fsAddBtn").addEventListener("click",triggerPick);
 document.getElementById("fsDelBtn").addEventListener("click",()=>{
-  if(!ap||!ap.photos.length)return;
-  if(!confirm("この写真を削除しますか？"))return;
-  log(ap,"🗑 写真削除");ap.photos.splice(fsIdx,1);fsEl.classList.remove("show");galIdx=Math.max(0,fsIdx-1);renderGallery(ap);
+  deletePhotoAt(ap,fsIdx,{closeFullscreen:true});
 });
 document.getElementById("fsPickBtn").addEventListener("click",()=>fileInputReplace.click());
+
+/* ─── photo change/delete action sheet ───
+   Reached via "🔄 この写真を変更" in the normal edit panel.
+   "写真ライブラリ / 写真を撮る / ファイルを選択" all defer to the same
+   <input type=file accept="image/*">, since iOS Safari itself already shows
+   its own native photo-library / camera / files chooser for that input —
+   we can't control which of those three iOS shows from web code, but we can
+   present the three options in our own sheet for a consistent, native feel.
+*/
+let paTargetIdx=0;
+function openPhotoActionSheet(p,idx,{closeFullscreenAfter=false}={}){
+  paTargetIdx=idx;
+  paCloseFsAfter=closeFullscreenAfter;
+  openSh("paBd","paSheet");
+}
+let paCloseFsAfter=false;
+function paTriggerReplace(){
+  galIdx=paTargetIdx;
+  closeSh("paBd","paSheet");
+  fileInputReplace.click();
+}
+document.getElementById("paLibraryBtn").addEventListener("click",paTriggerReplace);
+document.getElementById("paCameraBtn").addEventListener("click",paTriggerReplace);
+document.getElementById("paFilesBtn").addEventListener("click",paTriggerReplace);
+document.getElementById("paDeleteBtn").addEventListener("click",()=>{
+  closeSh("paBd","paSheet");
+  deletePhotoAt(ap,paTargetIdx,{closeFullscreen:paCloseFsAfter});
+});
+document.getElementById("paCancelBtn").addEventListener("click",()=>closeSh("paBd","paSheet"));
+document.getElementById("paBd").addEventListener("click",()=>closeSh("paBd","paSheet"));
+bindHandleClose("paHandle",()=>closeSh("paBd","paSheet"));
 
 /* ─── home hamburger menu ─── */
 const HOME_MENU_INFO={
@@ -1755,19 +1932,21 @@ const HOME_MENU_INFO={
   },
   version:{
     title:"🔖 バージョン情報",
-    body:`<p><b style="color:var(--g)">Project:SS</b> Version Alpha 0.6.2</p>
+    body:`<p><b style="color:var(--g)">Project:SS</b> Version Alpha 0.6.3</p>
       <p style="color:var(--muted);font-size:11.5px">Built with ❤️ using AI · Blueprint Project</p>
-      <p>今回のアップデートでは、クイックリンクの挙動改善、写真の閲覧/編集の分離、AI詳細のモーダル表示化、基本情報編集の入力改善などを行いました。</p>`
+      <p>今回のアップデートでは、写真削除メニューの整理、画面遷移の不具合修正、色味調整、新規物件登録機能の追加などを行いました。</p>`
   }
 };
 document.getElementById("homeMenuBtn").addEventListener("click",()=>openSh("hmBd","hmSheet"));
 document.getElementById("hmCancelBtn").addEventListener("click",()=>closeSh("hmBd","hmSheet"));
 document.getElementById("hmBd").addEventListener("click",()=>closeSh("hmBd","hmSheet"));
+bindHandleClose("hmHandle",()=>closeSh("hmBd","hmSheet"));
 document.querySelectorAll("#hmSheet .sh-opt").forEach(btn=>{
   btn.addEventListener("click",()=>{
     const info=HOME_MENU_INFO[btn.dataset.info];
     if(!info)return;
-    closeSh("hmBd","hmSheet");
+    // Keep hmSheet (the menu list) open underneath, and stack hiSheet on top of it.
+    // Closing hiSheet will then naturally reveal the menu list again.
     document.getElementById("hiTitle").textContent=info.title;
     document.getElementById("hiBody").innerHTML=info.body;
     openSh("hiBd","hiSheet");
@@ -1775,6 +1954,7 @@ document.querySelectorAll("#hmSheet .sh-opt").forEach(btn=>{
 });
 document.getElementById("hiCloseBtn").addEventListener("click",()=>closeSh("hiBd","hiSheet"));
 document.getElementById("hiBd").addEventListener("click",()=>closeSh("hiBd","hiSheet"));
+bindHandleClose("hiHandle",()=>closeSh("hiBd","hiSheet"));
 
 /* ─── settings ─── */
 document.getElementById("logoShapeRow").querySelectorAll(".logo-shape-btn").forEach(btn=>{
