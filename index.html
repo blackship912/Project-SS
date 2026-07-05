@@ -167,6 +167,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .gal-edit-panel-inner{padding-top:6px}
 .gal-edit-actions{display:flex;gap:8px;padding:10px 14px 4px}
 .gal-edit-actions button{flex:1;border:0;border-radius:13px;padding:10px;font-weight:800;font-size:12px;background:#f4f7f5;color:#3c473f}
+.gal-delete-btn{flex:none !important;width:40px;font-size:15px !important;color:#7a8780 !important}
+.gal-delete-btn:active{background:#fbe9e9 !important;color:#a23131 !important}
 .gal-tags-area{padding:10px 14px 0}
 .gal-tags-label{font-size:10.5px;color:var(--muted);font-weight:700;margin-bottom:6px}
 .gal-tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
@@ -202,8 +204,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .fs-slide img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .2s}
 .fs-foot{padding:10px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:6px}
 .fs-foot span{background:rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:5px 10px}
-.fs-actions{display:flex;gap:8px;padding:0 16px 10px;justify-content:center}
+.fs-actions{display:flex;align-items:center;gap:8px;padding:0 16px 10px}
 .fs-actions button{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700}
+.fs-actions .fs-spacer{flex:1}
+.fs-delete-btn{width:38px;height:38px;padding:0 !important;border-radius:50% !important;font-size:15px;flex:none}
+.fs-delete-btn:active{background:rgba(255,69,58,.35) !important}
 
 /* ── detail quicklinks (swipe mode) ── */
 .ql-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;position:sticky;top:0;z-index:4}
@@ -333,6 +338,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 #hiBd{z-index:32;background:rgba(15,30,20,0)}
 #hiBd.show{background:rgba(15,30,20,0);pointer-events:auto}
 #hiSheet{z-index:33}
+/* The photo-delete confirmation can be opened from inside the fullscreen
+   photo viewer (z-index:60), so it needs to sit above that layer or it
+   would render hidden behind it until the fullscreen view is closed. */
+#pdBd{z-index:80}
+#pdSheet{z-index:81}
 .sheet{position:fixed;left:0;right:0;bottom:0;width:min(430px,100%);margin:0 auto;background:var(--card);border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -16px 40px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .34s cubic-bezier(.22,.7,.36,1);z-index:31;max-height:86vh;overflow-y:auto}
 .sheet.show{transform:translateY(0)}
 .sh-handle{width:38px;height:5px;background:#e1e7e2;border-radius:99px;margin:8px auto 14px;cursor:pointer;position:relative}
@@ -342,29 +352,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .sh-opt .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .sh-opt.cur{background:#e2f5e8;color:#14733d}
 .sh-cancel{display:block;width:100%;border:0;background:transparent;color:#9aa6a0;font-weight:700;font-size:13.5px;padding:12px;margin-top:2px}
-
-/* ── shared "native-ish" option styling, used by the source-anchored
-   popup menu below (photo add / change / delete). ── */
-.as-group{background:rgba(70,70,72,.78);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border-radius:14px;overflow:hidden}
-.as-opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:13px 16px;font-size:15px;font-weight:400;color:#fff;position:relative;text-align:left}
-.as-opt:not(:last-child)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(255,255,255,.18)}
-.as-opt .as-ico{width:20px;text-align:center;font-size:16px;line-height:1;flex:none}
-.as-opt.as-danger{color:#ff453a;font-weight:600}
-.as-opt:active{background:rgba(255,255,255,.14)}
-
-/* ── source-anchored popup menu (photo add / change) ──
-   Grows outward from the button that was tapped, like a native iOS
-   context menu / macOS popover — NOT a bottom sheet. The page behind it
-   is never dimmed; only the popup itself has a translucent dark
-   background. Tapping anywhere outside the popup dismisses it.
-   Both layers default to pointer-events:none while closed so this
-   fixed, full-screen catcher never intercepts taps on the rest of the
-   app when the popup isn't open. */
-.pm-catcher{position:fixed;inset:0;z-index:70;background:transparent;pointer-events:none}
-.pm-catcher.show{pointer-events:auto}
-.pm-popup{position:fixed;z-index:71;min-width:210px;background:rgba(70,70,72,.92);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border-radius:14px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.28);
-  transform:scale(.4);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.32,.72,.33,1),opacity .18s ease}
-.pm-popup.show{transform:scale(1);opacity:1;pointer-events:auto}
 
 .hi-body{font-size:13px;line-height:1.85;color:#3c473f;padding:2px 2px 14px}
 .hi-body p+p{margin-top:10px}
@@ -750,12 +737,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <button class="sh-cancel" id="hiCloseBtn">閉じる</button>
 </div>
 
-<!-- source-anchored popup menu container (photo add / change) — filled in
-     dynamically by openPhotoPopup() so the same markup can show either the
-     "add" trio (library/camera/files) or that trio plus a delete option. -->
-<div class="pm-catcher" id="pmCatcher"></div>
-<div class="pm-popup" id="pmPopup"></div>
-
 <!-- generic "full value" sheet: used when an info-grid cell's text is too
      long to show in full within the small card (e.g. a long hand-typed
      "その他" value). Kept intentionally generic so any future long-value
@@ -781,6 +762,16 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <button class="sh-cancel" id="npCancelBtn">キャンセル</button>
 </div>
 
+<!-- photo delete confirmation -->
+<div class="bd" id="pdBd"></div>
+<div class="sheet" id="pdSheet">
+  <div class="sh-handle" id="pdHandle"></div>
+  <p class="sh-title">この写真を削除しますか？</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 4px">削除すると元に戻せません。</p>
+  <button class="sh-opt" id="pdCancelBtn"><span class="dot" style="background:#9aa6a0"></span>キャンセル</button>
+  <button class="sh-opt" id="pdConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>削除</button>
+</div>
+
 <!-- fullscreen photo -->
 <div class="fs" id="fsView">
   <div class="fs-head">
@@ -792,7 +783,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <div class="fs-track" id="fsTrack"></div>
   </div>
   <div class="fs-actions">
+    <div class="fs-spacer"></div>
     <button id="fsPickBtn">📁 この写真を変更</button>
+    <button id="fsDeleteBtn" class="fs-delete-btn" aria-label="この写真を削除">🗑️</button>
   </div>
   <div class="fs-foot" id="fsFoot"></div>
 </div>
@@ -1849,7 +1842,7 @@ function renderGallery(p){
   const el=document.getElementById("gallery");
   if(!p.photos.length){
     el.innerHTML=`<div class="gal-empty"><button class="gal-empty-btn" id="galEmptyBtn">＋ 写真を追加</button><p>外観・室内などの写真を登録できます</p></div>`;
-    document.getElementById("galEmptyBtn").addEventListener("click",e=>{openPhotoPopup(e.currentTarget,p,0,{includeDelete:false,mode:"add"});});
+    document.getElementById("galEmptyBtn").addEventListener("click",()=>{triggerPhotoAdd(p);});
     return;
   }
   const n=p.photos.length;
@@ -1875,6 +1868,7 @@ function renderGallery(p){
         <div class="gal-edit-actions">
           <button id="galAddBtn">＋ 写真を追加</button>
           <button id="galReplaceBtn">🔄 この写真を変更</button>
+          <button id="galDeleteBtn" class="gal-delete-btn" aria-label="この写真を削除">🗑️</button>
         </div>
         <div class="gal-tags-area">
           <p class="gal-tags-label">📷 現在の写真にタグを追加</p>
@@ -1885,8 +1879,9 @@ function renderGallery(p){
       </div>
     </div>`;
 
-  document.getElementById("galAddBtn").addEventListener("click",e=>{e.stopPropagation();openPhotoPopup(e.currentTarget,p,galIdx,{includeDelete:false,mode:"add"});});
-  document.getElementById("galReplaceBtn").addEventListener("click",e=>{e.stopPropagation();openPhotoPopup(e.currentTarget,p,galIdx,{includeDelete:true,mode:"replace"});});
+  document.getElementById("galAddBtn").addEventListener("click",e=>{e.stopPropagation();triggerPhotoAdd(p);});
+  document.getElementById("galReplaceBtn").addEventListener("click",e=>{e.stopPropagation();triggerPhotoReplace(p,galIdx,{closeFullscreenAfter:false});});
+  document.getElementById("galDeleteBtn").addEventListener("click",e=>{e.stopPropagation();deletePhotoAt(p,galIdx,{closeFullscreen:false});});
   document.getElementById("galTagAdd").addEventListener("click",()=>{
     const v=document.getElementById("galTagInput").value.trim();if(!v)return;
     toggleTag(p,galIdx,v,true);document.getElementById("galTagInput").value="";
@@ -2015,130 +2010,64 @@ function renderFsFoot(p,idx){
   document.getElementById("fsFoot").innerHTML=tags+memo;
 }
 /* ─── shared photo delete logic (used by both fullscreen and the normal edit panel) ─── */
+/* ─── shared photo delete logic (used by both fullscreen and the normal edit panel) ───
+   Uses a custom confirm sheet (キャンセル / 削除 in red) instead of the
+   browser's native confirm(), so the buttons match the rest of the app.
+*/
+let pdPendingProp=null, pdPendingIdx=-1, pdPendingCloseFs=false;
 function deletePhotoAt(p,idx,{closeFullscreen=false}={}){
   if(!p||!p.photos.length||idx<0||idx>=p.photos.length)return false;
-  if(!confirm("この写真を削除しますか？"))return false;
+  pdPendingProp=p; pdPendingIdx=idx; pdPendingCloseFs=closeFullscreen;
+  openSh("pdBd","pdSheet");
+  return true; // the sheet, not this call, decides whether the photo is actually removed
+}
+function closePhotoDeleteConfirm(){
+  closeSh("pdBd","pdSheet");
+  pdPendingProp=null; pdPendingIdx=-1; pdPendingCloseFs=false;
+}
+document.getElementById("pdCancelBtn").addEventListener("click",closePhotoDeleteConfirm);
+document.getElementById("pdBd").addEventListener("click",closePhotoDeleteConfirm);
+bindHandleClose("pdHandle",closePhotoDeleteConfirm);
+document.getElementById("pdConfirmBtn").addEventListener("click",()=>{
+  const p=pdPendingProp, idx=pdPendingIdx, closeFullscreen=pdPendingCloseFs;
+  closePhotoDeleteConfirm();
+  if(!p||idx<0||idx>=p.photos.length)return;
   log(p,"🗑 写真削除");
+  // photos[idx] carries its own tags/memo, so splicing it out removes that
+  // tag/memo information along with the photo — nothing extra to clean up.
   p.photos.splice(idx,1);
   const newIdx=Math.max(0,Math.min(idx,p.photos.length-1));
   galIdx=newIdx;
   if(closeFullscreen)fsEl.classList.remove("show");
   renderGallery(p);
-  return true;
-}
+});
 
 document.getElementById("fsClose").addEventListener("click",()=>{fsEl.classList.remove("show");renderGallery(ap);});
 document.getElementById("fsAddBtn").addEventListener("click",triggerPick);
-document.getElementById("fsPickBtn").addEventListener("click",e=>{
-  openPhotoPopup(e.currentTarget, ap, fsIdx, {includeDelete:true,closeFullscreenAfter:true,mode:"replace"});
+document.getElementById("fsPickBtn").addEventListener("click",()=>{
+  triggerPhotoReplace(ap, fsIdx, {closeFullscreenAfter:true});
+});
+document.getElementById("fsDeleteBtn").addEventListener("click",()=>{
+  deletePhotoAt(ap, fsIdx, {closeFullscreen:true});
 });
 
-/* ─── source-anchored photo popup menu (add / change / delete) ───
-   Grows outward from whichever button was tapped, like a native iOS
-   context menu / macOS popover — this is NOT a bottom sheet, and the
-   rest of the page is never dimmed. "写真ライブラリ / 写真を撮る /
-   ファイルを選択" all defer to the same <input type=file accept="image/*">,
-   since iOS Safari itself already shows its own native chooser for that
-   input and we can't control which of those three iOS shows from web
-   code — but we can present the three options in our own popup for a
-   consistent, native feel. "この写真を削除" is the one addition on top
-   of that trio, shown only where deletion makes sense (i.e. not on the
-   very first "＋ 写真を追加" action, which has nothing yet to delete).
+/* ─── photo add / replace triggers ───
+   No custom action sheet here anymore: tapping "＋ 写真を追加" or
+   "この写真を変更" opens the OS's own native file chooser directly via
+   <input type=file>. Add and replace are kept as two clearly separate
+   entry points so they can never be confused with each other:
+     - triggerPhotoAdd(p)          -> appends new photo(s) to p.photos
+     - triggerPhotoReplace(p,idx,{closeFullscreenAfter}) -> overwrites
+       the single photo at p.photos[idx]
 */
-const pmCatcher=document.getElementById("pmCatcher");
-const pmPopup=document.getElementById("pmPopup");
-let pmOpen=false;
-let pmTargetProp=null, pmTargetIdx=0, pmCloseFsAfter=false, pmMode="replace";
-
-function pmItemsHtml(items){
-  return items.map(it=>`<button class="as-opt ${it.danger?"as-danger":""}" data-action="${it.action}"><span class="as-ico">${it.icon}</span>${it.label}</button>`).join("");
+function triggerPhotoAdd(p){
+  fileInput.click();
 }
-
-function openPhotoPopup(triggerEl, p, idx, {includeDelete=true, closeFullscreenAfter=false, mode="replace"}={}){
-  pmTargetProp=p; pmTargetIdx=idx; pmCloseFsAfter=closeFullscreenAfter; pmMode=mode;
-
-  const items=[
-    {icon:"🖼️",label:"写真ライブラリ",action:"library"},
-    {icon:"📷",label:"写真を撮る",action:"camera"},
-    {icon:"📁",label:"ファイルを選択",action:"files"},
-  ];
-  if(includeDelete)items.push({icon:"🗑️",label:"この写真を削除",action:"delete",danger:true});
-
-  pmPopup.innerHTML=pmItemsHtml(items);
-  pmPopup.classList.remove("show");
-
-  const rect=triggerEl.getBoundingClientRect();
-  pmPopup.style.visibility="hidden";
-  pmPopup.style.left="0px";
-  pmPopup.style.top="0px";
-  const popupW=pmPopup.offsetWidth, popupH=pmPopup.offsetHeight;
-
-  const margin=8;
-  const vw=window.innerWidth, vh=window.innerHeight;
-  let left=rect.left, top=rect.bottom+6;
-  let originX="left", originY="top";
-
-  if(left+popupW+margin>vw){ left=rect.right-popupW; originX="right"; }
-  if(left<margin)left=margin;
-  if(top+popupH+margin>vh){ top=rect.top-popupH-6; originY="bottom"; }
-  if(top<margin)top=margin;
-
-  pmPopup.style.left=left+"px";
-  pmPopup.style.top=top+"px";
-  pmPopup.style.transformOrigin=`${originX} ${originY}`;
-  pmPopup.style.visibility="visible";
-
-  setTimeout(()=>{
-    pmCatcher.classList.add("show");
-    pmPopup.classList.add("show");
-    pmOpen=true;
-  },10);
-
-  pmPopup.querySelectorAll(".as-opt").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      // Capture everything this click needs BEFORE closePhotoPopup() resets
-      // the shared pmTargetProp/pmTargetIdx/pmMode state.
-      const action=btn.dataset.action;
-      const targetProp=pmTargetProp, targetIdx=pmTargetIdx;
-      const closeFsAfter=pmCloseFsAfter, activeMode=pmMode;
-      closePhotoPopup();
-
-      if(action==="delete"){
-        deletePhotoAt(targetProp,targetIdx,{closeFullscreen:closeFsAfter});
-        return;
-      }
-
-      // "写真を撮る" can skip iOS's own library/camera/files chooser
-      // entirely by setting capture="environment" on the <input> right
-      // before triggering it — for library/files we can't avoid iOS's
-      // native chooser (that's a platform limitation, not something we
-      // control), but at least the camera option becomes a single,
-      // direct action instead of another round of choices.
-      const targetInput = activeMode==="add" ? fileInput : fileInputReplace;
-      if(action==="camera"){ targetInput.setAttribute("capture","environment"); }
-      else { targetInput.removeAttribute("capture"); }
-
-      if(activeMode==="add"){
-        // "＋ 写真を追加": push a brand-new photo onto the gallery
-        fileInput.click();
-      } else {
-        // "この写真を変更": overwrite the currently-viewed photo
-        galIdx=targetIdx;
-        replaceShouldCloseFs=closeFsAfter;
-        fileInputReplace.click();
-      }
-    },{once:true});
-  });
+function triggerPhotoReplace(p,idx,{closeFullscreenAfter=false}={}){
+  galIdx=idx;
+  replaceShouldCloseFs=closeFullscreenAfter;
+  fileInputReplace.click();
 }
-function closePhotoPopup(){
-  pmPopup.classList.remove("show");
-  pmCatcher.classList.remove("show");
-  pmOpen=false;
-  // Reset internal targeting state so a stale target can never leak into
-  // the next time the popup is opened.
-  pmTargetProp=null; pmTargetIdx=0; pmCloseFsAfter=false; pmMode="replace";
-}
-pmCatcher.addEventListener("click",closePhotoPopup);
 
 /* ─── home hamburger menu ─── */
 const HOME_MENU_INFO={
