@@ -58,28 +58,6 @@ p,h1,h2,h3{margin:0}input,textarea,select{font-family:inherit}
 .logo span{position:relative;z-index:1}
 .logo.shield::before{transform:scale(.82)}
 .logo.shield::after{transform:scale(.72)}
-.logo-toggle-row{display:flex;gap:10px;margin-top:8px}
-.logo-shape-btn{flex:1;border:1.5px solid #e3ede5;background:#fff;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#3c473f}
-.logo-shape-btn.sel{border-color:var(--g);background:#f0faf3;color:var(--g)}
-.logo-shape-preview{
-  width:30px;height:34px;position:relative;
-  background:var(--g);display:grid;place-items:center;
-  color:#fff;font-size:11px;font-weight:800;
-  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
-}
-.logo-shape-preview::before{
-  content:"";position:absolute;inset:0;background:#fff;
-  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
-  transform:scale(.84);
-}
-.logo-shape-preview::after{
-  content:"";position:absolute;inset:0;background:var(--g);
-  clip-path:polygon(50% 0%,100% 27%,100% 73%,50% 100%,0% 73%,0% 27%);
-  transform:scale(.76);
-}
-.logo-shape-preview span{position:relative;z-index:1}
-.logo-shape-preview.shield::before{transform:scale(.80)}
-.logo-shape-preview.shield::after{transform:scale(.69)}
 h1{font-size:19px;font-weight:800}
 .sub{font-size:11px;color:var(--g);font-weight:800;letter-spacing:.04em}
 .sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:0}
@@ -98,6 +76,20 @@ h1{font-size:19px;font-weight:800}
 .home-hero-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--g),var(--g2));border-radius:4px 0 0 4px}
 #homeHero{transition:transform .15s,box-shadow .15s}
 #homeHero:active{transform:scale(.98)}
+
+/* ── top-pick (第1候補) card on Home ── */
+.top-pick-card{position:relative;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.top-pick-card:active{transform:scale(.98)}
+.top-pick-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#d9a528,#f3d27a);border-radius:4px 0 0 4px}
+.top-pick-label{font-size:12px;color:#8a5a00;font-weight:800;letter-spacing:.02em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.top-pick-row{display:flex;gap:12px;align-items:flex-start}
+.top-pick-thumb{width:56px;height:56px;border-radius:14px;flex:none;background-size:cover;background-position:center;background-color:#e9f1ea;display:grid;place-items:center;font-size:22px;color:#fff}
+.top-pick-body{flex:1;min-width:0}
+.top-pick-title{font-size:14.5px;font-weight:800;margin:0 0 2px}
+.top-pick-addr{font-size:11px;color:var(--muted);margin-bottom:6px}
+.top-pick-stats{display:flex;gap:12px;font-size:11.5px;flex-wrap:wrap}
+.top-pick-stats b{font-size:13.5px;display:block}
+.top-pick-comment{margin-top:10px;font-size:12px;line-height:1.7;color:#3c473f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .score-hero .top{display:flex;justify-content:space-between;align-items:center}
 .score-label{font-size:12px;color:var(--g);font-weight:800;letter-spacing:.02em;margin-bottom:4px}
 .score-num{font-size:44px;font-weight:800;line-height:1}
@@ -382,24 +374,65 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .wiz-swipe-inner{display:flex;will-change:transform;transition:transform .4s cubic-bezier(.25,.85,.35,1)}
 .wiz-swipe-panel{width:100%;flex:none;box-sizing:border-box;padding-right:2px}
 
-/* ── compare screen ── */
+/* ── compare screen ──
+   Kept simple on purpose: with only a handful of comparison rows right
+   now, pinning the header both ways (like a full spreadsheet) adds
+   complexity without much benefit yet. What matters most is never
+   losing track of which row is which while scrolling sideways, so only
+   the left label column is pinned horizontally. The property header
+   (photo/name/score) scrolls normally along with the rest of the page.
+*/
 .cmp-select-area{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
 .cmp-select-area::-webkit-scrollbar{display:none}
 .cmp-prop-btn{flex:none;border:2px solid #dbe9df;background:var(--card);border-radius:18px;padding:10px 14px;font-size:12px;font-weight:700;color:#3c473f;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .cmp-prop-btn.on{border-color:var(--g);background:#e2f5e8;color:var(--g)}
 .cmp-prop-btn .dot{width:8px;height:8px;border-radius:50%;flex:none}
-.cmp-table-wrap{overflow-x:auto;border-radius:18px;box-shadow:var(--card-shadow)}
-.cmp-table{min-width:400px;width:100%;border-collapse:collapse;background:var(--card);border-radius:18px;overflow:hidden}
-.cmp-table th{background:#f4f7f5;padding:10px 12px;font-size:11px;font-weight:800;color:var(--muted);text-align:center;white-space:nowrap}
-.cmp-table th:first-child{text-align:left;min-width:90px}
-.cmp-table td{padding:10px 12px;font-size:12.5px;text-align:center;border-top:1px solid #eef2ef;font-weight:700}
-.cmp-table td:first-child{text-align:left;font-size:11.5px;color:var(--muted);font-weight:600}
-.cmp-table td.best{color:var(--g);background:#f0faf3;font-weight:800}
-.cmp-ai{background:linear-gradient(135deg,#fff,#eef7f0);border-radius:20px;padding:16px;margin-bottom:14px}
-.cmp-ai p{font-size:13px;line-height:1.8;color:#3c473f;margin-top:8px}
-.cmp-ai .cmp-ai-text.clamp{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
-.cmp-ai-toggle{display:none;border:0;background:#e7f4eb;color:var(--g);border-radius:13px;padding:9px;width:100%;font-weight:800;font-size:12.5px;margin-top:10px}
-.cmp-pick-btn{width:100%;border:0;background:var(--g);color:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:14px;margin-bottom:8px}
+
+.cmp-grid-wrap{border-radius:18px;box-shadow:var(--card-shadow);background:var(--card);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp-grid{display:grid;grid-auto-rows:min-content}
+.cmp-cell{padding:10px 10px;font-size:12px;border-bottom:1px solid #eef2ef;border-right:1px solid #eef2ef;background:var(--card);display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box}
+.cmp-cell:last-child{border-right:0}
+
+/* left label column — the one thing that stays pinned while scrolling
+   sideways, so the row's meaning is never lost. */
+.cmp-cell.label{position:sticky;left:0;z-index:2;justify-content:flex-start;font-weight:700;color:var(--muted);font-size:11.5px;min-width:104px;background:#f8faf8}
+
+/* property header cells — scroll normally with the rest of the grid;
+   photo + name (tappable, see .cmp-h-link) + score. */
+.cmp-header-cell{background:var(--card);flex-direction:column;gap:4px;padding:12px 8px;min-width:120px;border-bottom:2px solid #eef2ef}
+.cmp-header-cell .cmp-thumb{width:52px;height:52px;border-radius:12px;background-size:cover;background-position:center;background-color:#e9f1ea;display:grid;place-items:center;font-size:20px;color:#fff;cursor:pointer}
+.cmp-header-cell .cmp-h-link{font-size:11.5px;font-weight:800;color:#2563a8;text-decoration:underline;line-height:1.3;max-width:110px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;background:none;border:0;padding:0;cursor:pointer;font-family:inherit}
+.cmp-header-cell .cmp-h-score{font-size:15px;font-weight:800;color:var(--g)}
+.cmp-header-cell .cmp-h-score small{font-size:9.5px;color:var(--muted);font-weight:700}
+
+/* the top-left corner cell — just pinned horizontally, same as the rest
+   of the label column below it. */
+.cmp-corner{position:sticky;left:0;z-index:2;background:#f8faf8;font-weight:800;font-size:11.5px;color:var(--muted);min-width:104px}
+
+.cmp-cell.best{color:var(--g);background:#f0faf3;font-weight:800}
+
+/* ── per-property AI comment accordion ── */
+.cmp-ai-section{margin-top:14px;margin-bottom:14px}
+.cmp-ai-section-title{font-size:14px;font-weight:700;margin:0 0 10px;display:flex;align-items:center;gap:7px}
+.cmp-ai-item{background:var(--card);border-radius:18px;box-shadow:var(--card-shadow);margin-bottom:10px;overflow:hidden}
+.cmp-ai-item:last-child{margin-bottom:0}
+.cmp-ai-item-head{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:13px 14px;text-align:left}
+.cmp-ai-item-thumb{width:34px;height:34px;border-radius:9px;flex:none;background-size:cover;background-position:center;background-color:#e9f1ea;display:grid;place-items:center;font-size:15px;color:#fff}
+.cmp-ai-item-name{flex:1;font-size:13px;font-weight:700;color:var(--ink)}
+.cmp-ai-item-caret{font-size:11px;color:var(--muted);transition:transform .25s ease;flex:none}
+.cmp-ai-item.open .cmp-ai-item-caret{transform:rotate(180deg)}
+.cmp-ai-item-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.cmp-ai-item.open .cmp-ai-item-body{max-height:400px}
+.cmp-ai-item-body-inner{padding:0 14px 14px;font-size:12.5px;line-height:1.8;color:#3c473f}
+
+/* ── top-pick (第1候補) selection ── */
+.cmp-pick-section{margin-top:14px;margin-bottom:14px}
+.cmp-pick-title{font-size:14px;font-weight:700;margin:0 0 10px}
+.cmp-pick-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.cmp-pick-row::-webkit-scrollbar{display:none}
+.cmp-pick-btn{flex:none;min-width:100px;border:2px solid #dbe9df;background:var(--card);color:#3c473f;border-radius:16px;padding:12px 14px;font-weight:700;font-size:12.5px;white-space:nowrap}
+.cmp-pick-btn.picked{border-color:var(--g);background:#e2f5e8;color:var(--g);font-weight:800}
+.cmp-pick-btn .cmp-pick-crown{display:block;font-size:15px;margin-bottom:2px}
 
 /* ── fav screen ── */
 .fav-empty{text-align:center;padding:48px 16px;color:var(--muted)}
@@ -449,6 +482,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <button class="round" id="homeMenuBtn">☰</button>
   </header>
   <section class="card score-hero home-hero-card" id="homeHero"></section>
+  <section id="topPickSection"></section>
   <section class="card">
     <input class="search" id="search" placeholder="地区・タグ・見送り理由で検索"/>
     <div class="chips" id="statusChips"></div>
@@ -620,18 +654,6 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
         <div class="theme-dot" data-color="#9333ea" style="background:#9333ea"></div>
         <div class="theme-dot" data-color="#b45309" style="background:#b45309"></div>
         <div class="theme-dot" data-color="#be123c" style="background:#be123c"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="settings-section">
-    <h3>ロゴデザイン <span style="font-weight:600;text-transform:none">（試験実装）</span></h3>
-    <div class="settings-card" style="padding:14px 16px">
-      <p style="font-size:13px;font-weight:700;margin-bottom:2px">SSロゴの見え方</p>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Ver.1.2 UX Prototype のロゴ（Design Reference）を基準にした、二重ライン強調版を採用しています</p>
-      <div class="logo-toggle-row" id="logoShapeRow">
-        <button class="logo-shape-btn" data-shape="rounded"><span class="logo-shape-preview"><span>SS</span></span>標準ライン</button>
-        <button class="logo-shape-btn sel" data-shape="shield"><span class="logo-shape-preview shield"><span>SS</span></span>二重ライン強調（採用中）</button>
       </div>
     </div>
   </div>
@@ -1101,7 +1123,7 @@ bindHandleClose("ivHandle",()=>closeSh("ivBd","ivSheet"));
 
 /* ─── home ─── */
 let filterSt="all";
-function renderHome(){renderHero();renderChips();renderList();}
+function renderHome(){renderHero();renderTopPickCard();renderChips();renderList();}
 function renderHero(){
   const top=[...props].sort((a,b)=>b.score-a.score)[0],m=SM[top.status];
   const cnt={}; SO.forEach(s=>cnt[s]=0); props.forEach(p=>cnt[p.status]++);
@@ -1116,6 +1138,32 @@ function renderHero(){
     <p class="score-substats">${SO.map(s=>`${s} ${cnt[s]}件`).join(" ・ ")}</p>`;
   hero.style.cursor="pointer";
   hero.onclick=()=>goToDetail(top,"home");
+}
+function renderTopPickCard(){
+  const section=document.getElementById("topPickSection");
+  const p=getTopPickProperty();
+  if(!p){ section.innerHTML=""; return; }
+  const m=SM[p.status];
+  const thumbStyle=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
+  const summary=topPickComment||p.comment;
+  section.innerHTML=`<div class="card top-pick-card" id="topPickCard">
+    <p class="top-pick-label">🏆 第1候補物件</p>
+    <div class="top-pick-row">
+      <div class="top-pick-thumb" style="${thumbStyle}">${p.photos.length?"":"🏠"}</div>
+      <div class="top-pick-body">
+        <p class="top-pick-title">${p.title}</p>
+        <p class="top-pick-addr">${p.address}</p>
+        <div class="top-pick-stats">
+          <div><b>${p.score}</b>Score</div>
+          <div><b>${p.price}</b>価格</div>
+          <div><b>${p.yieldRate}</b>利回り</div>
+          <div><span class="pill" style="background:${m.bg};color:${m.fg};margin-top:0">${m.e} ${p.status}</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="top-pick-comment">${summary}</p>
+  </div>`;
+  document.getElementById("topPickCard").addEventListener("click",()=>goToDetail(p,"home"));
 }
 function renderChips(){
   const w=document.getElementById("statusChips");
@@ -1172,6 +1220,20 @@ document.getElementById("favBtn").addEventListener("click",()=>{if(ap){toggleFav
 
 /* ─── compare ─── */
 let cmpSel=[];
+// The single "第1候補" (top-pick) property, by id. null when none is set.
+// Selecting a different property always overwrites this — there is never
+// more than one top pick at a time. topPickComment freezes a short summary
+// of *why* it was picked (its per-property comparison comment at the
+// moment of selection), so the Home screen card can show something more
+// useful than just re-stating the property's general AI comment.
+let topPickId=null;
+let topPickComment="";
+function getTopPickProperty(){ return props.find(p=>p.id===topPickId)||null; }
+function setTopPick(p,comment){
+  topPickId=p.id;
+  topPickComment=comment||"";
+  log(p,"🏆 第1候補に設定");
+}
 function renderCompare(){
   const area=document.getElementById("cmpSelectArea");
   area.innerHTML=props.map(p=>{
@@ -1188,6 +1250,58 @@ function renderCompare(){
   });
   renderCmpBody();
 }
+
+/* ─── per-property comparison analysis (used to build each property's
+   own AI comment, rather than a single comment for the whole group) ─── */
+const CMP_ANALYSIS_ROWS=[
+  {l:"Score",k:"score",higher:true},
+  {l:"利回り",k:"yieldRate",higher:true,numeric:true},
+  {l:"調査完了率",k:"_pct",higher:true}
+];
+function cmpAnalysisVal(p,row){
+  if(row.k==="_pct")return calcStats(p).pct;
+  if(row.k==="score")return p.score;
+  if(row.numeric)return parseFloat(p[row.k])||0;
+  return p[row.k];
+}
+function analyzeAgainstGroup(target,group){
+  const strengths=[],weaknesses=[];
+  CMP_ANALYSIS_ROWS.forEach(row=>{
+    const vals=group.map(p=>cmpAnalysisVal(p,row));
+    if(new Set(vals).size<2)return; // no meaningful difference across the group
+    const tv=cmpAnalysisVal(target,row);
+    const best=row.higher?Math.max(...vals):Math.min(...vals);
+    const worst=row.higher?Math.min(...vals):Math.max(...vals);
+    if(tv===best)strengths.push(row.l);
+    else if(tv===worst)weaknesses.push(row.l);
+  });
+  return{strengths,weaknesses};
+}
+function buildPerPropertyComment(p,group){
+  const{strengths,weaknesses}=analyzeAgainstGroup(p,group);
+  const others=group.filter(o=>o!==p).map(o=>o.title).join("・");
+  const parts=[];
+  if(strengths.length){
+    parts.push(`${others}と比べて、${strengths.join("・")}の点で優れています。`);
+  }
+  if(weaknesses.length){
+    // "一方で" only reads naturally as a follow-up to the strengths
+    // sentence above. When there are no strengths, this would otherwise
+    // become the opening sentence and "一方で" (roughly "on the other
+    // hand") wouldn't have anything to contrast against — so it needs a
+    // self-contained opening in that case instead.
+    const lead=strengths.length?"一方で、":`${others}と比べて、`;
+    parts.push(`${lead}${weaknesses.join("・")}は比較対象の中では見劣りします。`);
+  }
+  if(!strengths.length&&!weaknesses.length){
+    parts.push(`比較対象の中では、際立って優れている・劣っている項目は見当たりません。`);
+  }
+  const{unc}=calcStats(p);
+  if(unc>0)parts.push(`今後は未確認の調査項目（${unc}件）を優先的に確認するとよいでしょう。`);
+  else if(p.aiNext&&p.aiNext.length)parts.push(p.aiNext[0]);
+  return parts.join("");
+}
+
 function renderCmpBody(){
   const el=document.getElementById("cmpBody");
   const sel=props.filter(p=>cmpSel.includes(p.id));
@@ -1197,6 +1311,7 @@ function renderCmpBody(){
     {l:"価格",k:"price",type:"str"},
     {l:"利回り",k:"yieldRate",type:"pct",higher:true},
     {l:"築年数",k:"age",type:"str"},
+    {l:"構造",k:"structure",type:"str"},
     {l:"駐車場",k:"parking",type:"str"},
     {l:"調査完了率",k:"_pct",type:"num",higher:true},
     {l:"メモ数",k:"_memos",type:"num",higher:true},
@@ -1211,52 +1326,104 @@ function renderCmpBody(){
     if(row.type==="pct")return parseFloat(p[row.k]);
     return p[row.k];
   }
-  const html=`<div class="cmp-table-wrap"><table class="cmp-table">
-    <thead><tr><th>項目</th>${sel.map(p=>`<th>${p.title}</th>`).join("")}</tr></thead>
-    <tbody>${rows.map(row=>{
-      const vals=sel.map(p=>getVal(p,row));
-      let bestIdx=-1;
-      if(row.higher!==undefined){
-        const nums=vals.map(v=>typeof v==="number"?v:parseFloat(v)||0);
-        const best=row.higher?Math.max(...nums):Math.min(...nums);
-        bestIdx=nums.indexOf(best);
-      }
-      return`<tr><td>${row.l}</td>${sel.map((p,i)=>{
-        const v=getVal(p,row);
-        const show=row.k==="_pct"?`${v}%`:row.k==="_memos"?`${v}件`:row.k==="_photos"?`${v}枚`:v;
-        return`<td class="${i===bestIdx?"best":""}">${show}</td>`;
-      }).join("")}</tr>`;
-    }).join("")}</tbody>
-  </table></div>`;
 
-  // AI compare comment
-  const top=sel.reduce((a,b)=>a.score>b.score?a:b);
-  const cmpFullText=`${top.title}がスコア${top.score}点でトップです。${top.comment}`;
-  const aiComment=`<div class="cmp-ai card">
-    <p class="card-title">🤖 AI比較コメント</p>
-    <p class="cmp-ai-text clamp" id="cmpAiText">${cmpFullText}</p>
-    <button class="cmp-ai-toggle" id="cmpAiToggle">続きを読む</button>
-    <p style="margin-top:8px;font-size:12px;color:var(--muted)">
-    ${sel.map(p=>{const {pct}=calcStats(p);return `${p.title}：調査${pct}%完了`}).join(" ／ ")}</p>
+  // Corner cell + one header cell per property. Both the photo and the
+  // property name are tappable and jump straight to that property's detail
+  // screen — comparing is meant to lead naturally into a closer look.
+  const headerCells=[`<div class="cmp-cell cmp-corner">比較項目</div>`]
+    .concat(sel.map(p=>{
+      const m=SM[p.status];
+      const thumbStyle=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
+      return`<div class="cmp-cell cmp-header-cell">
+        <div class="cmp-thumb" data-cmp-open="${p.id}" style="${thumbStyle}">${p.photos.length?"":"🏠"}</div>
+        <button class="cmp-h-link" data-cmp-open="${p.id}">${p.title}</button>
+        <div class="cmp-h-score">${p.score}<small>/100</small></div>
+      </div>`;
+    })).join("");
+
+  // Data rows: one label cell (pinned horizontally) + one cell per property.
+  const dataRows=rows.map(row=>{
+    const vals=sel.map(p=>getVal(p,row));
+    let bestIdx=-1;
+    if(row.higher!==undefined){
+      const nums=vals.map(v=>typeof v==="number"?v:parseFloat(v)||0);
+      const best=row.higher?Math.max(...nums):Math.min(...nums);
+      bestIdx=nums.indexOf(best);
+    }
+    const labelCell=`<div class="cmp-cell label">${row.l}</div>`;
+    const dataCells=sel.map((p,i)=>{
+      const v=getVal(p,row);
+      const show=row.k==="_pct"?`${v}%`:row.k==="_memos"?`${v}件`:row.k==="_photos"?`${v}枚`:v;
+      return`<div class="cmp-cell ${i===bestIdx?"best":""}">${show}</div>`;
+    }).join("");
+    return labelCell+dataCells;
+  }).join("");
+
+  const colTemplate=`104px repeat(${sel.length},120px)`;
+  const html=`<div class="cmp-grid-wrap"><div class="cmp-grid" style="grid-template-columns:${colTemplate}">
+    ${headerCells}
+    ${dataRows}
+  </div></div>`;
+
+  // AI comments: one per property, collapsed into an accordion so the
+  // screen doesn't get crowded when more properties are being compared.
+  const aiItems=sel.map(p=>{
+    const m=SM[p.status];
+    const thumbStyle=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
+    const comment=buildPerPropertyComment(p,sel);
+    return`<div class="cmp-ai-item" id="cmpAiItem${p.id}">
+      <button class="cmp-ai-item-head" data-cmp-toggle="${p.id}">
+        <div class="cmp-ai-item-thumb" style="${thumbStyle}">${p.photos.length?"":"🏠"}</div>
+        <span class="cmp-ai-item-name">${p.title}</span>
+        <span class="cmp-ai-item-caret">▾</span>
+      </button>
+      <div class="cmp-ai-item-body"><div class="cmp-ai-item-body-inner">${comment}</div></div>
+    </div>`;
+  }).join("");
+  const aiSection=`<div class="cmp-ai-section">
+    <p class="cmp-ai-section-title">🤖 AI比較コメント（物件ごと）</p>
+    ${aiItems}
   </div>`;
 
-  const pickBtn=`<button class="cmp-pick-btn" id="cmpPickBtn">🏆 ${top.title} を第一候補に設定</button>`;
-  el.innerHTML=html+aiComment+pickBtn;
-  document.getElementById("cmpPickBtn").addEventListener("click",()=>{
-    top.tags=[...new Set([...top.tags,"#第一候補"])];
-    log(top,"🏆 第一候補に設定");
-    alert(`✅ ${top.title} を第一候補に設定しました！`);
+  // Top-pick (第1候補) selection: exactly one property can be picked at a
+  // time; picking another always overwrites the previous choice.
+  const pickButtons=sel.map(p=>{
+    const picked=topPickId===p.id;
+    return`<button class="cmp-pick-btn ${picked?"picked":""}" data-cmp-pick="${p.id}">
+      <span class="cmp-pick-crown">${picked?"🏆":"☆"}</span>${p.title}
+    </button>`;
+  }).join("");
+  const pickSection=`<div class="cmp-pick-section">
+    <p class="cmp-pick-title">🏆 第1候補を選ぶ</p>
+    <div class="cmp-pick-row">${pickButtons}</div>
+  </div>`;
+
+  el.innerHTML=html+aiSection+pickSection;
+
+  // Tapping a photo or property name jumps to that property's detail screen.
+  el.querySelectorAll("[data-cmp-open]").forEach(elm=>{
+    elm.addEventListener("click",()=>{
+      const p=props.find(x=>x.id===Number(elm.dataset.cmpOpen));
+      if(p)goToDetail(p,"compare");
+    });
   });
-  const cmpAiText=document.getElementById("cmpAiText"),cmpAiToggle=document.getElementById("cmpAiToggle");
-  requestAnimationFrame(()=>{
-    const over=cmpAiText.scrollHeight>cmpAiText.clientHeight+2;
-    cmpAiToggle.style.display=over?"block":"none";
-    if(!over)cmpAiText.classList.remove("clamp");
-    else cmpAiToggle.textContent="続きを読む";
+
+  // AI comment accordion: toggling one doesn't affect the others.
+  el.querySelectorAll("[data-cmp-toggle]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.getElementById(`cmpAiItem${btn.dataset.cmpToggle}`).classList.toggle("open");
+    });
   });
-  cmpAiToggle.addEventListener("click",()=>{
-    cmpAiText.classList.toggle("clamp");
-    cmpAiToggle.textContent=cmpAiText.classList.contains("clamp")?"続きを読む":"閉じる";
+
+  // Top-pick buttons: selecting one always overwrites any previous pick.
+  el.querySelectorAll("[data-cmp-pick]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const p=props.find(x=>x.id===Number(btn.dataset.cmpPick));
+      if(!p)return;
+      setTopPick(p,buildPerPropertyComment(p,sel));
+      renderCmpBody(); // re-render so the "picked" highlight moves correctly
+      renderTopPickCard(); // keep the Home screen card in sync in the background
+    });
   });
 }
 
@@ -2118,15 +2285,6 @@ document.getElementById("hiBd").addEventListener("click",()=>closeSh("hiBd","hiS
 bindHandleClose("hiHandle",()=>closeSh("hiBd","hiSheet"));
 
 /* ─── settings ─── */
-document.getElementById("logoShapeRow").querySelectorAll(".logo-shape-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".logo-shape-btn").forEach(b=>b.classList.remove("sel"));
-    btn.classList.add("sel");
-    const isShield=btn.dataset.shape==="shield";
-    document.getElementById("homeLogo").classList.toggle("shield",isShield);
-    document.getElementById("settingsLogo").classList.toggle("shield",isShield);
-  });
-});
 document.getElementById("themeRow").querySelectorAll(".theme-dot").forEach(dot=>{
   dot.addEventListener("click",()=>{
     document.querySelectorAll(".theme-dot").forEach(d=>d.classList.remove("sel"));
