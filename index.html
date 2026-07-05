@@ -360,9 +360,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
    Both layers default to pointer-events:none while closed so this
    fixed, full-screen catcher never intercepts taps on the rest of the
    app when the popup isn't open. */
-.pm-catcher{position:fixed;inset:0;z-index:30;background:transparent;pointer-events:none}
+.pm-catcher{position:fixed;inset:0;z-index:70;background:transparent;pointer-events:none}
 .pm-catcher.show{pointer-events:auto}
-.pm-popup{position:fixed;z-index:31;min-width:210px;background:rgba(70,70,72,.92);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border-radius:14px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.28);
+.pm-popup{position:fixed;z-index:71;min-width:210px;background:rgba(70,70,72,.92);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border-radius:14px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.28);
   transform:scale(.4);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.32,.72,.33,1),opacity .18s ease}
 .pm-popup.show{transform:scale(1);opacity:1;pointer-events:auto}
 
@@ -1808,11 +1808,12 @@ document.getElementById("uCancelBtn").addEventListener("click",()=>closeSh("uBd"
 
 /* ─── gallery ─── */
 let galIdx=0;
+let replaceShouldCloseFs=false; // whether a pending "この写真を変更" was opened from fullscreen
 const fileInput=document.getElementById("fileInput");
 const fileInputReplace=document.getElementById("fileInputReplace");
 function triggerPick(){fileInput.click();}
 fileInput.addEventListener("change",e=>{
-  const files=[...e.target.files];if(!files.length)return;
+  const files=[...e.target.files];if(!files.length){fileInput.removeAttribute("capture");return;}
   let rem=files.length;
   const wasFsOpen=fsEl.classList.contains("show");
   const insertAt=ap.photos.length;
@@ -1827,11 +1828,20 @@ fileInput.addEventListener("change",e=>{
     }
   }};r.readAsDataURL(f);});
   fileInput.value="";
+  fileInput.removeAttribute("capture");
 });
 fileInputReplace.addEventListener("change",e=>{
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{ap.photos[galIdx].src=r.result;log(ap,"🔄 写真を変更");renderGallery(ap);fsEl.classList.remove("show");};r.readAsDataURL(f);
+  const f=e.target.files[0];
+  if(!f){fileInputReplace.removeAttribute("capture");return;}
+  const shouldCloseFs=replaceShouldCloseFs;
+  const r=new FileReader();r.onload=()=>{
+    ap.photos[galIdx].src=r.result;
+    log(ap,"🔄 写真を変更");
+    renderGallery(ap);
+    if(shouldCloseFs)fsEl.classList.remove("show");
+  };r.readAsDataURL(f);
   fileInputReplace.value="";
+  fileInputReplace.removeAttribute("capture");
 });
 
 let galEditOpen=false;
@@ -2086,17 +2096,35 @@ function openPhotoPopup(triggerEl, p, idx, {includeDelete=true, closeFullscreenA
 
   pmPopup.querySelectorAll(".as-opt").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      closePhotoPopup();
+      // Capture everything this click needs BEFORE closePhotoPopup() resets
+      // the shared pmTargetProp/pmTargetIdx/pmMode state.
       const action=btn.dataset.action;
+      const targetProp=pmTargetProp, targetIdx=pmTargetIdx;
+      const closeFsAfter=pmCloseFsAfter, activeMode=pmMode;
+      closePhotoPopup();
+
       if(action==="delete"){
-        deletePhotoAt(pmTargetProp,pmTargetIdx,{closeFullscreen:pmCloseFsAfter});
-      } else if(pmMode==="add"){
+        deletePhotoAt(targetProp,targetIdx,{closeFullscreen:closeFsAfter});
+        return;
+      }
+
+      // "写真を撮る" can skip iOS's own library/camera/files chooser
+      // entirely by setting capture="environment" on the <input> right
+      // before triggering it — for library/files we can't avoid iOS's
+      // native chooser (that's a platform limitation, not something we
+      // control), but at least the camera option becomes a single,
+      // direct action instead of another round of choices.
+      const targetInput = activeMode==="add" ? fileInput : fileInputReplace;
+      if(action==="camera"){ targetInput.setAttribute("capture","environment"); }
+      else { targetInput.removeAttribute("capture"); }
+
+      if(activeMode==="add"){
         // "＋ 写真を追加": push a brand-new photo onto the gallery
-        triggerPick();
+        fileInput.click();
       } else {
-        // "この写真を変更": library / camera / files all defer to the
-        // same file picker and overwrite the currently-viewed photo
-        galIdx=pmTargetIdx;
+        // "この写真を変更": overwrite the currently-viewed photo
+        galIdx=targetIdx;
+        replaceShouldCloseFs=closeFsAfter;
         fileInputReplace.click();
       }
     },{once:true});
@@ -2104,7 +2132,11 @@ function openPhotoPopup(triggerEl, p, idx, {includeDelete=true, closeFullscreenA
 }
 function closePhotoPopup(){
   pmPopup.classList.remove("show");
+  pmCatcher.classList.remove("show");
   pmOpen=false;
+  // Reset internal targeting state so a stale target can never leak into
+  // the next time the popup is opened.
+  pmTargetProp=null; pmTargetIdx=0; pmCloseFsAfter=false; pmMode="replace";
 }
 pmCatcher.addEventListener("click",closePhotoPopup);
 
