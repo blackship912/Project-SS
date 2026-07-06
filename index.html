@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Project:SS Alpha 0.6.3</title>
+<title>Project:SS Beta 0.1</title>
 <style>
 :root{--g:#1f7a45;--g2:#7ecb91;--ink:#17251b;--muted:#7a8780;--bg:#F6FAF8;--card:#FFFEFC;--danger:#c0392b;--card-shadow:0 8px 20px rgba(32,59,41,.06)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -69,6 +69,9 @@ h1{font-size:19px;font-weight:800}
 .card-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;margin:0 0 12px}
 .ctrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .link-btn{border:1.5px solid #cfe6d7;background:#fff;color:var(--g);font-size:12px;font-weight:800;border-radius:999px;padding:6px 13px}
+.danger-zone{margin:20px 0 8px;text-align:center}
+.delete-prop-btn{border:0;background:none;color:var(--muted);font-size:12.5px;font-weight:700;padding:10px 16px;display:inline-flex;align-items:center;gap:6px}
+.delete-prop-btn:active{color:#a23131}
 
 /* ── score hero ── */
 .score-hero{background:var(--card)}
@@ -388,14 +391,17 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .cmp-prop-btn.on{border-color:var(--g);background:#e2f5e8;color:var(--g)}
 .cmp-prop-btn .dot{width:8px;height:8px;border-radius:50%;flex:none}
 
-.cmp-grid-wrap{border-radius:18px;box-shadow:var(--card-shadow);background:var(--card);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp-section-title{font-size:14px;font-weight:700;margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cmp-scroll-hint{font-size:10.5px;font-weight:600;color:var(--muted)}
+.cmp-grid-wrap{border-radius:18px;box-shadow:var(--card-shadow);background:var(--card);overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px}
 .cmp-grid{display:grid;grid-auto-rows:min-content}
-.cmp-cell{padding:10px 10px;font-size:12px;border-bottom:1px solid #eef2ef;border-right:1px solid #eef2ef;background:var(--card);display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box}
+.cmp-cell{padding:12px 11px;font-size:12.5px;border-bottom:1px solid #eef2ef;border-right:1px solid #eef2ef;background:var(--card);display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;line-height:1.35}
 .cmp-cell:last-child{border-right:0}
 
 /* left label column — the one thing that stays pinned while scrolling
    sideways, so the row's meaning is never lost. */
-.cmp-cell.label{position:sticky;left:0;z-index:2;justify-content:flex-start;font-weight:700;color:var(--muted);font-size:11.5px;min-width:104px;background:#f8faf8}
+.cmp-cell.label{position:sticky;left:0;z-index:2;justify-content:flex-start;font-weight:700;color:var(--muted);font-size:11px;min-width:108px;background:#f8faf8;gap:5px}
+.cmp-row-icon{font-size:12px;flex:none}
 
 /* property header cells — scroll normally with the rest of the grid;
    photo + name (tappable, see .cmp-h-link) + score. */
@@ -407,7 +413,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 
 /* the top-left corner cell — just pinned horizontally, same as the rest
    of the label column below it. */
-.cmp-corner{position:sticky;left:0;z-index:2;background:#f8faf8;font-weight:800;font-size:11.5px;color:var(--muted);min-width:104px}
+.cmp-corner{position:sticky;left:0;z-index:2;background:#f8faf8;font-weight:800;font-size:11px;color:var(--muted);min-width:108px}
 
 .cmp-cell.best{color:var(--g);background:#f0faf3;font-weight:800}
 
@@ -594,6 +600,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <div class="swipe-dots" id="swipeDots">
     <span class="on"></span><span></span><span></span><span></span>
   </div>
+  <div class="danger-zone">
+    <button class="delete-prop-btn" id="deletePropBtn">🗑️ この物件を削除</button>
+  </div>
 </section>
 
 <!-- ====== FAVORITES ====== -->
@@ -629,7 +638,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <div class="app-info-card">
     <div class="logo shield" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:60px;font-size:19px"><span>SS</span></div>
     <h2 style="font-size:17px">Project:SS</h2>
-    <p class="version">Version Alpha 0.6.3</p>
+    <p class="version">Version Beta 0.1</p>
     <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
     <p class="since">Since 2026.06.30</p>
     <p class="blueprint-sig">Built with ❤️ using AI · Blueprint Project</p>
@@ -792,6 +801,16 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 4px">削除すると元に戻せません。</p>
   <button class="sh-opt" id="pdCancelBtn"><span class="dot" style="background:#9aa6a0"></span>キャンセル</button>
   <button class="sh-opt" id="pdConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>削除</button>
+</div>
+
+<!-- property delete confirmation -->
+<div class="bd" id="propDelBd"></div>
+<div class="sheet" id="propDelSheet">
+  <div class="sh-handle" id="propDelHandle"></div>
+  <p class="sh-title" id="propDelTitle">この物件を削除しますか？</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 4px">写真・メモ・調査記録も削除されます。この操作は元に戻せません。</p>
+  <button class="sh-opt" id="propDelCancelBtn"><span class="dot" style="background:#9aa6a0"></span>キャンセル</button>
+  <button class="sh-opt" id="propDelConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>削除</button>
 </div>
 
 <!-- fullscreen photo -->
@@ -1125,9 +1144,19 @@ bindHandleClose("ivHandle",()=>closeSh("ivBd","ivSheet"));
 let filterSt="all";
 function renderHome(){renderHero();renderTopPickCard();renderChips();renderList();}
 function renderHero(){
+  const hero=document.getElementById("homeHero");
+  if(!props.length){
+    // No properties at all (e.g. the last one was just deleted) — there's
+    // nothing to feature, so hide the card entirely rather than risk
+    // showing stale or undefined data.
+    hero.innerHTML="";
+    hero.style.display="none";
+    hero.onclick=null;
+    return;
+  }
+  hero.style.display="";
   const top=[...props].sort((a,b)=>b.score-a.score)[0],m=SM[top.status];
   const cnt={}; SO.forEach(s=>cnt[s]=0); props.forEach(p=>cnt[p.status]++);
-  const hero=document.getElementById("homeHero");
   hero.innerHTML=`
     <div class="top"><div>
       <p class="score-label">注目物件 Shonai Score</p>
@@ -1173,6 +1202,10 @@ function renderChips(){
 function renderList(){
   const q=document.getElementById("search").value.trim().toLowerCase();
   const el=document.getElementById("propList"); el.innerHTML="";
+  if(!props.length){
+    el.innerHTML=`<div class="fav-empty"><div class="ico">🏠</div><p>物件がまだありません<br>＋ボタンから物件を追加できます</p></div>`;
+    return;
+  }
   props.filter(p=>filterSt==="all"||p.status===filterSt)
     .filter(p=>JSON.stringify(p).toLowerCase().includes(q))
     .forEach(p=>{
@@ -1252,28 +1285,22 @@ function renderCompare(){
 }
 
 /* ─── per-property comparison analysis (used to build each property's
-   own AI comment, rather than a single comment for the whole group) ─── */
-const CMP_ANALYSIS_ROWS=[
-  {l:"Score",k:"score",higher:true},
-  {l:"利回り",k:"yieldRate",higher:true,numeric:true},
-  {l:"調査完了率",k:"_pct",higher:true}
-];
-function cmpAnalysisVal(p,row){
-  if(row.k==="_pct")return calcStats(p).pct;
-  if(row.k==="score")return p.score;
-  if(row.numeric)return parseFloat(p[row.k])||0;
-  return p[row.k];
-}
+   own AI comment, rather than a single comment for the whole group).
+   This reuses CMP_ROWS (defined below) rather than keeping a second,
+   separate list of "things worth comparing" — any row added to CMP_ROWS
+   with a `higher` direction automatically participates in the analysis,
+   with no extra step needed. ─── */
 function analyzeAgainstGroup(target,group){
   const strengths=[],weaknesses=[];
-  CMP_ANALYSIS_ROWS.forEach(row=>{
-    const vals=group.map(p=>cmpAnalysisVal(p,row));
+  CMP_ROWS.forEach(row=>{
+    if(row.higher===undefined)return; // no ranking direction = not analyzable
+    const vals=group.map(p=>row.val(p));
     if(new Set(vals).size<2)return; // no meaningful difference across the group
-    const tv=cmpAnalysisVal(target,row);
+    const tv=row.val(target);
     const best=row.higher?Math.max(...vals):Math.min(...vals);
     const worst=row.higher?Math.min(...vals):Math.max(...vals);
-    if(tv===best)strengths.push(row.l);
-    else if(tv===worst)weaknesses.push(row.l);
+    if(tv===best)strengths.push(row.commentLabel||row.l);
+    else if(tv===worst)weaknesses.push(row.commentLabel||row.l);
   });
   return{strengths,weaknesses};
 }
@@ -1302,30 +1329,42 @@ function buildPerPropertyComment(p,group){
   return parts.join("");
 }
 
+/* Each row is self-contained: it knows how to read its own value from a
+   property, how to format that value for display, and (optionally) which
+   direction counts as "better" for highlighting the best cell. Adding a
+   new comparison axis later means adding one object here — nothing else
+   needs to change. Ordered by how directly each axis feeds an investment
+   decision: overall score first, then the money numbers, then how much
+   of the property is actually verified (i.e. how much the score can be
+   trusted), then the physical/status attributes.
+*/
+const CMP_ROWS=[
+  {l:"Score",icon:"⭐",higher:true,
+    val:p=>p.score, show:v=>v},
+  {l:"価格",icon:"¥",
+    val:p=>p.price, show:v=>v},
+  {l:"利回り",icon:"%",higher:true,
+    val:p=>parseFloat(p.yieldRate)||0, show:(v,p)=>p.yieldRate},
+  {l:"家賃",icon:"🏠",
+    val:p=>p.rent, show:v=>v},
+  {l:"調査完了率",icon:"📋",higher:true,
+    val:p=>calcStats(p).pct, show:v=>`${v}%`},
+  {l:"未確認項目",commentLabel:"未確認項目の少なさ",icon:"❓",higher:false,
+    val:p=>calcStats(p).unc, show:v=>`${v}件`},
+  {l:"築年数",icon:"📅",
+    val:p=>p.age, show:v=>v},
+  {l:"構造",icon:"🏗️",
+    val:p=>p.structure, show:v=>v},
+  {l:"駐車場",icon:"🚗",
+    val:p=>p.parking, show:v=>v},
+  {l:"ステータス",icon:"🏷️",
+    val:p=>p.status, show:(v,p)=>{const m=SM[p.status];return`${m.e} ${v}`;}}
+];
+
 function renderCmpBody(){
   const el=document.getElementById("cmpBody");
   const sel=props.filter(p=>cmpSel.includes(p.id));
   if(sel.length<2){el.innerHTML=`<div class="card" style="text-align:center;color:var(--muted);font-size:13px;padding:24px">2件以上選択すると比較表が表示されます</div>`;return;}
-  const rows=[
-    {l:"Score",k:"score",type:"num",higher:true},
-    {l:"価格",k:"price",type:"str"},
-    {l:"利回り",k:"yieldRate",type:"pct",higher:true},
-    {l:"築年数",k:"age",type:"str"},
-    {l:"構造",k:"structure",type:"str"},
-    {l:"駐車場",k:"parking",type:"str"},
-    {l:"調査完了率",k:"_pct",type:"num",higher:true},
-    {l:"メモ数",k:"_memos",type:"num",higher:true},
-    {l:"写真数",k:"_photos",type:"num",higher:true},
-    {l:"ステータス",k:"status",type:"str"}
-  ];
-  function getVal(p,row){
-    if(row.k==="_pct")return calcStats(p).pct;
-    if(row.k==="_memos")return p.memos.length;
-    if(row.k==="_photos")return p.photos.length;
-    if(row.k==="score")return p.score;
-    if(row.type==="pct")return parseFloat(p[row.k]);
-    return p[row.k];
-  }
 
   // Corner cell + one header cell per property. Both the photo and the
   // property name are tappable and jump straight to that property's detail
@@ -1342,36 +1381,46 @@ function renderCmpBody(){
     })).join("");
 
   // Data rows: one label cell (pinned horizontally) + one cell per property.
-  const dataRows=rows.map(row=>{
-    const vals=sel.map(p=>getVal(p,row));
+  const dataRows=CMP_ROWS.map(row=>{
+    const vals=sel.map(p=>row.val(p));
     let bestIdx=-1;
     if(row.higher!==undefined){
       const nums=vals.map(v=>typeof v==="number"?v:parseFloat(v)||0);
-      const best=row.higher?Math.max(...nums):Math.min(...nums);
-      bestIdx=nums.indexOf(best);
+      // Only highlight a "best" cell when the properties actually differ —
+      // if everyone ties, nothing is highlighted.
+      if(new Set(nums).size>1){
+        const best=row.higher?Math.max(...nums):Math.min(...nums);
+        bestIdx=nums.indexOf(best);
+      }
     }
-    const labelCell=`<div class="cmp-cell label">${row.l}</div>`;
+    const labelCell=`<div class="cmp-cell label"><span class="cmp-row-icon">${row.icon}</span>${row.l}</div>`;
     const dataCells=sel.map((p,i)=>{
-      const v=getVal(p,row);
-      const show=row.k==="_pct"?`${v}%`:row.k==="_memos"?`${v}件`:row.k==="_photos"?`${v}枚`:v;
+      const v=row.val(p);
+      const show=row.show(v,p);
       return`<div class="cmp-cell ${i===bestIdx?"best":""}">${show}</div>`;
     }).join("");
     return labelCell+dataCells;
   }).join("");
 
-  const colTemplate=`104px repeat(${sel.length},120px)`;
-  const html=`<div class="cmp-grid-wrap"><div class="cmp-grid" style="grid-template-columns:${colTemplate}">
+  const colTemplate=`108px repeat(${sel.length},120px)`;
+  const html=`<p class="cmp-section-title">📊 比較表<span class="cmp-scroll-hint">← 横にスクロールできます →</span></p>
+  <div class="cmp-grid-wrap"><div class="cmp-grid" style="grid-template-columns:${colTemplate}">
     ${headerCells}
     ${dataRows}
   </div></div>`;
 
   // AI comments: one per property, collapsed into an accordion so the
   // screen doesn't get crowded when more properties are being compared.
+  // The top-scoring property starts expanded so there's always at least
+  // one comment visible without having to tap anything first; the rest
+  // stay closed until tapped.
+  const topScoreId=sel.reduce((a,b)=>b.score>a.score?b:a).id;
   const aiItems=sel.map(p=>{
     const m=SM[p.status];
     const thumbStyle=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
     const comment=buildPerPropertyComment(p,sel);
-    return`<div class="cmp-ai-item" id="cmpAiItem${p.id}">
+    const startOpen=p.id===topScoreId;
+    return`<div class="cmp-ai-item ${startOpen?"open":""}" id="cmpAiItem${p.id}">
       <button class="cmp-ai-item-head" data-cmp-toggle="${p.id}">
         <div class="cmp-ai-item-thumb" style="${thumbStyle}">${p.photos.length?"":"🏠"}</div>
         <span class="cmp-ai-item-name">${p.title}</span>
@@ -1381,7 +1430,7 @@ function renderCmpBody(){
     </div>`;
   }).join("");
   const aiSection=`<div class="cmp-ai-section">
-    <p class="cmp-ai-section-title">🤖 AI比較コメント（物件ごと）</p>
+    <p class="cmp-ai-section-title">🤖 AI比較コメント<span class="cmp-scroll-hint">タップで開閉</span></p>
     ${aiItems}
   </div>`;
 
@@ -2211,6 +2260,55 @@ document.getElementById("pdConfirmBtn").addEventListener("click",()=>{
 
 document.getElementById("fsClose").addEventListener("click",()=>{fsEl.classList.remove("show");renderGallery(ap);});
 document.getElementById("fsAddBtn").addEventListener("click",triggerPick);
+
+/* ─── property delete ───
+   Mirrors deletePhotoAt's confirm-sheet pattern: the button only opens
+   the confirmation; the actual removal happens once "削除" is tapped.
+   Because a property's photos/tags/memos/checks/logs/favorite state all
+   live as properties on the same object, splicing the object out of
+   `props` removes all of that together — there's nothing left over to
+   clean up on that front. What *does* need explicit cleanup is anything
+   that references the property by id from *outside* the object itself:
+   the compare selection (cmpSel) and the single top-pick id (topPickId).
+*/
+let propDelPendingId=null;
+function requestDeleteProperty(p){
+  if(!p)return;
+  propDelPendingId=p.id;
+  document.getElementById("propDelTitle").textContent=`「${p.title}」を削除しますか？`;
+  openSh("propDelBd","propDelSheet");
+}
+function closePropDeleteConfirm(){
+  closeSh("propDelBd","propDelSheet");
+  propDelPendingId=null;
+}
+document.getElementById("propDelCancelBtn").addEventListener("click",closePropDeleteConfirm);
+document.getElementById("propDelBd").addEventListener("click",closePropDeleteConfirm);
+bindHandleClose("propDelHandle",closePropDeleteConfirm);
+document.getElementById("propDelConfirmBtn").addEventListener("click",()=>{
+  const id=propDelPendingId;
+  closePropDeleteConfirm();
+  if(id==null)return;
+  const idx=props.findIndex(x=>x.id===id);
+  if(idx===-1)return;
+
+  // Clean up every place that references this property by id, not just
+  // the property object itself.
+  cmpSel=cmpSel.filter(x=>x!==id);
+  if(topPickId===id){ topPickId=null; topPickComment=""; }
+
+  // Removing the object from `props` takes its photos, tags, photo memos,
+  // basic info, survey checks, notes, logs, and favorite flag with it,
+  // since all of those are just properties on this one object.
+  props.splice(idx,1);
+
+  // Always return Home after deleting from the detail screen, regardless
+  // of which screen the detail view was originally opened from.
+  if(ap&&ap.id===id)ap=null;
+  goTo("home");
+  renderHome();
+});
+document.getElementById("deletePropBtn").addEventListener("click",()=>requestDeleteProperty(ap));
 document.getElementById("fsPickBtn").addEventListener("click",()=>{
   triggerPhotoReplace(ap, fsIdx, {closeFullscreenAfter:true});
 });
@@ -2260,9 +2358,9 @@ const HOME_MENU_INFO={
   },
   version:{
     title:"🔖 バージョン情報",
-    body:`<p><b style="color:var(--g)">Project:SS</b> Version Alpha 0.6.3</p>
+    body:`<p><b style="color:var(--g)">Project:SS</b> Version Beta 0.1</p>
       <p style="color:var(--muted);font-size:11.5px">Built with ❤️ using AI · Blueprint Project</p>
-      <p>今回のアップデートでは、写真削除メニューの整理、画面遷移の不具合修正、色味調整、新規物件登録機能の追加などを行いました。</p>`
+      <p>Alpha 0.6.3 を完成版として、ここから Beta シリーズの開発を開始しました。</p>`
   }
 };
 document.getElementById("homeMenuBtn").addEventListener("click",()=>openSh("hmBd","hmSheet"));
