@@ -365,7 +365,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .wiz-step-name{font-size:12.5px;font-weight:800;color:var(--g);margin-bottom:12px}
 .ff{margin-bottom:11px}
 .ff label{display:block;font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:5px}
-.ff input,.ff select{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:11px;outline:none;font-size:14px}
+.ff input,.ff select{width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:11px;outline:none;font-size:16px}
 .ff-numeric-row{display:flex;gap:8px}
 .ff-numeric-row input{flex:1.4;min-width:0}
 .ff-numeric-row select{flex:1;min-width:0}
@@ -876,48 +876,60 @@ const CK={
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
 const PTAGS=["🏠 外観","🛋 リビング","🍳 キッチン","🛁 浴室","🚽 トイレ","🅿 駐車場","🌿 庭","⚡ 設備","📦 その他"];
-const UNIT_OPTIONS={
-  price:["万円","円"],
-  yieldRate:["%"],
-  rent:["円/月","万円/月"],
-  age:["年"],
-  buildingArea:["㎡","坪"],
-  landArea:["㎡","坪"],
-  parking:["台"],
-  station:["分"]
-};
-const STEPS=[
-  {name:"価格・収益",fields:[
-    {k:"price",l:"価格",numeric:true},
-    {k:"yieldRate",l:"利回り",numeric:true},
-    {k:"rent",l:"家賃（満室想定）",numeric:true},
-    {k:"age",l:"築年数",numeric:true}
-  ]},
-  {name:"建物情報",fields:[
-    {k:"structure",l:"構造",sel:["木造","軽量鉄骨","重量鉄骨","RC造","SRC造"],allowOther:true},
-    {k:"occupancy",l:"現況",sel:["賃貸中","空室","空家","自己使用"]},
-    {k:"buildingArea",l:"建物面積",numeric:true},
-    {k:"landArea",l:"土地面積",numeric:true},
-    {k:"floorPlan",l:"間取り",sel:["1K","1DK","1LDK","2DK","2LDK","3DK","3LDK","4DK","4LDK","5LDK以上"],allowOther:true}
-  ]},
-  {name:"立地・その他",fields:[
-    {k:"parking",l:"駐車場",numeric:true},
-    {k:"road",l:"接道"},
-    {k:"zoning",l:"用途地域",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
-    {k:"source",l:"情報源",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","レインズ","その他"],allowOther:true}
-  ]}
+/* ─── unified property field master ───
+   This single list drives all three screens that deal with a property's
+   basic info: the "＋ 新規登録" form, the "基本情報を編集" wizard, and the
+   "基本情報" display grid on the detail screen. Adding, removing, or
+   reordering a field here automatically updates all three — there is no
+   second or third copy of this list to keep in sync.
+   (title/status are handled separately: title already has its own home in
+   the detail screen's header, so it isn't repeated in this list at all;
+   status has its own dedicated change UI elsewhere in the app and is only
+   included in the *new property* form here, via NEW_PROPERTY_EXTRA_FIELDS.)
+*/
+const PROPERTY_FIELDS=[
+  {k:"address",l:"所在地",icon:"📍",group:"物件概要"},
+  {k:"station",l:"最寄駅・徒歩",icon:"🚉",group:"物件概要"},
+  {k:"price",l:"価格",icon:"¥",group:"価格・収益",numeric:true,unit:["万円","円"]},
+  {k:"yieldRate",l:"利回り（表面）",icon:"%",group:"価格・収益",numeric:true,unit:["%"]},
+  {k:"rent",l:"家賃（満室想定）",icon:"🏠",group:"価格・収益",numeric:true,unit:["円/月","万円/月"]},
+  {k:"age",l:"築年数",icon:"📅",group:"価格・収益",numeric:true,unit:["年"]},
+  {k:"structure",l:"構造",icon:"🏗️",group:"建物情報",sel:["木造","軽量鉄骨","重量鉄骨","RC造","SRC造"],allowOther:true},
+  {k:"occupancy",l:"現況",icon:"👤",group:"建物情報",sel:["賃貸中","空室","空家","自己使用"]},
+  {k:"landArea",l:"土地面積",icon:"⛰️",group:"建物情報",numeric:true,unit:["㎡","坪"]},
+  {k:"buildingArea",l:"建物面積",icon:"🏢",group:"建物情報",numeric:true,unit:["㎡","坪"]},
+  {k:"floorPlan",l:"間取り",icon:"🪟",group:"建物情報",sel:["1K","1DK","1LDK","2DK","2LDK","3DK","3LDK","4DK","4LDK","5LDK以上"],allowOther:true},
+  {k:"parking",l:"駐車場",icon:"🚗",group:"立地・その他",numeric:true,unit:["台"]},
+  {k:"road",l:"接道",icon:"🛣️",group:"立地・その他"},
+  {k:"zoning",l:"用途地域",icon:"🏙️",group:"立地・その他",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
+  {k:"source",l:"情報源",icon:"🌐",group:"立地・その他",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","レインズ","その他"],allowOther:true}
 ];
+// Groups, in display/step order, derived from PROPERTY_FIELDS itself rather
+// than listed a second time — adding a field with a new `group` name is
+// enough to introduce a new step/section everywhere.
+const PROPERTY_FIELD_GROUPS=[...new Set(PROPERTY_FIELDS.map(f=>f.group))]
+  .map(name=>({name,fields:PROPERTY_FIELDS.filter(f=>f.group===name)}));
+
+// Backwards-compatible alias: the edit wizard groups fields into "steps".
+const STEPS=PROPERTY_FIELD_GROUPS;
+
+// UNIT_OPTIONS is derived from PROPERTY_FIELDS too, so a field's unit list
+// only ever needs to be declared once, right next to the field itself.
+const UNIT_OPTIONS={};
+PROPERTY_FIELDS.forEach(f=>{ if(f.unit)UNIT_OPTIONS[f.k]=f.unit; });
 
 /* ─── new property registration form ───
    Reuses the same field-rendering logic (fieldHtml) as the edit wizard, via a
    separate draft object (npDraft) so the two forms never interfere with each other.
+   Only the new-property form needs a couple of fields that don't belong in
+   PROPERTY_FIELDS itself (title has its own header treatment everywhere
+   else; status has its own dedicated change UI once the property exists).
 */
-const NEW_PROPERTY_FIELDS=[
+const NEW_PROPERTY_EXTRA_FIELDS=[
   {k:"title",l:"物件名"},
-  {k:"address",l:"住所"},
-  {k:"status",l:"ステータス",sel:["候補","調査中","保留","見送り","購入済"]},
-  ...STEPS.flatMap(s=>s.fields)
+  {k:"status",l:"ステータス",sel:["候補","調査中","保留","見送り","購入済"]}
 ];
+const NEW_PROPERTY_FIELDS=[...NEW_PROPERTY_EXTRA_FIELDS,...PROPERTY_FIELDS];
 
 function parseNumericField(value){
   const v=String(value||"");
@@ -1073,10 +1085,14 @@ function renderNpFields(){
   NEW_PROPERTY_FIELDS.forEach(f=>{
     if(f.numeric){
       const unitSel=document.getElementById(`np_${f.k}_unit`);
-      if(unitSel)unitSel.addEventListener("change",()=>{captureNpFields();renderNpFields();});
+      if(unitSel)unitSel.addEventListener("change",()=>{
+        setTimeout(()=>{ captureNpFields();renderNpFields(); },0);
+      });
     } else if(f.sel&&f.allowOther){
       const sel=document.getElementById(`np_${f.k}`);
-      if(sel)sel.addEventListener("change",()=>{captureNpFields();renderNpFields();});
+      if(sel)sel.addEventListener("change",()=>{
+        setTimeout(()=>{ captureNpFields();renderNpFields(); },0);
+      });
     }
   });
 }
@@ -1123,18 +1139,28 @@ function saveNewProperty(){
   // flags before persisting — they're only meant to drive the form's
   // own re-rendering, not to live on as part of the property's data.
   Object.keys(npDraft).forEach(k=>{ if(k.endsWith("__isOther")||k.endsWith("__unitIsOther"))delete npDraft[k]; });
-  props.push(npDraft);
+  const savedProperty=npDraft;
+  props.push(savedProperty);
   closeSh("npBd","npSheet");
   // Refresh the home list/hero in the background so it's correct once the
   // person eventually returns to Home, then go straight to the new
   // property's detail screen (skipping a flash of the Home screen).
   renderHome();
-  goToDetail(npDraft,"home");
+  goToDetail(savedProperty,"home");
+  npDraft=null;
+}
+function closeNewPropertySheet(){
+  closeSh("npBd","npSheet");
+  // Belt-and-braces: openNewPropertySheet() already assigns a brand-new
+  // draft object every time it's opened, but explicitly clearing the
+  // reference here too means there's never a moment where a stale draft
+  // object could be read from by anything else.
+  npDraft=null;
 }
 document.getElementById("navAdd").addEventListener("click",openNewPropertySheet);
-document.getElementById("npCancelBtn").addEventListener("click",()=>closeSh("npBd","npSheet"));
-document.getElementById("npBd").addEventListener("click",()=>closeSh("npBd","npSheet"));
-bindHandleClose("npHandle",()=>closeSh("npBd","npSheet"));
+document.getElementById("npCancelBtn").addEventListener("click",closeNewPropertySheet);
+document.getElementById("npBd").addEventListener("click",closeNewPropertySheet);
+bindHandleClose("npHandle",closeNewPropertySheet);
 document.getElementById("npSaveBtn").addEventListener("click",saveNewProperty);
 document.getElementById("ivCloseBtn").addEventListener("click",()=>closeSh("ivBd","ivSheet"));
 document.getElementById("ivBd").addEventListener("click",()=>closeSh("ivBd","ivSheet"));
@@ -1570,17 +1596,26 @@ document.getElementById("doneToggle").addEventListener("click",()=>document.getE
 
 const INFO_VALUE_TAP_THRESHOLD=10; // characters — beyond this, the 2-line clamp
                                     // likely cuts the text off, so make it tappable
+
+// A numeric field's stored value (e.g. "680万円") is only meaningful once it
+// has an actual number in it. If the number portion is empty — which can
+// happen for a freshly-added property, or if only a unit was ever selected
+// without typing a number — the unit alone ("万円") is not useful information
+// and must not be displayed on its own.
+function infoDisplayValue(f,raw){
+  if(f.numeric){
+    const{num}=parseNumericField(raw);
+    return num?raw:"";
+  }
+  return raw||"";
+}
 function renderInfo(p){
-  const items=[
-    ["¥","価格",p.price],["%","利回り（表面）",p.yieldRate],["🏠","家賃（満室想定）",p.rent],
-    ["📍","所在地",p.address],["🚉","最寄駅・徒歩",p.station],["📅","築年数",p.age],
-    ["🏗️","構造",p.structure],["👤","現況",p.occupancy],["⛰️","土地面積",p.landArea],
-    ["🏢","建物面積",p.buildingArea],["🪟","間取り",p.floorPlan],["🚗","駐車場",p.parking],
-    ["🛣️","接道",p.road],["🏙️","用途地域",p.zoning],["🌐","情報源",p.source]
-  ];
+  const items=PROPERTY_FIELDS.map(f=>[f.icon,f.l,infoDisplayValue(f,p[f.k])]);
   document.getElementById("infoGrid").innerHTML=items.map(([ico,l,v],i)=>{
     const long=v&&v.length>INFO_VALUE_TAP_THRESHOLD;
-    return`<div class="info-cell"><div class="ico">${ico}</div><span>${l}</span><b data-i="${i}" class="${long?"tappable":""}"${v?"":' style="color:#bcc4bf"'}>${v||"未入力"}</b></div>`;
+    // Unified empty-state rule: every field shows either its real value, or
+    // a plain "－" — never a half-filled string like a lone unit.
+    return`<div class="info-cell"><div class="ico">${ico}</div><span>${l}</span><b data-i="${i}" class="${long?"tappable":""}"${v?"":' style="color:#bcc4bf"'}>${v||"－"}</b></div>`;
   }).join("");
   document.querySelectorAll("#infoGrid b.tappable").forEach(el=>{
     el.addEventListener("click",()=>{
@@ -1780,10 +1815,10 @@ function fieldHtml(f,draft,idPrefix="wf"){
     return`<div class="ff">
       <label>${f.l}</label>
       <div class="ff-numeric-row">
-        <input id="${idPrefix}_${f.k}_num" inputmode="decimal" pattern="[0-9.,]*" placeholder="数値" value="${num}">
+        <input id="${idPrefix}_${f.k}_num" inputmode="decimal" pattern="[0-9.,]*" placeholder="数値" value="${num}" autocomplete="off">
         <select id="${idPrefix}_${f.k}_unit">${unitOptsHtml}</select>
       </div>
-      ${unitIsOther?`<input class="ff-other-input" id="${idPrefix}_${f.k}_unit_other" placeholder="単位を入力（例：万円）" value="${unit}">`:""}
+      ${unitIsOther?`<input class="ff-other-input" id="${idPrefix}_${f.k}_unit_other" placeholder="単位を入力（例：万円）" value="${unit}" autocomplete="off">`:""}
     </div>`;
   }
   if(f.sel){
@@ -1794,24 +1829,30 @@ function fieldHtml(f,draft,idPrefix="wf"){
     return`<div class="ff">
       <label>${f.l}</label>
       <select id="${idPrefix}_${f.k}">${optsHtml}</select>
-      ${f.allowOther&&isOther?`<input class="ff-other-input" id="${idPrefix}_${f.k}_other" placeholder="${f.l}を入力" value="${cur}">`:""}
+      ${f.allowOther&&isOther?`<input class="ff-other-input" id="${idPrefix}_${f.k}_other" placeholder="${f.l}を入力" value="${cur}" autocomplete="off">`:""}
     </div>`;
   }
-  return`<div class="ff"><label>${f.l}</label><input id="${idPrefix}_${f.k}" value="${cur}"></div>`;
+  return`<div class="ff"><label>${f.l}</label><input id="${idPrefix}_${f.k}" value="${cur}" autocomplete="off"></div>`;
 }
 
 function bindFieldEvents(f){
   if(f.numeric){
     const unitSel=document.getElementById(`wf_${f.k}_unit`);
     if(unitSel)unitSel.addEventListener("change",()=>{
-      captureWiz();renderWizPanels(false);
+      // Deferring to the next tick avoids a real-world iOS Safari quirk:
+      // rebuilding (via innerHTML) the very <select> that just fired
+      // "change", synchronously inside that same event, can leave the
+      // browser's internal selection state out of sync — a later tap on
+      // the rebuilt <select> then appears to only ever re-select the
+      // first option. Letting the change event finish first avoids that.
+      setTimeout(()=>{ captureWiz();renderWizPanels(false); },0);
     });
     return;
   }
   if(f.sel&&f.allowOther){
     const sel=document.getElementById(`wf_${f.k}`);
     if(sel)sel.addEventListener("change",()=>{
-      captureWiz();renderWizPanels(false);
+      setTimeout(()=>{ captureWiz();renderWizPanels(false); },0);
     });
   }
 }
