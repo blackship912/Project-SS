@@ -1129,12 +1129,17 @@ function captureNpFields(){
       let unit=unitEl.value;
       if(unit===OTHER_VALUE){
         const otherEl=document.getElementById(`np_${f.k}_unit_other`);
-        const{unit:prevUnit}=parseNumericField(npDraft[f.k]);
+        const prevUnit=npDraft[f.k+"__unit"]!==undefined?npDraft[f.k+"__unit"]:parseNumericField(npDraft[f.k]).unit;
         unit=otherEl?otherEl.value:(npDraft[f.k+"__unitIsOther"]?prevUnit:"");
         npDraft[f.k+"__unitIsOther"]=true;
       } else {
         npDraft[f.k+"__unitIsOther"]=false;
       }
+      // Remember the chosen unit on its own, independent of whether a
+      // number has been typed yet — this is what lets someone pick a unit
+      // first and type the number afterwards without the selection being
+      // silently reset back to the first option.
+      npDraft[f.k+"__unit"]=unit;
       const{suffix}=parseNumericField(npDraft[f.k]);
       npDraft[f.k]=numEl.value?buildNumericValue(numEl.value,unit,suffix):"";
       return;
@@ -1159,10 +1164,11 @@ function captureNpFields(){
 function saveNewProperty(){
   captureNpFields();
   if(!npDraft.title.trim())npDraft.title="無題の物件";
-  // Strip the internal "is currently showing the hand-typed input"
-  // flags before persisting — they're only meant to drive the form's
-  // own re-rendering, not to live on as part of the property's data.
-  Object.keys(npDraft).forEach(k=>{ if(k.endsWith("__isOther")||k.endsWith("__unitIsOther"))delete npDraft[k]; });
+  // Strip the internal "is currently showing the hand-typed input" /
+  // "which unit is currently chosen" tracking flags before persisting —
+  // they're only meant to drive the form's own re-rendering, not to live
+  // on as part of the property's data.
+  Object.keys(npDraft).forEach(k=>{ if(k.endsWith("__isOther")||k.endsWith("__unitIsOther")||k.endsWith("__unit"))delete npDraft[k]; });
   const savedProperty=npDraft;
   props.push(savedProperty);
   closeSh("npBd","npSheet");
@@ -1848,7 +1854,15 @@ const OTHER_VALUE="__other__";
 function fieldHtml(f,draft,idPrefix="wf"){
   const cur=draft[f.k]||"";
   if(f.numeric){
-    const{num,unit,suffix}=parseNumericField(cur);
+    const{num,suffix}=parseNumericField(cur);
+    // The unit the person has picked is tracked independently of whether a
+    // number has been typed yet (draft[f.k+"__unit"]), so that choosing a
+    // unit first — before any number — is never lost or reset. Once a
+    // number exists, its embedded unit (from parsing the combined stored
+    // value) and the independently-tracked unit are always kept in sync by
+    // captureWiz/captureNpFields, so either source gives the same answer;
+    // preferring the independent one just makes the empty-number case work.
+    const unit=draft[f.k+"__unit"]!==undefined?draft[f.k+"__unit"]:parseNumericField(cur).unit;
     const units=UNIT_OPTIONS[f.k]||[];
     const unitIsOther=!!draft[f.k+"__unitIsOther"];
     const unitKnown=units.includes(unit)&&!unitIsOther;
@@ -1961,14 +1975,17 @@ function captureWiz(){
         const otherEl=document.getElementById(`wf_${f.k}_unit_other`);
         // Keep whatever the person already typed (or had before switching
         // to "その他"); only fall back to empty if there's truly nothing yet.
-        const{unit:prevUnit}=parseNumericField(wizDraft[f.k]);
+        const prevUnit=wizDraft[f.k+"__unit"]!==undefined?wizDraft[f.k+"__unit"]:parseNumericField(wizDraft[f.k]).unit;
         unit=otherEl?otherEl.value:(wizDraft[f.k+"__unitIsOther"]?prevUnit:"");
         wizDraft[f.k+"__unitIsOther"]=true;
       } else {
         wizDraft[f.k+"__unitIsOther"]=false;
       }
+      // Track the chosen unit independently of the number, so picking a
+      // unit while the number field is empty is never silently lost.
+      wizDraft[f.k+"__unit"]=unit;
       const{suffix}=parseNumericField(wizDraft[f.k]);
-      wizDraft[f.k]=buildNumericValue(numEl.value,unit,suffix);
+      wizDraft[f.k]=numEl.value?buildNumericValue(numEl.value,unit,suffix):"";
       return;
     }
     if(f.sel&&f.allowOther){
