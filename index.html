@@ -455,21 +455,13 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .settings-row+.settings-row{border-top:1px solid #f0f3f0}
 .settings-row span{color:var(--muted);font-size:12px;font-weight:600}
 .settings-card{background:var(--card);border-radius:18px;box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:8px}
-.toggle-switch{width:44px;height:24px;border-radius:999px;border:0;position:relative;cursor:pointer;transition:background .2s}
-.toggle-switch.on{background:var(--g)}.toggle-switch.off{background:#d1d9d3}
-.toggle-switch::after{content:"";position:absolute;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.toggle-switch.on::after{left:22px}.toggle-switch.off::after{left:2px}
 .app-info-card{background:linear-gradient(135deg,#fff,#e9f8ee);border-radius:22px;padding:22px;text-align:center;box-shadow:var(--card-shadow);margin-bottom:14px}
 .app-info-card .version{font-size:11px;color:var(--muted);margin-top:4px}
+.app-info-card .current-feature{font-size:10px;color:#8a5a00;background:#fdf0d8;display:inline-block;border-radius:999px;padding:5px 14px;margin-top:8px;line-height:1.5}
+.app-info-card .current-feature b{font-size:12px;font-weight:800}
 .app-info-card .tagline{font-size:13px;color:#3c473f;margin-top:12px;line-height:1.7}
 .app-info-card .since{font-size:11px;color:var(--muted);margin-top:8px}
 .blueprint-sig{font-size:10px;color:var(--muted);letter-spacing:.06em;margin-top:6px;font-style:italic}
-.dna-card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--card-shadow);margin-bottom:14px}
-.dna-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #eef2ef}
-.dna-item:last-child{border-bottom:0}
-.dna-item .num{font-size:13px;font-weight:800;color:var(--g);flex:none;width:20px}
-.dna-item p{font-size:13px;line-height:1.6;color:#3c473f;font-weight:700}
-.dna-item small{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
 .theme-row{display:flex;gap:10px;margin-top:8px}
 .theme-dot{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s}
 .theme-dot.sel{border-color:var(--ink);transform:scale(1.15)}
@@ -639,18 +631,14 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <div class="logo shield" id="settingsLogo" style="margin:0 auto 8px;width:54px;height:60px;font-size:19px"><span>SS</span></div>
     <h2 style="font-size:17px">Project:SS</h2>
     <p class="version">Version Beta 0.1</p>
+    <!-- Development-time only: shows which Feature is currently being
+         worked on. Update CURRENT_FEATURE below when starting a new one —
+         nothing else needs to change. Remove this whole block (and the
+         .current-feature CSS) once Project:SS reaches a stable release. -->
+    <p class="current-feature">Current Feature<br><b id="currentFeatureLabel"></b></p>
     <p class="tagline">地方中古戸建て投資の<br>判断力を育てる武器</p>
     <p class="since">Since 2026.06.30</p>
     <p class="blueprint-sig">Built with ❤️ using AI · Blueprint Project</p>
-  </div>
-
-  <div class="settings-section">
-    <h3>プロフィール</h3>
-    <div class="settings-card">
-      <div class="settings-row">名前<span>未設定</span></div>
-      <div class="settings-row">投資目標<span>年間CF 100万円</span></div>
-      <div class="settings-row">活動エリア<span>庄内エリア</span></div>
-    </div>
   </div>
 
   <div class="settings-section">
@@ -668,28 +656,12 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   </div>
 
   <div class="settings-section">
-    <h3>通知設定</h3>
-    <div class="settings-card">
-      <div class="settings-row">ToDo リマインダー<button class="toggle-switch on" id="toggleTodo"></button></div>
-      <div class="settings-row">スコア変動通知<button class="toggle-switch off" id="toggleScore"></button></div>
-    </div>
-  </div>
-
-  <div class="settings-section">
-    <h3>データ</h3>
+    <h3>データ管理</h3>
     <div class="settings-card">
       <div class="settings-row" id="exportBtn" style="cursor:pointer">データエクスポート（JSON）<span>→</span></div>
       <div class="settings-row">バックアップ（UI）<span>準備中</span></div>
-    </div>
-  </div>
-
-  <div class="settings-section">
-    <h3>Development DNA</h3>
-    <div class="dna-card">
-      <div class="dna-item"><span class="num">①</span><div><p>Forge by building, then refining.</p><small>作りながら研ぐ。完成前に触る。</small></div></div>
-      <div class="dna-item"><span class="num">②</span><div><p>Prototype first.</p><small>設計より先に動かす。</small></div></div>
-      <div class="dna-item"><span class="num">③</span><div><p>Learn by using.</p><small>使うことが最大の学習。</small></div></div>
-      <div class="dna-item"><span class="num">④</span><div><p>Every project becomes a page of Blueprint.</p><small>すべての試みが、自分の地図になる。</small></div></div>
+      <div class="settings-row" id="undoBtn" style="cursor:pointer">元に戻す<span id="undoStatus">→</span></div>
+      <div class="settings-row" id="resetDataBtn" style="cursor:pointer;color:#c0392b">データ初期化<span>→</span></div>
     </div>
   </div>
 </section>
@@ -813,6 +785,16 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <button class="sh-opt" id="propDelConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>削除</button>
 </div>
 
+<!-- data reset confirmation -->
+<div class="bd" id="resetDataBd"></div>
+<div class="sheet" id="resetDataSheet">
+  <div class="sh-handle" id="resetDataHandle"></div>
+  <p class="sh-title">データを初期化しますか？</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 4px">追加・編集した物件はすべて消え、最初のサンプルデータに戻ります。この操作は元に戻せません。</p>
+  <button class="sh-opt" id="resetDataCancelBtn"><span class="dot" style="background:#9aa6a0"></span>キャンセル</button>
+  <button class="sh-opt" id="resetDataConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>初期化する</button>
+</div>
+
 <!-- fullscreen photo -->
 <div class="fs" id="fsView">
   <div class="fs-head">
@@ -858,6 +840,11 @@ const SM={
   購入済:{e:"⭐",bg:"#fdf0d8",fg:"#8a5a00",dot:"#d9a528",gr:["#d9a528","#f3d27a"]}
 };
 const SO=["候補","調査中","保留","見送り","購入済"];
+// Development-time only (see the "current-feature" block in the settings
+// screen HTML). Update this single value when starting a new Feature —
+// nothing else needs to change. Set to null to hide the badge entirely
+// (e.g. right before a stable release).
+const CURRENT_FEATURE="#004";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -994,6 +981,10 @@ const props=[
  photos:[],
  logs:[{d:"2026/6/18 13:11",t:"🏠 物件登録"},{d:"2026/6/20 08:30",t:"⭐ Score 61 → 54"},{d:"2026/6/22 19:50",t:"⚫ ステータス変更：調査中 → 見送り"}]}
 ];
+// A one-time, structural-clone snapshot of the sample data this app ships
+// with, taken before anything can possibly have changed it. This is what
+// "データ初期化" (in 設定 > データ管理) restores back to.
+const INITIAL_PROPS_SNAPSHOT=JSON.parse(JSON.stringify(props));
 
 /* ─── helpers ─── */
 let ap=null;
@@ -1051,7 +1042,49 @@ document.getElementById("navHome").addEventListener("click",()=>{
 });
 document.getElementById("navFav").addEventListener("click",()=>{goTo("fav");renderFav();});
 document.getElementById("navCompare").addEventListener("click",()=>{goTo("compare");renderCompare();});
-document.getElementById("navSettings").addEventListener("click",()=>{goTo("settings");});
+document.getElementById("navSettings").addEventListener("click",()=>{goTo("settings");renderSettingsScreen();});
+
+/* ─── undo (settings > データ管理) ───
+   A small, generic undo mechanism: each undoable action pushes one entry
+   describing (in plain language) what it was, plus a function that knows
+   how to reverse it. Only the single most recent action is kept — this is
+   meant as a safety net for "oops" moments, not a full history — so
+   pushing a new entry simply replaces whatever was there before. Any
+   future feature that wants "undo" support just needs to call
+   pushUndo(label, restoreFn) at the point where it makes its change;
+   nothing else in this mechanism needs to know what that feature is.
+*/
+let lastUndo=null;
+function pushUndo(label,restoreFn){
+  lastUndo={label,restore:restoreFn};
+  updateUndoStatus();
+}
+function performUndo(){
+  if(!lastUndo)return;
+  lastUndo.restore();
+  lastUndo=null;
+  updateUndoStatus();
+}
+function updateUndoStatus(){
+  const el=document.getElementById("undoStatus");
+  if(!el)return;
+  el.textContent=lastUndo?`「${lastUndo.label}」を戻す`:"操作がありません";
+}
+function renderSettingsScreen(){
+  updateUndoStatus();
+  const featureEl=document.getElementById("currentFeatureLabel");
+  const badge=featureEl?featureEl.closest(".current-feature"):null;
+  if(!featureEl||!badge)return;
+  if(CURRENT_FEATURE){
+    featureEl.textContent=CURRENT_FEATURE;
+    badge.style.display="";
+  } else {
+    // CURRENT_FEATURE set to null (e.g. for a stable release) hides the
+    // whole development-time badge rather than showing an empty one.
+    badge.style.display="none";
+  }
+}
+
 /* ─── new property registration ─── */
 function createBlankProperty(){
   const nextId=props.length?Math.max(...props.map(p=>p.id))+1:1;
@@ -2409,6 +2442,18 @@ document.getElementById("propDelConfirmBtn").addEventListener("click",()=>{
   const idx=props.findIndex(x=>x.id===id);
   if(idx===-1)return;
 
+  // Snapshot everything this deletion is about to change, so a single
+  // "元に戻す" (undo) action in 設定 > データ管理 can put it all back
+  // exactly as it was — the same property object (with its photos, tags,
+  // checks, memos, logs, favorite flag all intact since none of that was
+  // ever touched), at the same position in the list, plus whether it was
+  // part of the compare selection or was the top pick.
+  const removedProperty=props[idx];
+  const removedIndex=idx;
+  const wasInCompare=cmpSel.includes(id);
+  const wasTopPick=topPickId===id;
+  const savedTopPickComment=topPickComment;
+
   // Clean up every place that references this property by id, not just
   // the property object itself.
   cmpSel=cmpSel.filter(x=>x!==id);
@@ -2418,6 +2463,15 @@ document.getElementById("propDelConfirmBtn").addEventListener("click",()=>{
   // basic info, survey checks, notes, logs, and favorite flag with it,
   // since all of those are just properties on this one object.
   props.splice(idx,1);
+
+  pushUndo(`${removedProperty.title}を削除`,()=>{
+    props.splice(removedIndex,0,removedProperty);
+    if(wasInCompare)cmpSel.push(id);
+    if(wasTopPick){ topPickId=id; topPickComment=savedTopPickComment; }
+    renderHome();
+    if(currentNav==="compare")renderCompare();
+    if(currentNav==="fav")renderFav();
+  });
 
   // Always return Home after deleting from the detail screen, regardless
   // of which screen the detail view was originally opened from.
@@ -2508,16 +2562,46 @@ document.getElementById("themeRow").querySelectorAll(".theme-dot").forEach(dot=>
     document.documentElement.style.setProperty("--g2",dot.dataset.color+"99");
   });
 });
-document.querySelectorAll(".toggle-switch").forEach(sw=>{
-  sw.addEventListener("click",()=>{sw.classList.toggle("on");sw.classList.toggle("off");});
-});
 document.getElementById("exportBtn").addEventListener("click",()=>{
   const data=JSON.stringify(props.map(p=>({id:p.id,title:p.title,score:p.score,status:p.status,price:p.price,yieldRate:p.yieldRate})),null,2);
   const a=document.createElement("a");a.href="data:application/json;charset=utf-8,"+encodeURIComponent(data);a.download="project_ss_export.json";a.click();
 });
 
+/* ─── data management: undo ─── */
+document.getElementById("undoBtn").addEventListener("click",()=>{
+  if(!lastUndo)return;
+  performUndo();
+});
+
+/* ─── data management: full reset ───
+   A deliberately heavy, confirm-gated action: restores props back to the
+   exact sample data the app ships with, and clears every other piece of
+   state that could reference properties which are about to disappear
+   (current detail view, compare selection, top pick, any pending undo).
+*/
+document.getElementById("resetDataBtn").addEventListener("click",()=>{
+  openSh("resetDataBd","resetDataSheet");
+});
+function closeResetDataConfirm(){ closeSh("resetDataBd","resetDataSheet"); }
+document.getElementById("resetDataCancelBtn").addEventListener("click",closeResetDataConfirm);
+document.getElementById("resetDataBd").addEventListener("click",closeResetDataConfirm);
+bindHandleClose("resetDataHandle",closeResetDataConfirm);
+document.getElementById("resetDataConfirmBtn").addEventListener("click",()=>{
+  closeResetDataConfirm();
+  props.splice(0,props.length,...JSON.parse(JSON.stringify(INITIAL_PROPS_SNAPSHOT)));
+  cmpSel=[];
+  topPickId=null;
+  topPickComment="";
+  lastUndo=null;
+  updateUndoStatus();
+  ap=null;
+  goTo("home");
+  renderHome();
+});
+
 /* ─── init ─── */
 renderHome();
+renderSettingsScreen();
 </script>
 </body>
 </html>
