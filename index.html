@@ -92,6 +92,17 @@ h1{font-size:19px;font-weight:800}
 .top-pick-addr{font-size:11px;color:var(--muted);margin-bottom:6px}
 .top-pick-stats{display:flex;gap:12px;font-size:11.5px;flex-wrap:wrap}
 .top-pick-stats b{font-size:13.5px;display:block}
+/* ── market analysis (Feature #007) ── */
+.market-teaser{font-size:12.5px;line-height:1.7;color:#3c473f;margin:8px 0 2px}
+.market-condition{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6}
+.market-stats{display:flex;justify-content:space-between;background:#f0f5f1;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.market-stats div{text-align:center;flex:1}
+.market-stats b{display:block;font-size:16px;color:var(--ink)}
+.market-stats span{font-size:10.5px;color:var(--muted)}
+.market-list-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f3f0;font-size:12px}
+.market-list-item:last-child{border-bottom:0}
+.market-list-item b{color:var(--g)}
+.market-empty{font-size:12.5px;color:var(--muted);line-height:1.7;padding:8px 0}
 .top-pick-comment{margin-top:10px;font-size:12px;line-height:1.7;color:#3c473f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .score-hero .top{display:flex;justify-content:space-between;align-items:center}
 .score-label{font-size:12px;color:var(--g);font-weight:800;letter-spacing:.02em;margin-bottom:4px}
@@ -531,6 +542,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     <div id="bdRows"></div>
   </section>
   <section class="card">
+    <p class="card-title">🏘 相場分析</p>
+    <p class="market-teaser" id="marketTeaser"></p>
+    <button class="ai-detail-link" id="marketDetailLink">相場分析を見る →</button>
+  </section>
+  <section class="card">
     <p class="card-title">✅ 次にやること</p>
     <div id="todoActive"></div>
     <button class="done-toggle" id="doneToggle">完了済み (<span id="doneCount">0</span>) ▾</button>
@@ -859,6 +875,22 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   </div>
 </div>
 
+<!-- market analysis modal (Feature #007) -->
+<div class="ai-modal-bd" id="marketModalBd">
+  <div class="ai-modal" id="marketModal">
+    <div class="ai-modal-head">
+      <p>🏘 相場分析</p>
+      <button class="ai-modal-close" id="marketModalClose">✕</button>
+    </div>
+    <div class="ai-modal-body" id="marketModalBody">
+      <p class="market-condition" id="marketCondition"></p>
+      <div class="market-stats" id="marketStats"></div>
+      <p class="ai-text" id="marketComment"></p>
+      <div class="ai-sub"><p class="h">📋 分析対象の物件</p><ul id="marketList"></ul></div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ─── constants ─── */
 const SM={
@@ -873,7 +905,7 @@ const SO=["候補","調査中","保留","見送り","購入済"];
 // screen HTML). Update this single value when starting a new Feature —
 // nothing else needs to change. Set to null to hide the badge entirely
 // (e.g. right before a stable release).
-const CURRENT_FEATURE="#006";
+const CURRENT_FEATURE="#007";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -887,7 +919,8 @@ const CK={
   "固定資産税":[["未確認","bu"],["確認済","bg"],["要確認","bw"]],
   "周辺環境":[["未確認","bu"],["良好","bg"],["騒音あり","bw"],["臭気あり","bw"]],
   "災害リスク":[["未確認","bu"],["リスクなし","bg"],["浸水域","bb"],["土砂災害域","bb"]],
-  "その他法令":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]]
+  "その他法令":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]],
+  "リフォーム":[["未確認","bu"],["未実施","bw"],["一部リフォーム済","bg"],["フルリフォーム済","bg"]]
 };
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
@@ -915,6 +948,8 @@ const PROPERTY_FIELDS=[
   {k:"landArea",l:"土地面積",icon:"⛰️",group:"建物情報",numeric:true,unit:["㎡","坪"]},
   {k:"buildingArea",l:"建物面積",icon:"🏢",group:"建物情報",numeric:true,unit:["㎡","坪"]},
   {k:"floorPlan",l:"間取り",icon:"🪟",group:"建物情報",sel:["1K","1DK","1LDK","2DK","2LDK","3DK","3LDK","4DK","4LDK","5LDK以上"],allowOther:true},
+  {k:"reformParts",l:"リフォーム箇所",icon:"🔨",group:"リフォーム"},
+  {k:"reformYear",l:"リフォーム時期",icon:"🗓️",group:"リフォーム"},
   {k:"parking",l:"駐車場",icon:"🚗",group:"立地・その他",numeric:true,unit:["台"]},
   {k:"road",l:"接道",icon:"🛣️",group:"立地・その他"},
   {k:"zoning",l:"用途地域",icon:"🏙️",group:"立地・その他",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
@@ -969,9 +1004,10 @@ const props=[
  price:"680万円",yieldRate:"12.4%",rent:"70,000円/月",station:"羽前大山駅 徒歩9分",
  age:"28年（H8年）",structure:"木造",occupancy:"賃貸中",buildingArea:"120.07㎡（36.3坪）",
  floorPlan:"4LDK",landArea:"198.34㎡（60坪）",parking:"2台",road:"両側4.0m公道",
+ reformParts:"屋根・外壁",reformYear:"2020年",
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"修繕履歴",i:2},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"修繕履歴",i:2},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1},{l:"リフォーム",i:2}],
  todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",t:"修繕履歴",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
  memos:[{date:"2026/6/29 21:10",text:"内見時、駐車場の地面に若干の傾斜あり。要再確認。"}],
  photos:[],
@@ -982,7 +1018,7 @@ const props=[
  floorPlan:"3LDK",landArea:"165.00㎡（50坪）",parking:"2台",road:"南側4.0m公道",
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#接道確認","#修繕履歴不明"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"修繕履歴",i:0},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"修繕履歴",i:0},{l:"給排水設備",i:2},{l:"空室理由",i:0},{l:"リフォーム",i:0}],
  todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",t:"修繕履歴",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
  memos:[],photos:[],
  logs:[{d:"2026/6/24 09:02",t:"🏠 物件登録"},{d:"2026/6/27 18:40",t:"⭐ Score 65 → 72"},{d:"2026/6/29 21:05",t:"🟡 ステータス変更：候補 → 調査中"}]},
@@ -992,7 +1028,7 @@ const props=[
  floorPlan:"3DK",landArea:"140.00㎡（42坪）",parking:"1台",road:"接道義務未確認",
  zoning:"用途地域外",source:"athome",
  tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
- checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3},{l:"修繕履歴",i:0}],
+ checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3},{l:"修繕履歴",i:0},{l:"リフォーム",i:1}],
  todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",t:"修繕履歴",done:false}],
  memos:[{date:"2026/6/20 08:40",text:"床下に蟻害の痕跡あり。解体前提でないと厳しい。"}],
  photos:[],
@@ -1319,6 +1355,122 @@ function evaluateProperty(p){
 // so there is exactly one source of truth for what a property's score is.
 function getScore(p){return evaluateProperty(p).score;}
 
+/* ═══════════ 相場分析エンジン (Feature #007) ═══════════
+   外部の相場データ・SUUMO等との連携は一切使わない。登録済みの物件
+   データ同士を比べるだけの、ルールベースの分析ロジック。
+
+   ある1件（target）について、「エリア」「築年数帯」「駐車場台数」が
+   近い他の登録物件を探し、その価格帯（最安・中央値・最高）を計算する。
+   類似物件が少なすぎる場合は、条件を自動的に広げていく（エリア＋築年数
+   帯＋駐車場 → エリア＋築年数帯 → エリアのみ → 築年数帯のみ →
+   登録済み全物件）。これにより、物件登録数が少ない今の時点でも「使え
+   ない」状態にはならず、登録が増えるほど条件を絞った分析ができるように
+   なる＝仕様書の「物件を登録するほどProject:SS自身が成長する」という
+   狙いに沿っている。
+
+   見送り物件も分析対象に含む（削除済みの物件は`props`配列に存在しない
+   ため、そもそも対象外になる）。
+
+   Feature #006のevaluateProperty()と同様、単一の入口関数
+   （analyzeMarket）だけに呼び出し側が依存する設計にしている。
+*/
+const MARKET_MIN_SAMPLE=3; // これ未満なら、より広い条件で探し直す
+const MARKET_AGE_BAND=10;  // 築年数帯の刻み幅（年）
+// "山形県鶴岡市○○町" → "山形県鶴岡市" のように、最初の市区町村までを
+// エリアの識別子として扱う。完全に汎用的な正規表現なので、庄内エリア
+// 以外の住所でも同じロジックで動く。
+function areaKeyOf(address){
+  if(!address)return null;
+  const m=String(address).match(/^.+?[市区町村]/);
+  return m?m[0]:null;
+}
+function ageBandOf(ageStr){
+  const age=numFrom(ageStr);
+  if(age===null)return null;
+  const lo=Math.floor(age/MARKET_AGE_BAND)*MARKET_AGE_BAND;
+  return`築${lo}〜${lo+MARKET_AGE_BAND}年`;
+}
+// 価格を万円単位の数値に統一する。「680万円」→680、「6800000円」→680、
+// のように、価格フィールドがどちらの単位で入力されていても比較できる
+// ようにする。
+function priceOf(p){
+  const raw=p.price;
+  if(!raw)return null;
+  const n=numFrom(raw);
+  if(n===null)return null;
+  const s=String(raw);
+  if(s.includes("万"))return n;
+  if(s.includes("円"))return n/10000;
+  return n;
+}
+// 「わからない項目では絞り込まない」という考え方の共通ヘルパー。
+// target側の値が不明なら、その条件は無条件で満たしたことにする
+// （比較する基準が無いのに除外してしまうと、単に情報が少ないだけの
+// 物件が分析から弾かれ続けてしまうため）。
+function critMatch(targetVal,propVal){ return targetVal===null||propVal===targetVal; }
+function parkingAtLeast(targetParking,propParking){
+  if(targetParking===null)return true;
+  if(propParking===null)return false;
+  return propParking>=targetParking;
+}
+function findMarketComparables(target,group){
+  const tArea=areaKeyOf(target.address),tAge=ageBandOf(target.age),tParking=numFrom(target.parking);
+  const tiers=[
+    {label:`${target.address?areaKeyOf(target.address)||"エリア":"エリア"}・${ageBandOf(target.age)||"築年数帯"}・駐車場${tParking??""}台以上`,
+     pred:p=>critMatch(tArea,areaKeyOf(p.address))&&critMatch(tAge,ageBandOf(p.age))&&parkingAtLeast(tParking,numFrom(p.parking))},
+    {label:`${areaKeyOf(target.address)||"エリア"}・${ageBandOf(target.age)||"築年数帯"}`,
+     pred:p=>critMatch(tArea,areaKeyOf(p.address))&&critMatch(tAge,ageBandOf(p.age))},
+    {label:`${areaKeyOf(target.address)||"エリア"}`,
+     pred:p=>critMatch(tArea,areaKeyOf(p.address))},
+    {label:`築年数帯「${ageBandOf(target.age)||"不明"}」`,
+     pred:p=>critMatch(tAge,ageBandOf(p.age))},
+    {label:"登録済みの全物件",
+     pred:()=>true}
+  ];
+  for(let i=0;i<tiers.length;i++){
+    const matched=group.filter(p=>tiers[i].pred(p)).filter(p=>priceOf(p)!==null);
+    if(matched.length>=MARKET_MIN_SAMPLE||i===tiers.length-1){
+      return{conditionLabel:tiers[i].label,matched,broadened:i>0};
+    }
+  }
+}
+function computeMarketStats(matched){
+  const prices=matched.map(priceOf).sort((a,b)=>a-b);
+  const n=prices.length;
+  const median=n%2===1?prices[(n-1)/2]:Math.round((prices[n/2-1]+prices[n/2])/2);
+  return{min:prices[0],max:prices[n-1],median,count:n};
+}
+function buildPriceBandComment(target,stats){
+  const price=priceOf(target);
+  if(price===null)return"この物件は価格が未入力のため、比較コメントは表示できません。";
+  if(stats.count<=1)return"類似物件がまだ少ないため、参考程度としてください。物件を登録するほど、この分析の精度が上がります。";
+  const diff=(price-stats.median)/stats.median;
+  if(diff<=-.15)return`中央値（${stats.median}万円）より大幅に低価格です。`;
+  if(diff<=-.05)return`中央値（${stats.median}万円）より低価格です。`;
+  if(diff<.05)return`中央値（${stats.median}万円）付近の価格帯です。`;
+  if(diff<.15)return`中央値（${stats.median}万円）よりやや高めの価格帯です。`;
+  return`中央値（${stats.median}万円）より大幅に高めの価格帯です。`;
+}
+// The single entry point every screen calls, mirroring evaluateProperty()'s
+// role for Feature #006 — one function, one return shape, everything else
+// (rendering, future AI replacement) depends only on that shape.
+function analyzeMarket(target,group){
+  group=group||props;
+  const found=findMarketComparables(target,group);
+  if(!found||!found.matched.length){
+    return{available:false,message:"価格情報のある登録物件がまだ十分にありません。物件を登録するほど、この分析の精度が上がります。"};
+  }
+  const stats=computeMarketStats(found.matched);
+  return{
+    available:true,
+    conditionLabel:found.conditionLabel,
+    broadened:found.broadened,
+    ...stats,
+    comment:buildPriceBandComment(target,stats),
+    matched:found.matched
+  };
+}
+
 /* ─── nav ─── */
 let currentNav="home";
 let detailReturnTo="home"; // remembers which screen to return to when leaving the detail view
@@ -1420,6 +1572,7 @@ function createBlankProperty(){
     price:"",yieldRate:"",rent:"",station:"",
     age:"",structure:"",occupancy:"",buildingArea:"",
     floorPlan:"",landArea:"",parking:"",road:"",
+    reformParts:"",reformYear:"",
     zoning:"",source:"",
     tags:[],reason:null,
     checks:Object.keys(CK).map(l=>({l,i:0})),
@@ -1922,7 +2075,7 @@ function renderDetail(p){
   document.getElementById("bdRows").innerHTML=pEval.breakdown.map(b=>`
     <div class="bd-row"><span>${b.label}</span><div class="bd-bar"><i style="width:${b.points/20*100}%"></i></div><span style="text-align:right">${b.points}/20</span></div>
     <p class="bd-reason">${b.reason}</p>`).join("");
-  renderStats(p);renderAI(p,pEval);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);
+  renderStats(p);renderAI(p,pEval);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);renderMarketTeaser(p);
   document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");
   setPanel(panelIdx,false);renderGallery(p);
 }
@@ -1943,6 +2096,56 @@ function closeAiModal(){
 document.getElementById("aiDetailLink").addEventListener("click",openAiModal);
 document.getElementById("aiModalClose").addEventListener("click",closeAiModal);
 aiModalBd.addEventListener("click",e=>{ if(e.target===aiModalBd)closeAiModal(); });
+
+/* ─── market analysis modal (Feature #007) ─── */
+const marketModalBd=document.getElementById("marketModalBd");
+let marketModalScrollY=0;
+function openMarketModal(){
+  marketModalScrollY=document.getElementById("detailScreen").scrollTop;
+  renderMarketModal(ap);
+  marketModalBd.classList.add("show");
+}
+function closeMarketModal(){
+  marketModalBd.classList.remove("show");
+  document.getElementById("detailScreen").scrollTop=marketModalScrollY;
+}
+document.getElementById("marketDetailLink").addEventListener("click",openMarketModal);
+document.getElementById("marketModalClose").addEventListener("click",closeMarketModal);
+marketModalBd.addEventListener("click",e=>{ if(e.target===marketModalBd)closeMarketModal(); });
+// The teaser line on the detail screen itself — short enough to read at a
+// glance without opening the modal, same idea as aiSummary for Feature #006.
+function renderMarketTeaser(p){
+  const m=analyzeMarket(p);
+  const el=document.getElementById("marketTeaser");
+  el.textContent=m.available
+    ? `${m.conditionLabel} ・ ${m.count}件 ・ 中央値${m.median}万円 ・ ${m.comment}`
+    : m.message;
+}
+function renderMarketModal(p){
+  const m=analyzeMarket(p);
+  const cond=document.getElementById("marketCondition");
+  const stats=document.getElementById("marketStats");
+  const comment=document.getElementById("marketComment");
+  const list=document.getElementById("marketList");
+  if(!m.available){
+    cond.textContent="";
+    stats.innerHTML="";
+    comment.textContent=m.message;
+    list.innerHTML="";
+    return;
+  }
+  cond.textContent=`条件：${m.conditionLabel}${m.broadened?"（類似物件が少ないため条件を広げています）":""} ・ 登録件数 ${m.count}件`;
+  stats.innerHTML=`
+    <div><b>${m.min}万円</b><span>最安</span></div>
+    <div><b>${m.median}万円</b><span>中央値</span></div>
+    <div><b>${m.max}万円</b><span>最高</span></div>`;
+  comment.textContent=m.comment;
+  list.innerHTML=m.matched.map(mp=>{
+    const reform=getCheckState(mp,"リフォーム");
+    const reformTag=reform&&reform.color!=="bu"?`（${reform.state}）`:"";
+    return`<li>${mp.title}${mp===p?"（この物件）":""}：<b>${priceOf(mp)}万円</b>${reformTag}</li>`;
+  }).join("");
+}
 function renderStats(p){
   const{pct,unc}=calcStats(p);
   document.getElementById("dSub").textContent=`情報完成度 ${pct}% ・ 未確認 ${unc}件${p.reason?" ・ 見送り理由："+p.reason:""}`;
