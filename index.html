@@ -225,6 +225,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 /* ── score breakdown ── */
 .radar-wrap{display:flex;justify-content:center;margin-bottom:10px}
 .bd-row{display:grid;grid-template-columns:62px 1fr 36px;align-items:center;gap:8px;font-size:11px;color:#3c473f;margin-bottom:7px}
+.bd-reason{font-size:11px;color:var(--muted);line-height:1.6;margin:-3px 0 12px;padding-left:2px}
 .bd-bar{height:7px;border-radius:999px;background:#eef2ef;overflow:hidden}
 .bd-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:999px}
 
@@ -236,6 +237,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .ai-sub{margin-top:13px}
 .ai-sub .h{font-size:11.5px;font-weight:800;color:var(--g);margin-bottom:5px}
 .ai-sub ul{margin:0;padding-left:18px;font-size:12px;line-height:1.85;color:#3c473f}
+.ai-breakdown-list li{margin-bottom:8px}
+.ai-breakdown-list li:last-child{margin-bottom:0}
 
 /* AI detail modal */
 .ai-modal-bd{position:fixed;inset:0;background:rgba(15,30,20,0);pointer-events:none;transition:background .3s;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -848,8 +851,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
     </div>
     <div class="ai-modal-body">
       <p class="ai-text" id="aiText"></p>
-      <div class="ai-sub"><p class="h">⭐ 重要ポイント</p><ul id="aiPts"></ul></div>
+      <div class="ai-sub"><p class="h">💪 強み</p><ul id="aiPts"></ul></div>
+      <div class="ai-sub"><p class="h">⚠️ 注意点</p><ul id="aiConcerns"></ul></div>
       <div class="ai-sub"><p class="h">🔎 次に確認すること</p><ul id="aiNext"></ul></div>
+      <div class="ai-sub"><p class="h">📊 評価理由（スコア内訳）</p><ul id="aiBreakdown" class="ai-breakdown-list"></ul></div>
     </div>
   </div>
 </div>
@@ -868,7 +873,7 @@ const SO=["候補","調査中","保留","見送り","購入済"];
 // screen HTML). Update this single value when starting a new Feature —
 // nothing else needs to change. Set to null to hide the badge entirely
 // (e.g. right before a stable release).
-const CURRENT_FEATURE=null;
+const CURRENT_FEATURE="#006";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -960,45 +965,33 @@ function buildNumericValue(num,unit,suffix){
 
 /* ─── data ─── */
 const props=[
-{id:1,title:"A町 戸建て",address:"山形県鶴岡市○○町",status:"候補",score:88,fav:false,
+{id:1,title:"A町 戸建て",address:"山形県鶴岡市○○町",status:"候補",fav:false,
  price:"680万円",yieldRate:"12.4%",rent:"70,000円/月",station:"羽前大山駅 徒歩9分",
  age:"28年（H8年）",structure:"木造",occupancy:"賃貸中",buildingArea:"120.07㎡（36.3坪）",
  floorPlan:"4LDK",landArea:"198.34㎡（60坪）",parking:"2台",road:"両側4.0m公道",
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
- comment:"利回りは12.4%と高水準です。庄内エリアの平均が9〜10%前後であることを考えると、この物件は収益力という点で優位に立っています。ただし、利回りが高い物件には「なぜ安い？」という問いが必要です。修繕履歴と境界確定の2点を確認すれば、判断の精度が大きく上がります。",
- aiPts:["利回り12.4%は庄内エリア平均より約2〜3pt高く、収益力に優れる","駐車場2台は賃貸需要に直結。ファミリー層を狙いやすい立地条件"],
- aiNext:["境界確定：仲介に境界確認書の有無を確認。なければ費用見積もりを取得","修繕履歴：屋根・外壁の直近工事履歴を書面で要求。不明なら減額交渉の材料に"],
- breakdown:[["収益性",18],["立地",16],["建物・管理",14],["法的リスク",12],["流動性",15],["将来性",13]],
  checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"修繕履歴",i:2},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
  todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",t:"修繕履歴",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
  memos:[{date:"2026/6/29 21:10",text:"内見時、駐車場の地面に若干の傾斜あり。要再確認。"}],
  photos:[],
  logs:[{d:"2026/6/30 10:18",t:"🏠 物件登録"},{d:"2026/6/30 10:32",t:"⭐ Score 76 → 88"},{d:"2026/6/30 10:41",t:"🟢 ステータス変更：調査中 → 候補"}]},
-{id:2,title:"B地区 中古戸建",address:"山形県鶴岡市△△町",status:"調査中",score:72,fav:false,
+{id:2,title:"B地区 中古戸建",address:"山形県鶴岡市△△町",status:"調査中",fav:false,
  price:"450万円",yieldRate:"10.8%",rent:"55,000円/月",station:"羽前水沢駅 徒歩15分",
  age:"32年（H6年）",structure:"木造",occupancy:"空室",buildingArea:"95.20㎡（28.8坪）",
  floorPlan:"3LDK",landArea:"165.00㎡（50坪）",parking:"2台",road:"南側4.0m公道",
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#接道確認","#修繕履歴不明"],reason:null,
- comment:"450万円という価格は魅力的ですが、3ヶ月の空室が続いている点が気になります。空室が長引いている理由には、①家賃設定が相場より高い、②設備が古い、③競合物件が多い、などが考えられます。まずこの理由を特定することが、投資判断の第一歩です。",
- aiPts:["450万円の低価格は取得ハードルが低く、初期投資リスクを抑えられる","駅徒歩15分は賃貸では不利になりやすい。駐車場2台が補完要素になる"],
- aiNext:["空室理由の特定：仲介に過去の問い合わせ状況を確認","シロアリ調査を手配：木造で32年。床下点検は必須"],
- breakdown:[["収益性",15],["立地",13],["建物・管理",10],["法的リスク",11],["流動性",12],["将来性",11]],
  checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"修繕履歴",i:0},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
  todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",t:"修繕履歴",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
  memos:[],photos:[],
  logs:[{d:"2026/6/24 09:02",t:"🏠 物件登録"},{d:"2026/6/27 18:40",t:"⭐ Score 65 → 72"},{d:"2026/6/29 21:05",t:"🟡 ステータス変更：候補 → 調査中"}]},
-{id:3,title:"C町 空き家",address:"山形県酒田市□□町",status:"見送り",score:54,fav:false,
+{id:3,title:"C町 空き家",address:"山形県酒田市□□町",status:"見送り",fav:false,
  price:"390万円",yieldRate:"14.1%",rent:"50,000円/月",station:"酒田駅 徒歩22分",
  age:"41年（H15年）",structure:"軽量鉄骨",occupancy:"空家",buildingArea:"88.00㎡（26.6坪）",
  floorPlan:"3DK",landArea:"140.00㎡（42坪）",parking:"1台",road:"接道義務未確認",
  zoning:"用途地域外",source:"athome",
  tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
- comment:"表面利回り14.1%は数字だけ見ると魅力的ですが、再建築不可物件は「出口戦略」が極めて限られます。売却時に買い手が付きにくく、融資も困難です。この物件から学べる教訓：利回りの高さと投資リスクは別物、という判断力を養う重要な事例です。",
- aiPts:["再建築不可は致命的。売却・融資の両面で出口が塞がれる","見送り判断は正しい。この経験を次の物件評価の基準として活かすべき"],
- aiNext:["この物件のリスク項目をチェックリストに追加","同エリアで再建築可の物件を改めて探す"],
- breakdown:[["収益性",14],["立地",9],["建物・管理",7],["法的リスク",4],["流動性",6],["将来性",6]],
  checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3},{l:"修繕履歴",i:0}],
  todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",t:"修繕履歴",done:false}],
  memos:[{date:"2026/6/20 08:40",text:"床下に蟻害の痕跡あり。解体前提でないと厳しい。"}],
@@ -1138,7 +1131,193 @@ let ap=null;
 function now(){const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
 function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");schedulePersist();}
 function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc};}
-function bumpScore(p,delta){const b=p.score;p.score=Math.max(0,Math.min(100,p.score+delta));log(p,`⭐ Score ${b} → ${p.score}`);}
+
+/* ═══════════ AI評価エンジン (Feature #006) ═══════════
+   外部AI・学習機能は一切使わない、ルールベースの物件評価ロジック。
+
+   6つの評価軸（収益性・立地・建物・管理・法的リスク・流動性・将来性）は
+   これまでサンプル3件にのみ固定値として存在していた`breakdown`配列と
+   同じ形をそのまま引き継いでいる。既存のレーダーチャート・内訳バー
+   表示（radarSVG / #bdRows）は変更なしで使え、今回はその中身を「サンプル
+   ごとに手入力した固定値」から「入力済みの物件データから毎回計算する値」
+   に置き換えることが主な仕事になる。
+
+   各軸は0〜20点、判断材料が乏しい項目は中立値（AXIS_BASELINE=10）を
+   基準に加減点する。合計（0〜100）がそのままスコアになるため、
+   「なぜこの点数なのか」は常に内訳を見れば説明できる状態になる。
+
+   将来、外部AIに置き換える場合はevaluateProperty()の中身を丸ごと
+   差し替えるだけでよい。呼び出し側（詳細画面・AI詳細モーダル・比較
+   画面・ホーム画面など）はこの関数の返り値の「形」にだけ依存しており、
+   中身がルールベースか実際のAI呼び出しかを気にしない設計にしている。
+*/
+const AXIS_BASELINE=10; // 各軸20点満点中、判断材料が乏しい場合の中立値
+const YIELD_BENCHMARK=9.5; // 表面利回りの地域相場目安（庄内エリア平均、既存コメントの言及値を踏襲）
+
+// "28年（H8年）"→28、"2台"→2、未入力→null。フリーテキスト項目から
+// 数値だけを緩やかに取り出す共通ヘルパー。
+function numFrom(str){
+  if(str===undefined||str===null||str==="")return null;
+  const m=String(str).match(/-?\d+(\.\d+)?/);
+  return m?parseFloat(m[0]):null;
+}
+// 特定の調査チェック項目について、その物件で選択されている状態
+// （state：表示文字列／color：bg=良好・bw=要注意・bb=懸念・bu=未確認）を
+// 取得する。CK（設定 > 調査チェック の全定義）を経由するため、CKに
+// 新しい選択肢や新しい調査項目が追加されても、このロジック自体は
+// 変更不要で対応できる。
+function getCheckState(p,label){
+  const c=(p.checks||[]).find(x=>x.l===label);
+  if(!c)return null;
+  const entry=(CK[label]||[])[c.i];
+  return entry?{state:entry[0],color:entry[1]}:null;
+}
+// 複数の調査チェック項目をまとめて1つの軸の加減点に変換する共通ヘルパー。
+// 個々のチェック項目のラベルごとに特別扱いのロジックを書く必要がなく、
+// CKに登録された色（良好/要注意/懸念）だけを見て機械的に加減点する。
+// 未確認（bu）はプラスにもマイナスにもしない＝わからないものは減点しない。
+function checkGroupDelta(p,labels,weight){
+  let delta=0; const details=[];
+  labels.forEach(label=>{
+    const cs=getCheckState(p,label);
+    if(!cs||cs.color==="bu")return;
+    if(cs.color==="bg"){delta+=weight;details.push({label,state:cs.state,tone:"good"});}
+    else if(cs.color==="bw"){delta-=weight*0.6;details.push({label,state:cs.state,tone:"caution"});}
+    else if(cs.color==="bb"){delta-=weight*1.4;details.push({label,state:cs.state,tone:"bad"});}
+  });
+  return{delta,details};
+}
+
+function axisProfitability(p){
+  const rate=numFrom(p.yieldRate);
+  if(rate===null)return{label:"収益性",points:AXIS_BASELINE,reason:"利回りが未入力のため、暫定評価としています。"};
+  const diff=rate-YIELD_BENCHMARK;
+  const points=Math.max(0,Math.min(20,Math.round(AXIS_BASELINE+diff*2.2)));
+  let reason;
+  if(diff>=2)reason=`表面利回り${rate}%は庄内エリア平均（目安${YIELD_BENCHMARK}%）を大きく上回り、収益性は良好です。`;
+  else if(diff>=0.3)reason=`表面利回り${rate}%はエリア平均をやや上回っており、収益性は良好です。`;
+  else if(diff>=-0.3)reason=`表面利回り${rate}%はエリア平均並みです。`;
+  else if(diff>=-2)reason=`表面利回り${rate}%はエリア平均をやや下回ります。`;
+  else reason=`表面利回り${rate}%はエリア平均を大きく下回っており、収益性の面では見劣りします。`;
+  return{label:"収益性",points,reason};
+}
+function axisLocation(p){
+  let points=AXIS_BASELINE; const reasons=[];
+  const parking=numFrom(p.parking);
+  if(parking!==null){
+    if(parking>=2){points+=4;reasons.push(`駐車場${parking}台は地方エリアの賃貸需要に対応しやすい条件です。`);}
+    else if(parking===1){reasons.push(`駐車場1台のみのため、複数台を必要とする層には対応しにくい可能性があります。`);}
+    else{points-=4;reasons.push(`駐車場なしは地方エリアでは需要面での制約になりやすい条件です。`);}
+  }
+  const road=getCheckState(p,"接道状況");
+  if(road){
+    if(road.color==="bg"){points+=4;reasons.push(`接道状況は「${road.state}」で、立地条件に不安はありません。`);}
+    else if(road.color==="bw"){points-=2;reasons.push(`接道状況が「${road.state}」のため、詳細確認が必要です。`);}
+    else if(road.color==="bb"){points-=6;reasons.push(`接道状況が「${road.state}」のため、立地面で重大な懸念があります。`);}
+  }
+  points=Math.max(0,Math.min(20,Math.round(points)));
+  return{label:"立地",points,reason:reasons.join("")||"駐車場・接道状況の情報が少ないため、暫定評価としています。"};
+}
+function axisBuilding(p){
+  let points=AXIS_BASELINE; const reasons=[];
+  const age=numFrom(p.age);
+  if(age!==null){
+    if(age<=15){points+=4;reasons.push(`築${age}年と比較的新しく、大規模修繕の必要性は低いと考えられます。`);}
+    else if(age<=30){points+=1;reasons.push(`築${age}年で一般的な範囲内ですが、経年劣化の確認は必要です。`);}
+    else{points-=4;reasons.push(`築${age}年と経年が進んでおり、修繕費用がかさむ可能性があります。`);}
+  }
+  const{delta,details}=checkGroupDelta(p,["雨漏り","シロアリ","給排水設備","修繕履歴"],3);
+  points+=delta;
+  details.forEach(d=>reasons.push(d.tone==="good"?`${d.label}は「${d.state}」で問題ありません。`:`${d.label}が「${d.state}」のため注意が必要です。`));
+  points=Math.max(0,Math.min(20,Math.round(points)));
+  return{label:"建物・管理",points,reason:reasons.join("")||"築年数・建物関連の調査項目が未入力のため、暫定評価としています。"};
+}
+function axisLegal(p){
+  let points=AXIS_BASELINE; const reasons=[];
+  const{delta,details}=checkGroupDelta(p,["再建築可否","接道状況","その他法令","境界"],3.5);
+  points+=delta;
+  details.forEach(d=>{
+    if(d.tone==="good")reasons.push(`${d.label}は「${d.state}」で法的リスクは低いと考えられます。`);
+    else if(d.label==="再建築可否"&&d.tone==="bad")reasons.push(`再建築が「${d.state}」のため、法的リスクが高い物件です。`);
+    else reasons.push(`${d.label}が「${d.state}」のため確認が必要です。`);
+  });
+  points=Math.max(0,Math.min(20,Math.round(points)));
+  return{label:"法的リスク",points,reason:reasons.join("")||"再建築可否・境界などの調査項目が未確認のため、暫定評価としています。"};
+}
+function axisLiquidity(p){
+  let points=AXIS_BASELINE; const reasons=[];
+  const rebuild=getCheckState(p,"再建築可否");
+  if(rebuild){
+    if(rebuild.color==="bb"){points-=8;reasons.push(`再建築${rebuild.state}の物件は、将来の売却・融資の両面で出口が限られ、流動性は低くなります。`);}
+    else if(rebuild.color==="bg"){points+=3;reasons.push(`再建築${rebuild.state}のため、将来の売却・融資の選択肢を確保しやすい物件です。`);}
+    else if(rebuild.color==="bw"){points-=3;reasons.push(`再建築可否が「${rebuild.state}」のため、流動性の見通しが立てにくい状態です。`);}
+  }
+  const{delta,details}=checkGroupDelta(p,["空室理由","家賃根拠"],2.5);
+  points+=delta;
+  details.forEach(d=>reasons.push(d.tone==="good"?`${d.label}は「${d.state}」で安心材料です。`:`${d.label}が「${d.state}」のため、賃貸需要の見通しに不確実さが残ります。`));
+  points=Math.max(0,Math.min(20,Math.round(points)));
+  return{label:"流動性",points,reason:reasons.join("")||"再建築可否などの調査項目が未確認のため、暫定評価としています。"};
+}
+function axisFuture(p){
+  let points=AXIS_BASELINE; const reasons=[];
+  const{delta,details}=checkGroupDelta(p,["周辺環境","災害リスク"],4);
+  points+=delta;
+  details.forEach(d=>{
+    if(d.label==="災害リスク")reasons.push(d.tone==="good"?`災害リスクは「${d.state}」で、長期保有の観点でも安心材料です。`:`災害リスクが「${d.state}」のため、長期的な資産価値への影響を考慮する必要があります。`);
+    else reasons.push(d.tone==="good"?`周辺環境は「${d.state}」で将来的な需要も見込みやすい立地です。`:`周辺環境が「${d.state}」のため、将来的な入居付けに影響する可能性があります。`);
+  });
+  const{pct}=calcStats(p);
+  if(pct>=80){points+=2;reasons.push(`調査完了率${pct}%と情報が揃っており、将来性の見通しにも自信を持てます。`);}
+  else if(pct>0&&pct<40){points-=2;reasons.push(`調査完了率${pct}%とまだ情報が少なく、将来性の判断には材料不足です。`);}
+  points=Math.max(0,Math.min(20,Math.round(points)));
+  return{label:"将来性",points,reason:reasons.join("")||"周辺環境・災害リスクなどの調査項目が未確認のため、暫定評価としています。"};
+}
+
+function buildEvalSummary(p,axes,score){
+  const parts=[];
+  if(score>=75)parts.push(`総合スコア${score}点と高評価の物件です。`);
+  else if(score>=55)parts.push(`総合スコア${score}点で、平均的な水準の物件です。`);
+  else parts.push(`総合スコア${score}点で、慎重な検討が必要な物件です。`);
+  const sorted=[...axes].sort((a,b)=>b.points-a.points);
+  const top=sorted[0],bottom=sorted[sorted.length-1];
+  if(top.points>AXIS_BASELINE)parts.push(top.reason);
+  if(bottom.points<AXIS_BASELINE&&bottom!==top)parts.push(bottom.reason);
+  if(p.status==="見送り"&&p.reason)parts.push(`見送り理由として「${p.reason}」が記録されています。`);
+  if(p.memos&&p.memos.length)parts.push(`メモが${p.memos.length}件記録されています。直近の気づきも判断材料に加えましょう。`);
+  return parts.join("");
+}
+function buildEvalNextActions(p){
+  const nextActions=[];
+  const unchecked=(p.checks||[]).filter(c=>c.i===0).map(c=>c.l);
+  unchecked.slice(0,3).forEach(l=>nextActions.push(`${l}：まだ未確認です。優先して調査しましょう。`));
+  if(!nextActions.length){
+    const openTodo=(p.todos||[]).find(t=>!t.done);
+    if(openTodo)nextActions.push(`「${openTodo.l}」がまだ完了していません。`);
+    else nextActions.push("主要な調査項目は確認済みです。次の判断ステップ（内見・指値検討など）に進みましょう。");
+  }
+  return nextActions;
+}
+// The single entry point every screen calls. Returns everything needed to
+// display this one property's AI evaluation — never depends on any other
+// property (unlike the compare screen's group-relative analysis below).
+function evaluateProperty(p){
+  const axes=[axisProfitability(p),axisLocation(p),axisBuilding(p),axisLegal(p),axisLiquidity(p),axisFuture(p)];
+  const score=Math.max(0,Math.min(100,Math.round(axes.reduce((s,a)=>s+a.points,0))));
+  const strengths=axes.filter(a=>a.points>=14).map(a=>a.reason);
+  const concerns=axes.filter(a=>a.points<=6).map(a=>a.reason);
+  return{
+    score,
+    breakdown:axes, // [{label,points,reason}, ...] — radarSVG/#bdRows read .label/.points
+    summary:buildEvalSummary(p,axes,score),
+    strengths:strengths.length?strengths:["際立った強みは見当たりません。バランス型の物件です。"],
+    concerns:concerns.length?concerns:["際立った注意点は見当たりません。"],
+    nextActions:buildEvalNextActions(p)
+  };
+}
+// Lightweight accessor for the many places that only need the number
+// (sorting, badges, list cards) — still goes through evaluateProperty()
+// so there is exactly one source of truth for what a property's score is.
+function getScore(p){return evaluateProperty(p).score;}
 
 /* ─── nav ─── */
 let currentNav="home";
@@ -1237,16 +1416,12 @@ function renderSettingsScreen(){
 function createBlankProperty(){
   const nextId=props.length?Math.max(...props.map(p=>p.id))+1:1;
   return{
-    id:nextId,title:"",address:"",status:"候補",score:50,fav:false,
+    id:nextId,title:"",address:"",status:"候補",fav:false,
     price:"",yieldRate:"",rent:"",station:"",
     age:"",structure:"",occupancy:"",buildingArea:"",
     floorPlan:"",landArea:"",parking:"",road:"",
     zoning:"",source:"",
     tags:[],reason:null,
-    comment:"まだAIコメントがありません。基本情報や調査チェックを入力すると、より詳しい評価が表示されるようになります。",
-    aiPts:["まずは基本情報を入力してみましょう"],
-    aiNext:["調査チェックを進めてみましょう"],
-    breakdown:[["収益性",10],["立地",10],["建物・管理",10],["法的リスク",10],["流動性",10],["将来性",10]],
     checks:Object.keys(CK).map(l=>({l,i:0})),
     todos:[],
     memos:[],
@@ -1393,15 +1568,16 @@ function renderHero(){
     return;
   }
   hero.style.display="";
-  const top=[...props].sort((a,b)=>b.score-a.score)[0],m=SM[top.status];
+  const top=[...props].sort((a,b)=>getScore(b)-getScore(a))[0],m=SM[top.status];
+  const topEval=evaluateProperty(top);
   const cnt={}; SO.forEach(s=>cnt[s]=0); props.forEach(p=>cnt[p.status]++);
   hero.innerHTML=`
     <div class="top"><div>
       <p class="score-label">注目物件 Shonai Score</p>
-      <p class="score-num">${top.score}<small>/100</small></p>
+      <p class="score-num">${topEval.score}<small>/100</small></p>
       <span class="pill" style="background:${m.bg};color:${m.fg}">${m.e} ${top.status}・${top.title}</span>
-    </div><div class="ring" style="--p:${top.score}"><i>${top.score}</i></div></div>
-    <p class="score-comment">${top.comment}</p>
+    </div><div class="ring" style="--p:${topEval.score}"><i>${topEval.score}</i></div></div>
+    <p class="score-comment">${topEval.summary}</p>
     <p class="score-substats">${SO.map(s=>`${s} ${cnt[s]}件`).join(" ・ ")}</p>`;
   hero.style.cursor="pointer";
   hero.onclick=()=>goToDetail(top,"home");
@@ -1412,7 +1588,8 @@ function renderTopPickCard(){
   if(!p){ section.innerHTML=""; return; }
   const m=SM[p.status];
   const thumbStyle=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
-  const summary=topPickComment||p.comment;
+  const pEval=evaluateProperty(p);
+  const summary=topPickComment||pEval.summary;
   section.innerHTML=`<div class="card top-pick-card" id="topPickCard">
     <p class="top-pick-label">🏆 第1候補物件</p>
     <div class="top-pick-row">
@@ -1421,7 +1598,7 @@ function renderTopPickCard(){
         <p class="top-pick-title">${p.title}</p>
         <p class="top-pick-addr">${p.address}</p>
         <div class="top-pick-stats">
-          <div><b>${p.score}</b>Score</div>
+          <div><b>${pEval.score}</b>Score</div>
           <div><b>${propFieldValueOrDash(p,"price")}</b>価格</div>
           <div><b>${propFieldValueOrDash(p,"yieldRate")}</b>利回り</div>
           <div><span class="pill" style="background:${m.bg};color:${m.fg};margin-top:0">${m.e} ${p.status}</span></div>
@@ -1454,7 +1631,7 @@ function renderList(){
         <div class="pc-body">
           <div class="pc-top"><div><p class="ptitle">${p.title}</p><p class="addr">${p.address}</p></div>
           <span class="sbadge" style="background:${m.bg};color:${m.fg}">${p.status}</span></div>
-          <div class="pc-metrics"><div><b>${p.score}</b>点</div><div><b>${propFieldValueOrDash(p,"price")}</b></div><div><b>${propFieldValueOrDash(p,"yieldRate")}</b>利回り</div></div>
+          <div class="pc-metrics"><div><b>${getScore(p)}</b>点</div><div><b>${propFieldValueOrDash(p,"price")}</b></div><div><b>${propFieldValueOrDash(p,"yieldRate")}</b>利回り</div></div>
           <div class="ptags">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join("")}</div>
           ${p.reason?`<div class="reason-box">見送り理由：${p.reason}</div>`:""}
         </div>
@@ -1481,7 +1658,7 @@ function renderFav(){
       <div class="pc-body">
         <div class="pc-top"><div><p class="ptitle">${p.title}</p><p class="addr">${p.address}</p></div>
         <span class="sbadge" style="background:${m.bg};color:${m.fg}">${p.status}</span></div>
-        <div class="pc-metrics"><div><b>${p.score}</b>点</div><div><b>${propFieldValueOrDash(p,"price")}</b></div><div><b>${propFieldValueOrDash(p,"yieldRate")}</b>利回り</div></div>
+        <div class="pc-metrics"><div><b>${getScore(p)}</b>点</div><div><b>${propFieldValueOrDash(p,"price")}</b></div><div><b>${propFieldValueOrDash(p,"yieldRate")}</b>利回り</div></div>
       </div>`;
     div.addEventListener("click",()=>goToDetail(p,"fav"));
     el.appendChild(div);
@@ -1563,7 +1740,7 @@ function buildPerPropertyComment(p,group){
   }
   const{unc}=calcStats(p);
   if(unc>0)parts.push(`今後は未確認の調査項目（${unc}件）を優先的に確認するとよいでしょう。`);
-  else if(p.aiNext&&p.aiNext.length)parts.push(p.aiNext[0]);
+  else{const na=evaluateProperty(p).nextActions;if(na.length)parts.push(na[0]);}
   return parts.join("");
 }
 
@@ -1578,7 +1755,7 @@ function buildPerPropertyComment(p,group){
 */
 const CMP_ROWS=[
   {l:"Score",icon:"⭐",higher:true,
-    val:p=>p.score, show:v=>v},
+    val:p=>getScore(p), show:v=>v},
   {l:"価格",icon:"¥",
     val:p=>p.price, show:(v,p)=>propFieldValueOrDash(p,"price")},
   {l:"利回り",icon:"%",higher:true,
@@ -1614,7 +1791,7 @@ function renderCmpBody(){
       return`<div class="cmp-cell cmp-header-cell">
         <div class="cmp-thumb" data-cmp-open="${p.id}" style="${thumbStyle}">${p.photos.length?"":"🏠"}</div>
         <button class="cmp-h-link" data-cmp-open="${p.id}">${p.title}</button>
-        <div class="cmp-h-score">${p.score}<small>/100</small></div>
+        <div class="cmp-h-score">${getScore(p)}<small>/100</small></div>
       </div>`;
     })).join("");
 
@@ -1652,7 +1829,7 @@ function renderCmpBody(){
   // The top-scoring property starts expanded so there's always at least
   // one comment visible without having to tap anything first; the rest
   // stay closed until tapped.
-  const topScoreId=sel.reduce((a,b)=>b.score>a.score?b:a).id;
+  const topScoreId=sel.reduce((a,b)=>getScore(b)>getScore(a)?b:a).id;
   const aiItems=sel.map(p=>{
     const m=SM[p.status];
     const thumbStyle=p.photos.length?`background-image:url(${p.photos[0].src})`:`background:linear-gradient(135deg,${m.gr[0]},${m.gr[1]})`;
@@ -1719,29 +1896,33 @@ let panelIdx=0;
 function radarSVG(bd){
   const s=170,c=s/2,r=s/2-28,max=20,n=bd.length;
   const pt=(i,v)=>{const a=(Math.PI*2*i/n)-Math.PI/2,rr=r*(v/max);return[c+rr*Math.cos(a),c+rr*Math.sin(a)];};
-  const poly=bd.map((b,i)=>pt(i,b[1]).join(",")).join(" ");
+  const poly=bd.map((b,i)=>pt(i,b.points).join(",")).join(" ");
   let ax="",lb="",ri="";
   [.33,.66,1].forEach(f=>{ri+=`<circle cx="${c}" cy="${c}" r="${r*f}" fill="none" stroke="#e3ede5" stroke-width="1"/>`;});
   bd.forEach((b,i)=>{
     const[x1,y1]=pt(i,max);ax+=`<line x1="${c}" y1="${c}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#dbe9df" stroke-width="1"/>`;
-    const[lx,ly]=pt(i,max*1.2);lb+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="9" fill="#4d5c51" font-weight="700" text-anchor="middle" dominant-baseline="middle">${b[0]}</text>`;
+    const[lx,ly]=pt(i,max*1.2);lb+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="9" fill="#4d5c51" font-weight="700" text-anchor="middle" dominant-baseline="middle">${b.label}</text>`;
   });
   return`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">${ri}${ax}<polygon points="${poly}" fill="#1f7a45" fill-opacity=".3" stroke="#1f7a45" stroke-width="2"/>${lb}</svg>`;
 }
 
 function renderDetail(p){
   const m=SM[p.status];
+  const pEval=evaluateProperty(p);
   document.getElementById("dTitle").textContent=p.title;
-  document.getElementById("dScore").textContent=p.score;
-  document.getElementById("dRingNum").textContent=p.score;
-  document.getElementById("dRing").style.setProperty("--p",p.score);
+  document.getElementById("dScore").textContent=pEval.score;
+  document.getElementById("dRingNum").textContent=pEval.score;
+  document.getElementById("dRing").style.setProperty("--p",pEval.score);
   const pill=document.getElementById("dPill");
   pill.innerHTML=`${m.e} ${p.status}<span class="pill-caret">▾</span>`;pill.style.background=m.bg;pill.style.color=m.fg;
-  document.getElementById("aiSummary").textContent=p.comment;
-  document.getElementById("radar").innerHTML=radarSVG(p.breakdown);
-  document.getElementById("bdRows").innerHTML=p.breakdown.map(([l,v])=>`
-    <div class="bd-row"><span>${l}</span><div class="bd-bar"><i style="width:${v/20*100}%"></i></div><span style="text-align:right">${v}/20</span></div>`).join("");
-  renderStats(p);renderAI(p);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);
+  document.getElementById("aiSummary").textContent=pEval.summary;
+  document.getElementById("radar").innerHTML=radarSVG(pEval.breakdown);
+  // 評価理由（スコア内訳）：既存の内訳バー表示に、各軸の根拠テキストを
+  // 添えている。Feature #006からはこの根拠が入力データに応じて変化する。
+  document.getElementById("bdRows").innerHTML=pEval.breakdown.map(b=>`
+    <div class="bd-row"><span>${b.label}</span><div class="bd-bar"><i style="width:${b.points/20*100}%"></i></div><span style="text-align:right">${b.points}/20</span></div>
+    <p class="bd-reason">${b.reason}</p>`).join("");
+  renderStats(p);renderAI(p,pEval);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);
   document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");
   setPanel(panelIdx,false);renderGallery(p);
 }
@@ -1769,11 +1950,13 @@ function renderStats(p){
   document.getElementById("progPct").textContent=pct+"%";
   document.getElementById("unconfN").textContent=unc+"件";
 }
-function renderAI(p){
-  const el=document.getElementById("aiText");
-  el.textContent=p.comment;
-  document.getElementById("aiPts").innerHTML=p.aiPts.map(t=>`<li>${t}</li>`).join("");
-  document.getElementById("aiNext").innerHTML=p.aiNext.map(t=>`<li>${t}</li>`).join("");
+function renderAI(p,pEval){
+  pEval=pEval||evaluateProperty(p);
+  document.getElementById("aiText").textContent=pEval.summary;
+  document.getElementById("aiPts").innerHTML=pEval.strengths.map(t=>`<li>${t}</li>`).join("");
+  document.getElementById("aiConcerns").innerHTML=pEval.concerns.map(t=>`<li>${t}</li>`).join("");
+  document.getElementById("aiNext").innerHTML=pEval.nextActions.map(t=>`<li>${t}</li>`).join("");
+  document.getElementById("aiBreakdown").innerHTML=pEval.breakdown.map(b=>`<li><b>${b.label}（${b.points}/20）</b><br>${b.reason}</li>`).join("");
 }
 function renderTodos(p){
   const act=p.todos.filter(t=>!t.done),dn=p.todos.filter(t=>t.done);
@@ -2199,7 +2382,6 @@ function saveWiz(){
   const p=ap,allF=STEPS.flatMap(s=>s.fields);let changed=0;
   allF.forEach(f=>{if(p[f.k]!==wizDraft[f.k]){log(p,`✏️ ${f.l}：${p[f.k]} → ${wizDraft[f.k]}`);p[f.k]=wizDraft[f.k];changed++;}});
   if(changed===0)log(p,"✏️ 基本情報を確認しました");
-  else{const d=Math.floor(Math.random()*5)-1;if(d!==0)bumpScore(p,d);}
   renderDetail(p);
   closeSh("eBd","eSheet");
 }
