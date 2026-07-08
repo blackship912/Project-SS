@@ -468,6 +468,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 </style>
 </head>
 <body>
+<div id="autoSaveWarningBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:90;background:#c0392b;color:#fff;text-align:center;font-size:12px;font-weight:700;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top))">
+  ⚠️ 自動保存ができていません。データを守るため「バックアップを作成」をご利用ください。
+</div>
 <div class="shell" id="shell">
 
 <!-- ====== HOME ====== -->
@@ -1054,13 +1057,33 @@ function persistProps(){
     updateAutoSaveStatus(false);
   }
 }
+// log() is called from many places, and at a couple of them (photo
+// delete, the basic-info edit wizard) it happens to run *before* the
+// actual data mutation line rather than after — that ordering is fine for
+// the log message itself (it wants to show the old value), but a
+// persistProps() call made synchronously at that exact moment would save
+// a snapshot that's missing the very change that triggered it. Deferring
+// the save to the next tick guarantees it always runs after the whole
+// synchronous operation (mutation included, wherever it falls relative to
+// the log() call) has finished. It also coalesces several log() calls
+// happening in the same tick (e.g. the edit wizard saving multiple
+// changed fields at once) into a single write.
+let persistScheduled=false;
+function schedulePersist(){
+  if(persistScheduled)return;
+  persistScheduled=true;
+  setTimeout(()=>{ persistScheduled=false; persistProps(); },0);
+}
 function updateAutoSaveStatus(ok){
   const el=document.getElementById("autoSaveStatus");
-  if(!el)return;
-  el.textContent=ok
-    ? `自動保存：この端末に保存済み（${now()}）`
-    : "⚠️ 自動保存に失敗しました。「バックアップを作成」での保存をおすすめします。";
-  el.style.color=ok?"var(--muted)":"#c0392b";
+  if(el){
+    el.textContent=ok
+      ? `自動保存：この端末に保存済み（${now()}）`
+      : "⚠️ 自動保存に失敗しました。「バックアップを作成」での保存をおすすめします。";
+    el.style.color=ok?"var(--muted)":"#c0392b";
+  }
+  const banner=document.getElementById("autoSaveWarningBanner");
+  if(banner)banner.style.display=ok?"none":"block";
 }
 function loadPersistedProps(){
   let raw;
@@ -1077,7 +1100,7 @@ function loadPersistedProps(){
 /* ─── helpers ─── */
 let ap=null;
 function now(){const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
-function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");persistProps();}
+function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");schedulePersist();}
 function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc};}
 function bumpScore(p,delta){const b=p.score;p.score=Math.max(0,Math.min(100,p.score+delta));log(p,`⭐ Score ${b} → ${p.score}`);}
 
