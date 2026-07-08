@@ -657,9 +657,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 
   <div class="settings-section">
     <h3>データ管理</h3>
+    <p class="tiny" id="autoSaveStatus" style="margin:0 0 8px;padding:0 2px">自動保存：この端末に保存されます</p>
     <div class="settings-card">
-      <div class="settings-row" id="exportBtn" style="cursor:pointer">データエクスポート（JSON）<span>→</span></div>
-      <div class="settings-row">バックアップ（UI）<span>準備中</span></div>
+      <div class="settings-row" id="backupCreateBtn" style="cursor:pointer">💾 バックアップを作成<span>→</span></div>
+      <div class="settings-row" id="backupRestoreBtn" style="cursor:pointer">📂 バックアップを復元<span>→</span></div>
       <div class="settings-row" id="undoBtn" style="cursor:pointer">元に戻す<span id="undoStatus">→</span></div>
       <div class="settings-row" id="resetDataBtn" style="cursor:pointer;color:#c0392b">データ初期化<span>→</span></div>
     </div>
@@ -795,6 +796,25 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <button class="sh-opt" id="resetDataConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>初期化する</button>
 </div>
 
+<!-- backup restore confirmation -->
+<div class="bd" id="backupRestoreBd"></div>
+<div class="sheet" id="backupRestoreSheet">
+  <div class="sh-handle" id="backupRestoreHandle"></div>
+  <p class="sh-title">バックアップを復元しますか？</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 4px" id="backupRestoreDetail"></p>
+  <button class="sh-opt" id="backupRestoreCancelBtn"><span class="dot" style="background:#9aa6a0"></span>キャンセル</button>
+  <button class="sh-opt" id="backupRestoreConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>復元する</button>
+</div>
+
+<!-- backup restore error -->
+<div class="bd" id="backupErrorBd"></div>
+<div class="sheet" id="backupErrorSheet">
+  <div class="sh-handle" id="backupErrorHandle"></div>
+  <p class="sh-title">バックアップを復元できませんでした</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 12px" id="backupErrorDetail"></p>
+  <button class="sh-cancel" id="backupErrorCloseBtn">閉じる</button>
+</div>
+
 <!-- fullscreen photo -->
 <div class="fs" id="fsView">
   <div class="fs-head">
@@ -814,6 +834,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 </div>
 
 <input type="file" id="fileInputReplace" accept="image/*" style="display:none">
+<input type="file" id="backupRestoreInput" accept="application/json,.json" style="display:none">
 
 <!-- AI detail modal -->
 <div class="ai-modal-bd" id="aiModalBd">
@@ -844,7 +865,7 @@ const SO=["候補","調査中","保留","見送り","購入済"];
 // screen HTML). Update this single value when starting a new Feature —
 // nothing else needs to change. Set to null to hide the badge entirely
 // (e.g. right before a stable release).
-const CURRENT_FEATURE="#004";
+const CURRENT_FEATURE="#005";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -986,10 +1007,77 @@ const props=[
 // "データ初期化" (in 設定 > データ管理) restores back to.
 const INITIAL_PROPS_SNAPSHOT=JSON.parse(JSON.stringify(props));
 
+/* ─── persistence (localStorage auto-save + manual backup) ───
+   Keeps whatever the person has typed into Project:SS on this device
+   across reloads. Only `props` (the actual property data — basic info,
+   photos, checks, memos, logs, favorite state) is persisted. Session-only
+   state such as the compare selection, top pick, or pending undo is left
+   out on purpose and still resets on reload, exactly as before — none of
+   that is something the person "entered", so treating it as disposable
+   is consistent with how the rest of the app already behaves.
+
+   DATA_FORMAT_VERSION describes the *shape* of a saved `props` array, not
+   the app's own Beta/Feature version shown elsewhere (CURRENT_FEATURE).
+   It only needs to change if a future Feature reshapes what a saved
+   property object looks like in a way old saves can't be read as-is. The
+   auto-save (localStorage) and the manual "バックアップを作成" file both
+   use this same version number, since they save the exact same shape —
+   one definition, same idea as PROPERTY_FIELDS having a single source.
+*/
+const DATA_FORMAT_VERSION="1";
+const STORAGE_KEY="project_ss_props_v1";
+
+// Placeholder for future format upgrades. If DATA_FORMAT_VERSION is ever
+// bumped, add an entry here keyed by the *previous* version number: a
+// function that takes props in that old shape and returns props in the
+// current shape. Restoring a backup checks this table before refusing a
+// version mismatch outright. Empty today because there is only one
+// version so far — see HANDOFF.md for the intended usage.
+const BACKUP_MIGRATIONS={};
+
+function persistProps(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      version:DATA_FORMAT_VERSION,
+      savedAt:new Date().toISOString(),
+      props
+    }));
+    updateAutoSaveStatus(true);
+  }catch(e){
+    // Auto-save failing (private browsing, storage disabled, or — most
+    // likely in practice — the device's storage quota being full because
+    // photos are stored as base64 and are by far the largest thing here)
+    // must never crash the app or block whatever the person was doing.
+    // It only means this particular change didn't reach the device's
+    // saved copy; "バックアップを作成" still lets them save a copy by hand.
+    console.warn("Project:SS: 自動保存に失敗しました", e);
+    updateAutoSaveStatus(false);
+  }
+}
+function updateAutoSaveStatus(ok){
+  const el=document.getElementById("autoSaveStatus");
+  if(!el)return;
+  el.textContent=ok
+    ? `自動保存：この端末に保存済み（${now()}）`
+    : "⚠️ 自動保存に失敗しました。「バックアップを作成」での保存をおすすめします。";
+  el.style.color=ok?"var(--muted)":"#c0392b";
+}
+function loadPersistedProps(){
+  let raw;
+  try{ raw=localStorage.getItem(STORAGE_KEY); }
+  catch(e){ return null; } // storage inaccessible -> behave as first launch
+  if(!raw)return null;
+  let parsed;
+  try{ parsed=JSON.parse(raw); }
+  catch(e){ return null; } // corrupted -> fall back to sample data rather than crash
+  if(!parsed||!Array.isArray(parsed.props))return null;
+  return parsed.props;
+}
+
 /* ─── helpers ─── */
 let ap=null;
 function now(){const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
-function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");}
+function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");persistProps();}
 function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc};}
 function bumpScore(p,delta){const b=p.score;p.score=Math.max(0,Math.min(100,p.score+delta));log(p,`⭐ Score ${b} → ${p.score}`);}
 
@@ -1064,6 +1152,7 @@ function performUndo(){
   lastUndo.restore();
   lastUndo=null;
   updateUndoStatus();
+  persistProps();
 }
 function updateUndoStatus(){
   const el=document.getElementById("undoStatus");
@@ -1204,6 +1293,7 @@ function saveNewProperty(){
   Object.keys(npDraft).forEach(k=>{ if(k.endsWith("__isOther")||k.endsWith("__unitIsOther")||k.endsWith("__unit"))delete npDraft[k]; });
   const savedProperty=npDraft;
   props.push(savedProperty);
+  persistProps();
   closeSh("npBd","npSheet");
   // Refresh the home list/hero in the background so it's correct once the
   // person eventually returns to Home, then go straight to the new
@@ -2463,6 +2553,7 @@ document.getElementById("propDelConfirmBtn").addEventListener("click",()=>{
   // basic info, survey checks, notes, logs, and favorite flag with it,
   // since all of those are just properties on this one object.
   props.splice(idx,1);
+  persistProps();
 
   pushUndo(`${removedProperty.title}を削除`,()=>{
     props.splice(removedIndex,0,removedProperty);
@@ -2562,9 +2653,118 @@ document.getElementById("themeRow").querySelectorAll(".theme-dot").forEach(dot=>
     document.documentElement.style.setProperty("--g2",dot.dataset.color+"99");
   });
 });
-document.getElementById("exportBtn").addEventListener("click",()=>{
-  const data=JSON.stringify(props.map(p=>({id:p.id,title:p.title,score:p.score,status:p.status,price:p.price,yieldRate:p.yieldRate})),null,2);
-  const a=document.createElement("a");a.href="data:application/json;charset=utf-8,"+encodeURIComponent(data);a.download="project_ss_export.json";a.click();
+/* ─── data management: backup create ───
+   Supersedes the old "データエクスポート（JSON）" row, which only wrote out
+   a handful of fields (id/title/score/status/price/yieldRate) and was
+   never meant to be a real backup. Keeping both around would mean two
+   different "export" concepts on the same screen, which invites
+   confusion about which one is safe to rely on — so this Feature folds
+   the old row into this one, full, backup instead. See README「判断した
+   こと」for this call.
+*/
+function backupFileStamp(){
+  const d=new Date(),z=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`;
+}
+document.getElementById("backupCreateBtn").addEventListener("click",()=>{
+  const payload=JSON.stringify({version:DATA_FORMAT_VERSION,exportedAt:new Date().toISOString(),props},null,2);
+  const blob=new Blob([payload],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`project_ss_backup_${backupFileStamp()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ─── data management: backup restore ───
+   Reads a previously-created backup file, validates it defensively (it
+   could be corrupted, hand-edited, from a future app version, or simply
+   the wrong file entirely), and only ever overwrites the current data
+   after the person confirms it on a dedicated sheet that states plainly
+   that this replaces what's currently saved. Any validation failure
+   shows a plain-language error sheet instead of silently doing nothing
+   or throwing — per Feature #005's brief, safety against losing data
+   comes first.
+*/
+let pendingRestoreProps=null;
+function showBackupError(message){
+  document.getElementById("backupErrorDetail").textContent=message;
+  openSh("backupErrorBd","backupErrorSheet");
+}
+function closeBackupErrorSheet(){ closeSh("backupErrorBd","backupErrorSheet"); }
+document.getElementById("backupErrorCloseBtn").addEventListener("click",closeBackupErrorSheet);
+document.getElementById("backupErrorBd").addEventListener("click",closeBackupErrorSheet);
+bindHandleClose("backupErrorHandle",closeBackupErrorSheet);
+
+document.getElementById("backupRestoreBtn").addEventListener("click",()=>{
+  document.getElementById("backupRestoreInput").click();
+});
+document.getElementById("backupRestoreInput").addEventListener("change",e=>{
+  const input=e.target;
+  const file=input.files[0];
+  input.value=""; // allow re-selecting the exact same file again later
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    let parsed;
+    try{ parsed=JSON.parse(reader.result); }
+    catch(err){ return showBackupError("選択したファイルを読み取れませんでした。Project:SSで作成したバックアップファイルを選択してください。"); }
+    if(!parsed||typeof parsed!=="object"||Array.isArray(parsed)){
+      return showBackupError("選択したファイルが正しいバックアップ形式ではありませんでした。");
+    }
+    if(!Array.isArray(parsed.props)){
+      return showBackupError("物件データが見つかりませんでした。Project:SSで作成したバックアップファイルを選択してください。");
+    }
+    let propsToRestore=parsed.props;
+    if(parsed.version!==DATA_FORMAT_VERSION){
+      const migrate=BACKUP_MIGRATIONS[parsed.version];
+      if(migrate){
+        propsToRestore=migrate(propsToRestore);
+      } else {
+        return showBackupError(`このバックアップは対応していない形式（version: ${parsed.version??"不明"}）のため復元できません。`);
+      }
+    }
+    // Minimal shape check on every item so a totally unrelated JSON file
+    // (valid JSON, but not a Project:SS backup) doesn't silently corrupt
+    // the app with property objects missing basic fields.
+    const looksValid=propsToRestore.every(p=>p&&typeof p==="object"&&typeof p.id!=="undefined"&&typeof p.title==="string");
+    if(!looksValid){
+      return showBackupError("物件データの内容が正しくないため復元できませんでした。");
+    }
+    pendingRestoreProps=propsToRestore;
+    document.getElementById("backupRestoreDetail").textContent=
+      `${propsToRestore.length}件の物件データに復元します。現在この端末にあるデータは上書きされます。この操作は元に戻せません。`;
+    openSh("backupRestoreBd","backupRestoreSheet");
+  };
+  reader.onerror=()=>showBackupError("ファイルの読み込み中にエラーが発生しました。");
+  reader.readAsText(file);
+});
+function closeBackupRestoreConfirm(){
+  closeSh("backupRestoreBd","backupRestoreSheet");
+  pendingRestoreProps=null;
+}
+document.getElementById("backupRestoreCancelBtn").addEventListener("click",closeBackupRestoreConfirm);
+document.getElementById("backupRestoreBd").addEventListener("click",closeBackupRestoreConfirm);
+bindHandleClose("backupRestoreHandle",closeBackupRestoreConfirm);
+document.getElementById("backupRestoreConfirmBtn").addEventListener("click",()=>{
+  const restored=pendingRestoreProps;
+  closeSh("backupRestoreBd","backupRestoreSheet");
+  pendingRestoreProps=null;
+  if(!restored)return;
+  // Same cleanup as "データ初期化": once props is replaced wholesale,
+  // anything referencing the old properties by id could now be pointing
+  // at ids that no longer exist, or mean something different.
+  props.splice(0,props.length,...restored);
+  cmpSel=[];
+  topPickId=null;
+  topPickComment="";
+  lastUndo=null;
+  updateUndoStatus();
+  ap=null;
+  persistProps();
+  goTo("home");
+  renderHome();
 });
 
 /* ─── data management: undo ─── */
@@ -2595,11 +2795,21 @@ document.getElementById("resetDataConfirmBtn").addEventListener("click",()=>{
   lastUndo=null;
   updateUndoStatus();
   ap=null;
+  persistProps();
   goTo("home");
   renderHome();
 });
 
 /* ─── init ─── */
+const persistedProps=loadPersistedProps();
+if(persistedProps){
+  // Returning visit on this device: whatever was last saved wins over the
+  // built-in sample data — including an empty array, if every sample
+  // property was since deleted. `null` (no key in storage at all) is the
+  // only case treated as "first launch".
+  props.splice(0,props.length,...persistedProps);
+}
+persistProps(); // first launch: saves the sample data immediately; returning visit: keeps the auto-save status line accurate right away
 renderHome();
 renderSettingsScreen();
 </script>
