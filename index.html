@@ -471,7 +471,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <div id="autoSaveWarningBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:90;background:#c0392b;color:#fff;text-align:center;font-size:12px;font-weight:700;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top))">
   ⚠️ 自動保存ができていません。データを守るため「バックアップを作成」をご利用ください。
 </div>
-<div class="shell" id="shell">
+<div class="shell" id="shell" style="transition:margin-top .2s ease,height .2s ease">
 
 <!-- ====== HOME ====== -->
 <section id="homeScreen" class="screen">
@@ -809,11 +809,11 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <button class="sh-opt" id="backupRestoreConfirmBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>復元する</button>
 </div>
 
-<!-- backup restore error -->
+<!-- data error (backup restore validation / photo save failure) -->
 <div class="bd" id="backupErrorBd"></div>
 <div class="sheet" id="backupErrorSheet">
   <div class="sh-handle" id="backupErrorHandle"></div>
-  <p class="sh-title">バックアップを復元できませんでした</p>
+  <p class="sh-title" id="backupErrorTitle">バックアップを復元できませんでした</p>
   <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 12px" id="backupErrorDetail"></p>
   <button class="sh-cancel" id="backupErrorCloseBtn">閉じる</button>
 </div>
@@ -1046,6 +1046,7 @@ function persistProps(){
       props
     }));
     updateAutoSaveStatus(true);
+    return true;
   }catch(e){
     // Auto-save failing (private browsing, storage disabled, or — most
     // likely in practice — the device's storage quota being full because
@@ -1055,6 +1056,7 @@ function persistProps(){
     // saved copy; "バックアップを作成" still lets them save a copy by hand.
     console.warn("Project:SS: 自動保存に失敗しました", e);
     updateAutoSaveStatus(false);
+    return false;
   }
 }
 // log() is called from many places, and at a couple of them (photo
@@ -1082,8 +1084,42 @@ function updateAutoSaveStatus(ok){
       : "⚠️ 自動保存に失敗しました。「バックアップを作成」での保存をおすすめします。";
     el.style.color=ok?"var(--muted)":"#c0392b";
   }
+  setAutoSaveBanner(!ok);
+}
+// Shows/hides the top warning banner. Rather than floating as an overlay
+// on top of the app (which used to sit right over the Home/hamburger/back
+// buttons at the very top of every screen and made them untappable), the
+// banner takes up its own real space and pushes `.shell` down by exactly
+// that much, shrinking `.shell`'s own height to match so nothing overflows
+// off the bottom of the viewport. The height is measured live (rather
+// than hard-coded) since the banner's actual height varies by device,
+// depending on the safe-area inset at the top.
+function setAutoSaveBanner(show){
   const banner=document.getElementById("autoSaveWarningBanner");
-  if(banner)banner.style.display=ok?"none":"block";
+  const shell=document.getElementById("shell");
+  const fs=document.getElementById("fsView");
+  if(!banner)return;
+  if(show){
+    banner.style.display="block";
+    requestAnimationFrame(()=>{
+      const h=banner.getBoundingClientRect().height;
+      if(shell){
+        shell.style.marginTop=h+"px";
+        shell.style.height=`calc(100dvh - ${h}px)`;
+      }
+      if(fs){
+        // #fsView is its own full-viewport overlay (position:fixed;inset:0),
+        // entirely separate from .shell, so it needs the same top-offset
+        // treatment or its close/add buttons could end up covered too.
+        fs.style.top=h+"px";
+        fs.style.height=`calc(100dvh - ${h}px)`;
+      }
+    });
+  } else {
+    banner.style.display="none";
+    if(shell){ shell.style.marginTop=""; shell.style.height=""; }
+    if(fs){ fs.style.top=""; fs.style.height=""; }
+  }
 }
 function loadPersistedProps(){
   let raw;
@@ -2287,11 +2323,59 @@ document.getElementById("uCancelBtn").addEventListener("click",()=>closeSh("uBd"
    error has already happened, every photo is downscaled and
    re-compressed to a reasonable JPEG once, up front, before it's ever
    held in memory or persisted. This is a real fix for a real failure
-   seen on-device (see README「Feature #005 Follow-up Fix ②」), not a
+   seen on-device (see README「Feature #005 Follow-up Fix ②③」), not a
    preventive guess.
+
+   A single fixed size/quality wasn't reliably enough on its own — some
+   photos (especially high-detail ones) still came out too large. So
+   this now re-compresses in stages: first by lowering JPEG quality, then
+   by shrinking the dimensions further, stopping only once the result is
+   under PHOTO_SIZE_BUDGET_CHARS or the defined floors are reached.
+   PHOTO_SIZE_BUDGET_CHARS is checked against the base64 string's own
+   length as a simple, close-enough proxy for its actual byte size (each
+   base64 character is a fixed 6 bits, so length and size scale together)
+   — good enough for a size *budget*, without needing an exact byte count.
 */
-const PHOTO_MAX_DIMENSION=1280; // longest side, in pixels — plenty for viewing on a phone screen
-const PHOTO_JPEG_QUALITY=0.72;
+const PHOTO_MAX_DIMENSION=1280;      // longest side to start from, in pixels
+const PHOTO_MIN_DIMENSION=640;       // never shrink further than this, even if still over budget
+const PHOTO_JPEG_QUALITY=0.72;       // JPEG quality to start from
+const PHOTO_MIN_QUALITY=0.35;        // never compress further than this, even if still over budget
+const PHOTO_SIZE_BUDGET_CHARS=350*1024; // ~350KB per photo (base64 string length)
+
+function drawAndEncode(img,maxDim,quality){
+  let w=img.naturalWidth,h=img.naturalHeight;
+  if(w>maxDim||h>maxDim){
+    if(w>=h){ h=Math.round(h*maxDim/w); w=maxDim; }
+    else{ w=Math.round(w*maxDim/h); h=maxDim; }
+  }
+  const canvas=document.createElement("canvas");
+  canvas.width=w;canvas.height=h;
+  canvas.getContext("2d").drawImage(img,0,0,w,h);
+  return canvas.toDataURL("image/jpeg",quality);
+}
+function compressToBudget(img){
+  let dimension=PHOTO_MAX_DIMENSION,quality=PHOTO_JPEG_QUALITY;
+  let dataUrl=drawAndEncode(img,dimension,quality);
+  // Stage 1: lower quality first — usually the cheaper way to shrink a
+  // photo without losing much visible detail.
+  while(dataUrl.length>PHOTO_SIZE_BUDGET_CHARS && quality>PHOTO_MIN_QUALITY){
+    quality=Math.max(PHOTO_MIN_QUALITY,quality-0.12);
+    dataUrl=drawAndEncode(img,dimension,quality);
+  }
+  // Stage 2: if quality alone couldn't get it under budget, shrink the
+  // dimensions further too.
+  while(dataUrl.length>PHOTO_SIZE_BUDGET_CHARS && dimension>PHOTO_MIN_DIMENSION){
+    dimension=Math.max(PHOTO_MIN_DIMENSION,Math.round(dimension*0.85));
+    dataUrl=drawAndEncode(img,dimension,quality);
+  }
+  // If it's still over budget after hitting both floors, this is the
+  // smallest/lowest-quality version this photo can reasonably be — it's
+  // returned as-is rather than refused outright. The persistProps()
+  // success check done right after a photo is added (see below) is what
+  // ultimately guarantees nothing is ever left looking "added" in the app
+  // without actually having been saved.
+  return dataUrl;
+}
 function resizeImageFile(file){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
@@ -2300,17 +2384,8 @@ function resizeImageFile(file){
       const img=new Image();
       img.onerror=()=>reject(new Error("image decode failed"));
       img.onload=()=>{
-        let w=img.naturalWidth,h=img.naturalHeight;
-        if(w>PHOTO_MAX_DIMENSION||h>PHOTO_MAX_DIMENSION){
-          if(w>=h){ h=Math.round(h*PHOTO_MAX_DIMENSION/w); w=PHOTO_MAX_DIMENSION; }
-          else{ w=Math.round(w*PHOTO_MAX_DIMENSION/h); h=PHOTO_MAX_DIMENSION; }
-        }
-        const canvas=document.createElement("canvas");
-        canvas.width=w;canvas.height=h;
-        const ctx=canvas.getContext("2d");
-        ctx.drawImage(img,0,0,w,h);
         let dataUrl;
-        try{ dataUrl=canvas.toDataURL("image/jpeg",PHOTO_JPEG_QUALITY); }
+        try{ dataUrl=compressToBudget(img); }
         catch(e){ reject(e); return; }
         resolve(dataUrl);
       };
@@ -2331,26 +2406,40 @@ fileInput.addEventListener("change",e=>{
   let rem=files.length;
   const wasFsOpen=fsEl.classList.contains("show");
   const insertAt=ap.photos.length;
+  function finishPhotoAdd(){
+    const addedCount=ap.photos.length-insertAt;
+    if(addedCount>0){
+      const saved=persistProps();
+      if(saved){
+        log(ap,`📷 写真追加（${addedCount}枚）`);
+        galIdx=insertAt;
+      } else {
+        // Never leave photos looking "added" in the app if they couldn't
+        // actually be saved — that gap is exactly what caused photos to
+        // silently disappear after a reload. Roll back to the last known
+        // good state and say so clearly, rather than staying silent.
+        ap.photos.splice(insertAt,addedCount);
+        persistProps();
+        galIdx=Math.max(0,Math.min(insertAt,ap.photos.length-1));
+        showDataError(
+          "写真の枚数を減らすか、他の写真を削除してから、もう一度お試しください。",
+          "写真を保存できませんでした"
+        );
+      }
+    }
+    if(wasFsOpen){
+      const safeIdx=Math.max(0,Math.min(galIdx,ap.photos.length-1));
+      if(ap.photos.length>0)openFS(ap,safeIdx);
+      else fsEl.classList.remove("show");
+    } else {
+      renderGallery(ap);
+    }
+  }
   files.forEach(f=>{
     resizeImageFile(f)
       .then(src=>{ ap.photos.push({id:Date.now()+Math.random(),src,tags:[],memo:""}); })
       .catch(err=>{ console.warn("Project:SS: 写真の読み込みに失敗しました", err); })
-      .finally(()=>{
-        rem--;
-        if(!rem){
-          const addedCount=ap.photos.length-insertAt;
-          if(addedCount>0){
-            log(ap,`📷 写真追加（${addedCount}枚）`);
-            galIdx=insertAt;
-          }
-          if(wasFsOpen){
-            // keep the fullscreen viewer open and reflect the newly added photos immediately
-            openFS(ap,insertAt);
-          } else {
-            renderGallery(ap);
-          }
-        }
-      });
+      .finally(()=>{ rem--; if(!rem)finishPhotoAdd(); });
   });
   fileInput.value="";
   fileInput.removeAttribute("capture");
@@ -2359,11 +2448,27 @@ fileInputReplace.addEventListener("change",e=>{
   const f=e.target.files[0];
   if(!f){fileInputReplace.removeAttribute("capture");return;}
   const shouldCloseFs=replaceShouldCloseFs;
+  const targetIdx=galIdx;
+  const previousSrc=ap.photos[targetIdx]?ap.photos[targetIdx].src:null;
   resizeImageFile(f).then(src=>{
-    ap.photos[galIdx].src=src;
-    log(ap,"🔄 写真を変更");
-    renderGallery(ap);
-    if(shouldCloseFs)fsEl.classList.remove("show");
+    if(!ap.photos[targetIdx])return; // the photo could have been deleted while this was processing
+    ap.photos[targetIdx].src=src;
+    const saved=persistProps();
+    if(saved){
+      log(ap,"🔄 写真を変更");
+      renderGallery(ap);
+      if(shouldCloseFs)fsEl.classList.remove("show");
+    } else {
+      // Same safety net as adding: don't leave an unsaved replacement
+      // showing in the app — put the previous photo back and say why.
+      ap.photos[targetIdx].src=previousSrc;
+      persistProps();
+      renderGallery(ap);
+      showDataError(
+        "写真の枚数を減らすか、他の写真を削除してから、もう一度お試しください。",
+        "写真を保存できませんでした"
+      );
+    }
   }).catch(err=>{
     console.warn("Project:SS: 写真の読み込みに失敗しました", err);
   });
@@ -2745,6 +2850,13 @@ function backupFileStamp(){
   return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`;
 }
 document.getElementById("backupCreateBtn").addEventListener("click",()=>{
+  // The backup file itself only ever contains version/exportedAt/props —
+  // never any UI or DOM state — but the warning banner is still hidden
+  // for the moment of creating a backup, purely so it doesn't visually
+  // sit over the screen while the person is doing this.
+  const banner=document.getElementById("autoSaveWarningBanner");
+  const bannerWasShowing=!!banner&&banner.style.display!=="none";
+  if(bannerWasShowing)setAutoSaveBanner(false);
   const payload=JSON.stringify({version:DATA_FORMAT_VERSION,exportedAt:new Date().toISOString(),props},null,2);
   const blob=new Blob([payload],{type:"application/json"});
   const url=URL.createObjectURL(blob);
@@ -2753,6 +2865,9 @@ document.getElementById("backupCreateBtn").addEventListener("click",()=>{
   a.download=`project_ss_backup_${backupFileStamp()}.json`;
   a.click();
   URL.revokeObjectURL(url);
+  // The underlying auto-save problem isn't fixed just because a manual
+  // backup was made, so bring the warning back afterward if it was up.
+  if(bannerWasShowing)setTimeout(()=>setAutoSaveBanner(true),300);
 });
 
 /* ─── data management: backup restore ───
@@ -2766,7 +2881,8 @@ document.getElementById("backupCreateBtn").addEventListener("click",()=>{
    comes first.
 */
 let pendingRestoreProps=null;
-function showBackupError(message){
+function showDataError(message,title="バックアップを復元できませんでした"){
+  document.getElementById("backupErrorTitle").textContent=title;
   document.getElementById("backupErrorDetail").textContent=message;
   openSh("backupErrorBd","backupErrorSheet");
 }
@@ -2787,12 +2903,12 @@ document.getElementById("backupRestoreInput").addEventListener("change",e=>{
   reader.onload=()=>{
     let parsed;
     try{ parsed=JSON.parse(reader.result); }
-    catch(err){ return showBackupError("選択したファイルを読み取れませんでした。Project:SSで作成したバックアップファイルを選択してください。"); }
+    catch(err){ return showDataError("選択したファイルを読み取れませんでした。Project:SSで作成したバックアップファイルを選択してください。"); }
     if(!parsed||typeof parsed!=="object"||Array.isArray(parsed)){
-      return showBackupError("選択したファイルが正しいバックアップ形式ではありませんでした。");
+      return showDataError("選択したファイルが正しいバックアップ形式ではありませんでした。");
     }
     if(!Array.isArray(parsed.props)){
-      return showBackupError("物件データが見つかりませんでした。Project:SSで作成したバックアップファイルを選択してください。");
+      return showDataError("物件データが見つかりませんでした。Project:SSで作成したバックアップファイルを選択してください。");
     }
     let propsToRestore=parsed.props;
     if(parsed.version!==DATA_FORMAT_VERSION){
@@ -2800,7 +2916,7 @@ document.getElementById("backupRestoreInput").addEventListener("change",e=>{
       if(migrate){
         propsToRestore=migrate(propsToRestore);
       } else {
-        return showBackupError(`このバックアップは対応していない形式（version: ${parsed.version??"不明"}）のため復元できません。`);
+        return showDataError(`このバックアップは対応していない形式（version: ${parsed.version??"不明"}）のため復元できません。`);
       }
     }
     // Minimal shape check on every item so a totally unrelated JSON file
@@ -2808,14 +2924,14 @@ document.getElementById("backupRestoreInput").addEventListener("change",e=>{
     // the app with property objects missing basic fields.
     const looksValid=propsToRestore.every(p=>p&&typeof p==="object"&&typeof p.id!=="undefined"&&typeof p.title==="string");
     if(!looksValid){
-      return showBackupError("物件データの内容が正しくないため復元できませんでした。");
+      return showDataError("物件データの内容が正しくないため復元できませんでした。");
     }
     pendingRestoreProps=propsToRestore;
     document.getElementById("backupRestoreDetail").textContent=
       `${propsToRestore.length}件の物件データに復元します。現在この端末にあるデータは上書きされます。この操作は元に戻せません。`;
     openSh("backupRestoreBd","backupRestoreSheet");
   };
-  reader.onerror=()=>showBackupError("ファイルの読み込み中にエラーが発生しました。");
+  reader.onerror=()=>showDataError("ファイルの読み込み中にエラーが発生しました。");
   reader.readAsText(file);
 });
 function closeBackupRestoreConfirm(){
