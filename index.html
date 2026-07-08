@@ -2278,6 +2278,48 @@ document.getElementById("uSaveBtn").addEventListener("click",()=>{closeSh("uBd",
 document.getElementById("uDiscardBtn").addEventListener("click",()=>{closeSh("uBd","uSheet");closeSh("eBd","eSheet");});
 document.getElementById("uCancelBtn").addEventListener("click",()=>closeSh("uBd","uSheet"));
 
+/* ─── photo compression ───
+   Photos are by far the largest thing a saved property can contain, and
+   a full-resolution photo straight from a phone camera can easily be
+   several MB on its own once base64-encoded — enough on its own to blow
+   through iOS Safari's localStorage quota (a few MB per origin) after
+   just one or two photos. Rather than trying to react after a quota
+   error has already happened, every photo is downscaled and
+   re-compressed to a reasonable JPEG once, up front, before it's ever
+   held in memory or persisted. This is a real fix for a real failure
+   seen on-device (see README「Feature #005 Follow-up Fix ②」), not a
+   preventive guess.
+*/
+const PHOTO_MAX_DIMENSION=1280; // longest side, in pixels — plenty for viewing on a phone screen
+const PHOTO_JPEG_QUALITY=0.72;
+function resizeImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>reject(reader.error||new Error("file read failed"));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error("image decode failed"));
+      img.onload=()=>{
+        let w=img.naturalWidth,h=img.naturalHeight;
+        if(w>PHOTO_MAX_DIMENSION||h>PHOTO_MAX_DIMENSION){
+          if(w>=h){ h=Math.round(h*PHOTO_MAX_DIMENSION/w); w=PHOTO_MAX_DIMENSION; }
+          else{ w=Math.round(w*PHOTO_MAX_DIMENSION/h); h=PHOTO_MAX_DIMENSION; }
+        }
+        const canvas=document.createElement("canvas");
+        canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,w,h);
+        let dataUrl;
+        try{ dataUrl=canvas.toDataURL("image/jpeg",PHOTO_JPEG_QUALITY); }
+        catch(e){ reject(e); return; }
+        resolve(dataUrl);
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 /* ─── gallery ─── */
 let galIdx=0;
 let replaceShouldCloseFs=false; // whether a pending "この写真を変更" was opened from fullscreen
@@ -2289,16 +2331,27 @@ fileInput.addEventListener("change",e=>{
   let rem=files.length;
   const wasFsOpen=fsEl.classList.contains("show");
   const insertAt=ap.photos.length;
-  files.forEach(f=>{const r=new FileReader();r.onload=()=>{ap.photos.push({id:Date.now()+Math.random(),src:r.result,tags:[],memo:""});rem--;if(!rem){
-    log(ap,`📷 写真追加（${files.length}枚）`);
-    galIdx=Math.max(0,ap.photos.length-files.length);
-    if(wasFsOpen){
-      // keep the fullscreen viewer open and reflect the newly added photos immediately
-      openFS(ap,insertAt);
-    } else {
-      renderGallery(ap);
-    }
-  }};r.readAsDataURL(f);});
+  files.forEach(f=>{
+    resizeImageFile(f)
+      .then(src=>{ ap.photos.push({id:Date.now()+Math.random(),src,tags:[],memo:""}); })
+      .catch(err=>{ console.warn("Project:SS: 写真の読み込みに失敗しました", err); })
+      .finally(()=>{
+        rem--;
+        if(!rem){
+          const addedCount=ap.photos.length-insertAt;
+          if(addedCount>0){
+            log(ap,`📷 写真追加（${addedCount}枚）`);
+            galIdx=insertAt;
+          }
+          if(wasFsOpen){
+            // keep the fullscreen viewer open and reflect the newly added photos immediately
+            openFS(ap,insertAt);
+          } else {
+            renderGallery(ap);
+          }
+        }
+      });
+  });
   fileInput.value="";
   fileInput.removeAttribute("capture");
 });
@@ -2306,12 +2359,14 @@ fileInputReplace.addEventListener("change",e=>{
   const f=e.target.files[0];
   if(!f){fileInputReplace.removeAttribute("capture");return;}
   const shouldCloseFs=replaceShouldCloseFs;
-  const r=new FileReader();r.onload=()=>{
-    ap.photos[galIdx].src=r.result;
+  resizeImageFile(f).then(src=>{
+    ap.photos[galIdx].src=src;
     log(ap,"🔄 写真を変更");
     renderGallery(ap);
     if(shouldCloseFs)fsEl.classList.remove("show");
-  };r.readAsDataURL(f);
+  }).catch(err=>{
+    console.warn("Project:SS: 写真の読み込みに失敗しました", err);
+  });
   fileInputReplace.value="";
   fileInputReplace.removeAttribute("capture");
 });
