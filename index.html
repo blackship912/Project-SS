@@ -855,6 +855,25 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 </div>
 
 <script>
+/* ══════════════════════════════════════════════════════════════════
+   DEBUG ONLY — 自動保存失敗を意図的に再現するためのテスト用コードです。
+   このファイルは検証専用のコピーで、本番の index.html / Project_SS.html /
+   Project_SS_Beta_Review.html には一切含まれていません。確認が終わったら
+   このファイル自体を削除してください。
+   ══════════════════════════════════════════════════════════════════ */
+(function(){
+  const realSetItem = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value){
+    if(key === "project_ss_props_v1"){
+      const e = new Error("DEBUG: 自動保存失敗を意図的に再現しています");
+      e.name = "QuotaExceededError";
+      throw e;
+    }
+    return realSetItem.call(this, key, value);
+  };
+})();
+</script>
+<script>
 /* ─── constants ─── */
 const SM={
   候補:{e:"🟢",bg:"#dff4e5",fg:"#14733d",dot:"#1f7a45",gr:["#1f7a45","#7ecb91"]},
