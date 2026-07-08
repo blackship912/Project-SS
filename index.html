@@ -569,6 +569,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
           </div>
           <div class="info-grid" id="infoGrid"></div>
         </div>
+        <div class="card">
+          <p class="card-title">🔨 リフォーム履歴</p>
+          <div id="reformList"></div>
+        </div>
       </div>
 
       <!-- panel 1: 調査 -->
@@ -716,6 +720,14 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <div class="sh-handle" id="cHandle"></div><p class="sh-title" id="cShTitle">調査項目</p>
   <div id="cOpts"></div>
   <button class="sh-cancel" id="cCancelBtn">キャンセル</button>
+</div>
+<div class="bd" id="reformBd"></div>
+<div class="sheet" id="reformSheet">
+  <div class="sh-handle" id="reformHandle"></div><p class="sh-title" id="reformShTitle">リフォーム時期</p>
+  <div class="ff"><input id="reformYearInput" placeholder="例：2021年" autocomplete="off"></div>
+  <button class="sh-opt" id="reformSaveBtn"><span class="dot" style="background:#1f7a45"></span>保存</button>
+  <button class="sh-opt" id="reformClearBtn"><span class="dot" style="background:#9aa6a0"></span>未実施にする</button>
+  <button class="sh-cancel" id="reformCancelBtn">キャンセル</button>
 </div>
 <div class="bd" id="eBd"></div>
 <div class="sheet" id="eSheet">
@@ -924,6 +936,11 @@ const CK={
 };
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
+// リフォーム履歴（Feature #007 修正）で扱う箇所の固定カタログ。CKと同じ
+// 考え方で、ここに1行足すだけで新規登録・既存物件表示の両方に反映される
+// （ただし既存サンプルの`reformHistory`配列は、CKのcheckesと同様に手動で
+// 追記が必要 — 詳しくはREADMEを参照）。
+const REFORM_PARTS=["屋根","外壁","キッチン","浴室","トイレ","給排水","内装","外構"];
 const PTAGS=["🏠 外観","🛋 リビング","🍳 キッチン","🛁 浴室","🚽 トイレ","🅿 駐車場","🌿 庭","⚡ 設備","📦 その他"];
 /* ─── unified property field master ───
    This single list drives all three screens that deal with a property's
@@ -948,8 +965,6 @@ const PROPERTY_FIELDS=[
   {k:"landArea",l:"土地面積",icon:"⛰️",group:"建物情報",numeric:true,unit:["㎡","坪"]},
   {k:"buildingArea",l:"建物面積",icon:"🏢",group:"建物情報",numeric:true,unit:["㎡","坪"]},
   {k:"floorPlan",l:"間取り",icon:"🪟",group:"建物情報",sel:["1K","1DK","1LDK","2DK","2LDK","3DK","3LDK","4DK","4LDK","5LDK以上"],allowOther:true},
-  {k:"reformParts",l:"リフォーム箇所",icon:"🔨",group:"リフォーム"},
-  {k:"reformYear",l:"リフォーム時期",icon:"🗓️",group:"リフォーム"},
   {k:"parking",l:"駐車場",icon:"🚗",group:"立地・その他",numeric:true,unit:["台"]},
   {k:"road",l:"接道",icon:"🛣️",group:"立地・その他"},
   {k:"zoning",l:"用途地域",icon:"🏙️",group:"立地・その他",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
@@ -1004,7 +1019,7 @@ const props=[
  price:"680万円",yieldRate:"12.4%",rent:"70,000円/月",station:"羽前大山駅 徒歩9分",
  age:"28年（H8年）",structure:"木造",occupancy:"賃貸中",buildingArea:"120.07㎡（36.3坪）",
  floorPlan:"4LDK",landArea:"198.34㎡（60坪）",parking:"2台",road:"両側4.0m公道",
- reformParts:"屋根・外壁",reformYear:"2020年",
+ reformHistory:[{part:"屋根",year:"2021年"},{part:"外壁",year:"2022年"},{part:"キッチン",year:"2023年"},{part:"浴室",year:""},{part:"トイレ",year:"2020年"},{part:"給排水",year:""},{part:"内装",year:""},{part:"外構",year:""}],
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
  checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"修繕履歴",i:2},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1},{l:"リフォーム",i:2}],
@@ -1016,6 +1031,7 @@ const props=[
  price:"450万円",yieldRate:"10.8%",rent:"55,000円/月",station:"羽前水沢駅 徒歩15分",
  age:"32年（H6年）",structure:"木造",occupancy:"空室",buildingArea:"95.20㎡（28.8坪）",
  floorPlan:"3LDK",landArea:"165.00㎡（50坪）",parking:"2台",road:"南側4.0m公道",
+ reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#接道確認","#修繕履歴不明"],reason:null,
  checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"修繕履歴",i:0},{l:"給排水設備",i:2},{l:"空室理由",i:0},{l:"リフォーム",i:0}],
@@ -1026,6 +1042,7 @@ const props=[
  price:"390万円",yieldRate:"14.1%",rent:"50,000円/月",station:"酒田駅 徒歩22分",
  age:"41年（H15年）",structure:"軽量鉄骨",occupancy:"空家",buildingArea:"88.00㎡（26.6坪）",
  floorPlan:"3DK",landArea:"140.00㎡（42坪）",parking:"1台",road:"接道義務未確認",
+ reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
  zoning:"用途地域外",source:"athome",
  tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
  checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3},{l:"修繕履歴",i:0},{l:"リフォーム",i:1}],
@@ -1572,7 +1589,7 @@ function createBlankProperty(){
     price:"",yieldRate:"",rent:"",station:"",
     age:"",structure:"",occupancy:"",buildingArea:"",
     floorPlan:"",landArea:"",parking:"",road:"",
-    reformParts:"",reformYear:"",
+    reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
     zoning:"",source:"",
     tags:[],reason:null,
     checks:Object.keys(CK).map(l=>({l,i:0})),
@@ -2075,7 +2092,7 @@ function renderDetail(p){
   document.getElementById("bdRows").innerHTML=pEval.breakdown.map(b=>`
     <div class="bd-row"><span>${b.label}</span><div class="bd-bar"><i style="width:${b.points/20*100}%"></i></div><span style="text-align:right">${b.points}/20</span></div>
     <p class="bd-reason">${b.reason}</p>`).join("");
-  renderStats(p);renderAI(p,pEval);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);renderMarketTeaser(p);
+  renderStats(p);renderAI(p,pEval);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);renderMarketTeaser(p);renderReformHistory(p);
   document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");
   setPanel(panelIdx,false);renderGallery(p);
 }
@@ -2385,6 +2402,47 @@ function openCheckSheet(p,label){
 document.getElementById("cCancelBtn").addEventListener("click",()=>closeSh("cBd","cSheet"));
 document.getElementById("cBd").addEventListener("click",()=>closeSh("cBd","cSheet"));
 bindHandleClose("cHandle",()=>closeSh("cBd","cSheet"));
+
+/* ─── reform history (Feature #007 修正: 箇所と時期をセットで表示) ───
+   リフォーム箇所ごとに実施時期（自由記述）を紐づけて保持・表示する。
+   調査チェックと違って時期は固定の選択肢ではなく自由入力のため、
+   openCheckSheetのような選択肢ボタン一覧ではなく、テキスト入力＋
+   「未実施にする」で1件ずつ編集する専用シートにしている。
+*/
+function renderReformHistory(p){
+  document.getElementById("reformList").innerHTML=p.reformHistory.map(r=>{
+    const has=!!r.year;
+    return`<button class="check-btn" data-part="${r.part}"><p class="cr-label">${r.part}</p><span class="badge ${has?"bg":"bu"}">${has?r.year:"未実施"}<span class="badge-caret">▾</span></span></button>`;
+  }).join("");
+  document.querySelectorAll("#reformList .check-btn").forEach(b=>b.addEventListener("click",()=>openReformSheet(ap,b.dataset.part)));
+}
+let reformEditPart=null;
+function openReformSheet(p,part){
+  reformEditPart=part;
+  const entry=p.reformHistory.find(r=>r.part===part);
+  document.getElementById("reformShTitle").textContent=`リフォーム時期：${part}`;
+  document.getElementById("reformYearInput").value=entry.year||"";
+  openSh("reformBd","reformSheet");
+}
+function closeReformSheet(){ closeSh("reformBd","reformSheet"); reformEditPart=null; }
+document.getElementById("reformSaveBtn").addEventListener("click",()=>{
+  const p=ap,part=reformEditPart;
+  if(!part)return;
+  const entry=p.reformHistory.find(r=>r.part===part);
+  const v=document.getElementById("reformYearInput").value.trim();
+  if(entry.year!==v){log(p,`🔨 リフォーム時期：${part}：${entry.year||"未実施"} → ${v||"未実施"}`);entry.year=v;renderReformHistory(p);}
+  closeReformSheet();
+});
+document.getElementById("reformClearBtn").addEventListener("click",()=>{
+  const p=ap,part=reformEditPart;
+  if(!part)return;
+  const entry=p.reformHistory.find(r=>r.part===part);
+  if(entry.year){log(p,`🔨 リフォーム時期：${part}：${entry.year} → 未実施`);entry.year="";renderReformHistory(p);}
+  closeReformSheet();
+});
+document.getElementById("reformCancelBtn").addEventListener("click",closeReformSheet);
+document.getElementById("reformBd").addEventListener("click",closeReformSheet);
+bindHandleClose("reformHandle",closeReformSheet);
 
 /* ─── status sheet ─── */
 function openStatusSheet(){
