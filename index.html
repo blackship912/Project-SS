@@ -922,7 +922,7 @@ const SO=["候補","調査中","保留","見送り","購入済"];
 // screen HTML). Update this single value when starting a new Feature —
 // nothing else needs to change. Set to null to hide the badge entirely
 // (e.g. right before a stable release).
-const CURRENT_FEATURE=null;
+const CURRENT_FEATURE="#007";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -2577,7 +2577,13 @@ function fieldHtml(f,draft,idPrefix="wf"){
     const unit=draft[f.k+"__unit"]!==undefined?draft[f.k+"__unit"]:parseNumericField(cur).unit;
     const units=UNIT_OPTIONS[f.k]||[];
     const unitIsOther=!!draft[f.k+"__unitIsOther"];
-    const unitKnown=units.includes(unit)&&!unitIsOther;
+    // Unlike the sel-field fix below, this one intentionally keeps the
+    // browser's own default-to-first-option behavior when no unit has
+    // been chosen yet: typing just a number without touching the unit
+    // dropdown is the common, expected interaction here, and doesn't
+    // corrupt anything even so — an empty number always saves as ""
+    // regardless of which unit happens to be shown (see captureWiz /
+    // captureNpFields below).
     const unitOptsHtml=units.map(u=>`<option${u===unit&&!unitIsOther?" selected":""}>${u}</option>`).join("")
       +`<option value="${OTHER_VALUE}"${unitIsOther?" selected":""}>その他・手入力</option>`;
     return`<div class="ff">
@@ -2591,8 +2597,14 @@ function fieldHtml(f,draft,idPrefix="wf"){
   }
   if(f.sel){
     const isOther=!!draft[f.k+"__isOther"];
-    const known=f.sel.includes(cur)&&!isOther;
-    const optsHtml=f.sel.map(o=>`<option${o===cur&&!isOther?" selected":""}>${o}</option>`).join("")
+    const isBlank=!cur&&!isOther;
+    // Same fix as the unit selector above: without an explicit blank
+    // option, leaving this field untouched was indistinguishable from
+    // choosing its first listed option — and worse, saving in that state
+    // would silently write that first option into the property's actual
+    // data, even though the person never selected anything.
+    const optsHtml=(isBlank?`<option value="" selected>選択してください</option>`:"")
+      +f.sel.map(o=>`<option${o===cur&&!isOther?" selected":""}>${o}</option>`).join("")
       +(f.allowOther?`<option value="${OTHER_VALUE}"${isOther?" selected":""}>その他・手入力</option>`:"");
     return`<div class="ff">
       <label>${f.l}</label>
