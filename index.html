@@ -289,6 +289,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .dg{background:var(--g)}.dw{background:#d99a1f}.db{background:#c0392b}.du{background:#9aa6a0}
 .check-btn{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;text-align:left;padding:12px 6px;border-bottom:1px solid #eef2ef;border-radius:14px;transition:background .3s,box-shadow .3s}
 .check-btn:last-child{border-bottom:0}
+.check-row-view{display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px 6px;border-bottom:1px solid #eef2ef}
+.check-row-view:last-child{border-bottom:0}
 .cr-label{font-size:13px;font-weight:700}
 .cr-note{font-size:10.5px;color:#9aa6a0;margin-top:2px}
 .check-btn.hi{background:#fff6da;box-shadow:0 0 0 2px #ffd866 inset;animation:pulse 1s 2}
@@ -578,7 +580,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
       <!-- panel 1: 調査 -->
       <div class="swipe-panel">
         <div class="card">
-          <p class="card-title">📋 調査チェック</p>
+          <div class="ctrow">
+            <p class="card-title" style="margin:0">📋 調査チェック</p>
+            <button class="link-btn" id="checksEditToggle">編集</button>
+          </div>
           <div class="legend"><span><i class="dg"></i>良好</span><span><i class="dw"></i>要確認</span><span><i class="db"></i>問題あり</span><span><i class="du"></i>未確認</span></div>
           <div id="checkRows"></div>
           <div class="prog-row">
@@ -921,6 +926,7 @@ const CURRENT_FEATURE="#007";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
+  "傾き":[["未確認","bu"],["傾きなし","bg"],["軽微な傾きあり","bw"],["著しい傾きあり","bb"]],
   "境界":[["未確認","bu"],["境界確定","bg"],["越境なし","bg"],["越境あり","bb"]],
   "再建築可否":[["未確認","bu"],["可能","bg"],["要調査","bw"],["不可","bb"]],
   "接道状況":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]],
@@ -1020,7 +1026,7 @@ const props=[
  reformHistory:[{part:"屋根",year:"2021年"},{part:"外壁",year:"2022年"},{part:"キッチン",year:"2023年"},{part:"浴室",year:""},{part:"トイレ",year:"2020年"},{part:"給排水",year:""},{part:"内装",year:""},{part:"外構",year:""}],
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"傾き",i:1},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
  todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
  memos:[{date:"2026/6/29 21:10",text:"内見時、駐車場の地面に若干の傾斜あり。要再確認。"}],
  photos:[],
@@ -1032,7 +1038,7 @@ const props=[
  reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#接道確認","#修繕履歴不明"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"傾き",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
  todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
  memos:[],photos:[],
  logs:[{d:"2026/6/24 09:02",t:"🏠 物件登録"},{d:"2026/6/27 18:40",t:"⭐ Score 65 → 72"},{d:"2026/6/29 21:05",t:"🟡 ステータス変更：候補 → 調査中"}]},
@@ -1043,7 +1049,7 @@ const props=[
  reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
  zoning:"用途地域外",source:"athome",
  tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
- checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3}],
+ checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"傾き",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3}],
  todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",done:false}],
  memos:[{date:"2026/6/20 08:40",text:"床下に蟻害の痕跡あり。解体前提でないと厳しい。"}],
  photos:[],
@@ -1202,7 +1208,13 @@ function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0
    画面・ホーム画面など）はこの関数の返り値の「形」にだけ依存しており、
    中身がルールベースか実際のAI呼び出しかを気にしない設計にしている。
 */
-const AXIS_BASELINE=10; // 各軸20点満点中、判断材料が乏しい場合の中立値
+const AXIS_BASELINE=10; // 各軸20点満点中、判断材料が乏しい場合の中立値（軸内部の計算はすべてこの0〜20の内部スケールで行う）
+// 各軸の「重み」＝最終スコアに占める配点。合計がちょうど100になるように
+// 設定しており、総合Scoreは常にこの重みで換算した後の内訳の合計と完全に
+// 一致する（Feature #007 修正：以前は各軸0〜20点×6軸＝最大120点になり
+// うる内部スコアを、最後に0〜100へ強制的に丸めていたため、丸め後の
+// 総合Scoreと画面に表示する内訳の合計が食い違うことがあった）。
+const AXIS_WEIGHTS={"収益性":20,"立地":15,"建物・管理":20,"法的リスク":20,"流動性":15,"将来性":10};
 const YIELD_BENCHMARK=9.5; // 表面利回りの地域相場目安（庄内エリア平均、既存コメントの言及値を踏襲）
 
 // "28年（H8年）"→28、"2台"→2、未入力→null。フリーテキスト項目から
@@ -1277,7 +1289,7 @@ function axisBuilding(p){
     else if(age<=30){points+=1;reasons.push(`築${age}年で一般的な範囲内ですが、経年劣化の確認は必要です。`);}
     else{points-=4;reasons.push(`築${age}年と経年が進んでおり、修繕費用がかさむ可能性があります。`);}
   }
-  const{delta,details}=checkGroupDelta(p,["雨漏り","シロアリ","給排水設備"],3);
+  const{delta,details}=checkGroupDelta(p,["雨漏り","シロアリ","給排水設備","傾き"],3);
   points+=delta;
   details.forEach(d=>reasons.push(d.tone==="good"?`${d.label}は「${d.state}」で問題ありません。`:`${d.label}が「${d.state}」のため注意が必要です。`));
   points=Math.max(0,Math.min(20,Math.round(points)));
@@ -1303,7 +1315,7 @@ function axisLiquidity(p){
     else if(rebuild.color==="bg"){points+=3;reasons.push(`再建築${rebuild.state}のため、将来の売却・融資の選択肢を確保しやすい物件です。`);}
     else if(rebuild.color==="bw"){points-=3;reasons.push(`再建築可否が「${rebuild.state}」のため、流動性の見通しが立てにくい状態です。`);}
   }
-  const{delta,details}=checkGroupDelta(p,["空室理由","家賃根拠"],2.5);
+  const{delta,details}=checkGroupDelta(p,["空室理由","家賃根拠","固定資産税"],2.5);
   points+=delta;
   details.forEach(d=>reasons.push(d.tone==="good"?`${d.label}は「${d.state}」で安心材料です。`:`${d.label}が「${d.state}」のため、賃貸需要の見通しに不確実さが残ります。`));
   points=Math.max(0,Math.min(20,Math.round(points)));
@@ -1352,13 +1364,21 @@ function buildEvalNextActions(p){
 // display this one property's AI evaluation — never depends on any other
 // property (unlike the compare screen's group-relative analysis below).
 function evaluateProperty(p){
-  const axes=[axisProfitability(p),axisLocation(p),axisBuilding(p),axisLegal(p),axisLiquidity(p),axisFuture(p)];
-  const score=Math.max(0,Math.min(100,Math.round(axes.reduce((s,a)=>s+a.points,0))));
-  const strengths=axes.filter(a=>a.points>=14).map(a=>a.reason);
-  const concerns=axes.filter(a=>a.points<=6).map(a=>a.reason);
+  const rawAxes=[axisProfitability(p),axisLocation(p),axisBuilding(p),axisLegal(p),axisLiquidity(p),axisFuture(p)];
+  // Rescale each axis from its internal 0-20 scale to its own weight
+  // (0-max). Since rawAxes[i].points is already clamped to [0,20], the
+  // rescaled value is mathematically guaranteed to land in [0,max] — no
+  // extra clamping needed, and the total can never exceed 100.
+  const axes=rawAxes.map(a=>{
+    const max=AXIS_WEIGHTS[a.label];
+    return{...a,points:Math.round(a.points/20*max),max};
+  });
+  const score=axes.reduce((s,a)=>s+a.points,0);
+  const strengths=axes.filter(a=>a.points>=a.max*0.7).map(a=>a.reason);
+  const concerns=axes.filter(a=>a.points<=a.max*0.3).map(a=>a.reason);
   return{
     score,
-    breakdown:axes, // [{label,points,reason}, ...] — radarSVG/#bdRows read .label/.points
+    breakdown:axes, // [{label,points,max,reason}, ...] — radarSVG/#bdRows read .label/.points/.max
     summary:buildEvalSummary(p,axes,score),
     strengths:strengths.length?strengths:["際立った強みは見当たりません。バランス型の物件です。"],
     concerns:concerns.length?concerns:["際立った注意点は見当たりません。"],
@@ -1528,7 +1548,7 @@ function goToDetail(p,fromScreen){
   shell.className="shell";
   shell.classList.add("to-detail");
   document.getElementById("detailScreen").scrollTop=0;
-  galIdx=0;panelIdx=0;galEditOpen=false;
+  galIdx=0;panelIdx=0;galEditOpen=false;checksEditMode=false;
   renderDetail(p);updateFavBtn(p);
   document.querySelectorAll(".bnav button").forEach(b=>b.classList.remove("nav-on"));
   setupBottomDotsVisibilityWatch();
@@ -2083,14 +2103,18 @@ function renderCmpBody(){
 /* ─── detail render ─── */
 let panelIdx=0;
 function radarSVG(bd){
-  const s=170,c=s/2,r=s/2-28,max=20,n=bd.length;
-  const pt=(i,v)=>{const a=(Math.PI*2*i/n)-Math.PI/2,rr=r*(v/max);return[c+rr*Math.cos(a),c+rr*Math.sin(a)];};
-  const poly=bd.map((b,i)=>pt(i,b.points).join(",")).join(" ");
+  const s=170,c=s/2,r=s/2-28,n=bd.length;
+  // Each axis is normalized to its own max (0-1 ratio) rather than a
+  // shared constant, since axes now carry different weights (10-20) —
+  // this is the standard way to draw a radar chart when axes don't share
+  // the same scale: each axis reaches the outer ring at its own 100%.
+  const pt=(i,ratio)=>{const a=(Math.PI*2*i/n)-Math.PI/2,rr=r*ratio;return[c+rr*Math.cos(a),c+rr*Math.sin(a)];};
+  const poly=bd.map((b,i)=>pt(i,b.points/b.max).join(",")).join(" ");
   let ax="",lb="",ri="";
   [.33,.66,1].forEach(f=>{ri+=`<circle cx="${c}" cy="${c}" r="${r*f}" fill="none" stroke="#e3ede5" stroke-width="1"/>`;});
   bd.forEach((b,i)=>{
-    const[x1,y1]=pt(i,max);ax+=`<line x1="${c}" y1="${c}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#dbe9df" stroke-width="1"/>`;
-    const[lx,ly]=pt(i,max*1.2);lb+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="9" fill="#4d5c51" font-weight="700" text-anchor="middle" dominant-baseline="middle">${b.label}</text>`;
+    const[x1,y1]=pt(i,1);ax+=`<line x1="${c}" y1="${c}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#dbe9df" stroke-width="1"/>`;
+    const[lx,ly]=pt(i,1.2);lb+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="9" fill="#4d5c51" font-weight="700" text-anchor="middle" dominant-baseline="middle">${b.label}</text>`;
   });
   return`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">${ri}${ax}<polygon points="${poly}" fill="#1f7a45" fill-opacity=".3" stroke="#1f7a45" stroke-width="2"/>${lb}</svg>`;
 }
@@ -2109,7 +2133,7 @@ function renderDetail(p){
   // 評価理由（スコア内訳）：既存の内訳バー表示に、各軸の根拠テキストを
   // 添えている。Feature #006からはこの根拠が入力データに応じて変化する。
   document.getElementById("bdRows").innerHTML=pEval.breakdown.map(b=>`
-    <div class="bd-row"><span>${b.label}</span><div class="bd-bar"><i style="width:${b.points/20*100}%"></i></div><span style="text-align:right">${b.points}/20</span></div>
+    <div class="bd-row"><span>${b.label}</span><div class="bd-bar"><i style="width:${b.points/b.max*100}%"></i></div><span style="text-align:right">${b.points}/${b.max}</span></div>
     <p class="bd-reason">${b.reason}</p>`).join("");
   renderStats(p);renderAI(p,pEval);renderTodos(p);renderInfo(p);renderChecks(p);renderMemos(p);renderMarketTeaser(p);renderReformHistory(p);
   document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");
@@ -2193,7 +2217,7 @@ function renderAI(p,pEval){
   document.getElementById("aiPts").innerHTML=pEval.strengths.map(t=>`<li>${t}</li>`).join("");
   document.getElementById("aiConcerns").innerHTML=pEval.concerns.map(t=>`<li>${t}</li>`).join("");
   document.getElementById("aiNext").innerHTML=pEval.nextActions.map(t=>`<li>${t}</li>`).join("");
-  document.getElementById("aiBreakdown").innerHTML=pEval.breakdown.map(b=>`<li><b>${b.label}（${b.points}/20）</b><br>${b.reason}</li>`).join("");
+  document.getElementById("aiBreakdown").innerHTML=pEval.breakdown.map(b=>`<li><b>${b.label}（${b.points}/${b.max}）</b><br>${b.reason}</li>`).join("");
 }
 function renderTodos(p){
   const act=p.todos.filter(t=>!t.done),dn=p.todos.filter(t=>t.done);
@@ -2279,13 +2303,42 @@ function openInfoValueSheet(label,value){
   document.getElementById("ivValue").textContent=value;
   openSh("ivBd","ivSheet");
 }
-function renderChecks(p){
-  document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
-    const o=ck(c.l)[c.i];
-    return`<button class="check-btn" data-key="${c.l}"><p class="cr-label">${c.l}</p><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
-  }).join("");
-  document.querySelectorAll("#checkRows .check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
+let checksEditMode=false;
+function updateChecksEditToggleLabel(){
+  document.getElementById("checksEditToggle").textContent=checksEditMode?"完了":"編集";
 }
+function renderChecks(p){
+  updateChecksEditToggleLabel();
+  if(checksEditMode){
+    document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
+      const o=ck(c.l)[c.i];
+      return`<button class="check-btn" data-key="${c.l}"><p class="cr-label">${c.l}</p><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
+    }).join("");
+    document.querySelectorAll("#checkRows .check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
+  } else {
+    // View mode: same information, but not tappable — a quick, calm
+    // read of "where things stand" without the risk of an accidental
+    // edit while just browsing the カルテ.
+    document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
+      const o=ck(c.l)[c.i];
+      return`<div class="check-row-view"><p class="cr-label">${c.l}</p><span class="badge ${o[1]}">${o[0]}</span></div>`;
+    }).join("");
+  }
+}
+document.getElementById("checksEditToggle").addEventListener("click",()=>{
+  checksEditMode=!checksEditMode;
+  if(checksEditMode){
+    // Entering edit mode: just switch the check list to its interactive
+    // form. Nothing about the property's data has changed yet, so there's
+    // nothing to recalculate.
+    renderChecks(ap);
+  } else {
+    // Exiting edit mode ("完了"): this is the "保存" moment in PM's flow
+    // — refresh everything that depends on the checks (Score, breakdown,
+    // AI comment) in one go, then land back in view mode.
+    renderDetail(ap);
+  }
+});
 function renderMemos(p){
   const el=document.getElementById("memoList");
   if(!p.memos.length){el.innerHTML=`<p style="font-size:12px;color:var(--muted)">まだメモはありません。</p>`;return;}
