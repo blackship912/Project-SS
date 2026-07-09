@@ -882,7 +882,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
       <p>🤖 AIアドバイス（詳細）</p>
       <button class="ai-modal-close" id="aiModalClose">✕</button>
     </div>
-    <div class="ai-modal-body">
+    <div class="ai-modal-body" id="aiModalBody">
       <p class="ai-text" id="aiText"></p>
       <div class="ai-sub"><p class="h">💪 強み</p><ul id="aiPts"></ul></div>
       <div class="ai-sub"><p class="h">⚠️ 注意点</p><ul id="aiConcerns"></ul></div>
@@ -2147,6 +2147,7 @@ function openAiModal(){
   // The modal always shows the full text from the start.
   aiModalScrollY=document.getElementById("detailScreen").scrollTop;
   aiModalBd.classList.add("show");
+  document.getElementById("aiModalBody").scrollTop=0;
 }
 function closeAiModal(){
   aiModalBd.classList.remove("show");
@@ -2164,6 +2165,7 @@ function openMarketModal(){
   marketModalScrollY=document.getElementById("detailScreen").scrollTop;
   renderMarketModal(ap);
   marketModalBd.classList.add("show");
+  document.getElementById("marketModalBody").scrollTop=0;
 }
 function closeMarketModal(){
   marketModalBd.classList.remove("show");
