@@ -2147,7 +2147,17 @@ function openAiModal(){
   // The modal always shows the full text from the start.
   aiModalScrollY=document.getElementById("detailScreen").scrollTop;
   aiModalBd.classList.add("show");
-  document.getElementById("aiModalBody").scrollTop=0;
+  const body=document.getElementById("aiModalBody");
+  const resetScroll=()=>{ body.scrollTop=0; body.scrollTo(0,0); };
+  // A single synchronous reset isn't reliable on real iOS Safari — the
+  // browser's own momentum-scroll/scroll-anchoring can restore the old
+  // position after this line runs, especially while the modal's open
+  // transition (.28s, see .ai-modal CSS) is still settling. Resetting
+  // again on the next frame and once more after the transition finishes
+  // covers both cases without relying on any single exact timing.
+  resetScroll();
+  requestAnimationFrame(resetScroll);
+  setTimeout(resetScroll,320);
 }
 function closeAiModal(){
   aiModalBd.classList.remove("show");
@@ -2165,7 +2175,11 @@ function openMarketModal(){
   marketModalScrollY=document.getElementById("detailScreen").scrollTop;
   renderMarketModal(ap);
   marketModalBd.classList.add("show");
-  document.getElementById("marketModalBody").scrollTop=0;
+  const body=document.getElementById("marketModalBody");
+  const resetScroll=()=>{ body.scrollTop=0; body.scrollTo(0,0); };
+  resetScroll();
+  requestAnimationFrame(resetScroll);
+  setTimeout(resetScroll,320);
 }
 function closeMarketModal(){
   marketModalBd.classList.remove("show");
