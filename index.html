@@ -2596,7 +2596,17 @@ function fieldHtml(f,draft,idPrefix="wf"){
     </div>`;
   }
   if(f.sel){
-    const isOther=!!draft[f.k+"__isOther"];
+    // The "__isOther" bookkeeping flag only ever lives in the in-memory
+    // draft during a single form session — it's deliberately stripped
+    // before a new property is saved, and the edit wizard's save never
+    // writes it onto the property at all (see saveWiz). So after a save
+    // and reload, it's always gone regardless of how the value was
+    // entered. A saved value that doesn't match any of the predefined
+    // options is by itself reliable proof that it came from "その他・
+    // 手入力", so that's checked here too rather than trusting the
+    // (usually-absent-after-save) flag alone.
+    const notPredefined=!!cur&&!f.sel.includes(cur);
+    const isOther=!!draft[f.k+"__isOther"]||notPredefined;
     const isBlank=!cur&&!isOther;
     // Same fix as the unit selector above: without an explicit blank
     // option, leaving this field untouched was indistinguishable from
@@ -2656,6 +2666,17 @@ function syncWizFieldValues(){
       const{num}=parseNumericField(wizDraft[f.k]);
       const numEl=document.getElementById(`wf_${f.k}_num`);
       if(numEl)numEl.value=num;
+    } else if(f.sel){
+      // A <select> can only ever be set to one of its own option values —
+      // never to arbitrary custom text. Setting .value to raw "その他"
+      // text (which matches no option) silently fails and leaves nothing
+      // selected, undoing the correct initial render.
+      const el=document.getElementById(`wf_${f.k}`);
+      if(!el)return;
+      const cur=wizDraft[f.k]||"";
+      const notPredefined=!!cur&&!f.sel.includes(cur);
+      const isOther=!!wizDraft[f.k+"__isOther"]||notPredefined;
+      el.value=isOther?OTHER_VALUE:cur;
     } else {
       const el=document.getElementById(`wf_${f.k}`);
       if(el&&"value"in el)el.value=wizDraft[f.k]||el.value;
