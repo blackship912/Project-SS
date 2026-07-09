@@ -544,7 +544,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <section class="card">
     <p class="card-title">🏘 相場分析</p>
     <p class="market-teaser" id="marketTeaser"></p>
-    <button class="ai-detail-link" id="marketDetailLink">相場分析を見る →</button>
+    <button class="ai-detail-link" id="marketDetailLink">詳しく見る →</button>
   </section>
   <section class="card">
     <p class="card-title">✅ 次にやること</p>
@@ -570,7 +570,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
           <div class="info-grid" id="infoGrid"></div>
         </div>
         <div class="card">
-          <p class="card-title">🔨 リフォーム履歴</p>
+          <p class="card-title">🔨 リフォーム・修繕履歴</p>
           <div id="reformList"></div>
         </div>
       </div>
@@ -1183,7 +1183,7 @@ function loadPersistedProps(){
 let ap=null;
 function now(){const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
 function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");schedulePersist();}
-function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc};}
+function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc,total};}
 
 /* ═══════════ AI評価エンジン (Feature #006) ═══════════
    外部AI・学習機能は一切使わない、ルールベースの物件評価ロジック。
@@ -1457,6 +1457,15 @@ function computeMarketStats(matched){
   const median=n%2===1?prices[(n-1)/2]:Math.round((prices[n/2-1]+prices[n/2])/2);
   return{min:prices[0],max:prices[n-1],median,count:n};
 }
+// 価格が中央値よりどのくらい高い/低いかを、短い定性表現で返す。カードの
+// 要約行（buildPriceBandTeaser）で使う。
+function priceBandQualitative(diffRatio){
+  if(diffRatio<=-.15)return"大幅に低め";
+  if(diffRatio<=-.05)return"やや低め";
+  if(diffRatio<.05)return"中央値付近";
+  if(diffRatio<.15)return"やや高め";
+  return"大幅に高め";
+}
 function buildPriceBandComment(target,stats){
   const price=priceOf(target);
   if(price===null)return"この物件は価格が未入力のため、比較コメントは表示できません。";
@@ -1467,6 +1476,17 @@ function buildPriceBandComment(target,stats){
   if(diff<.05)return`中央値（${stats.median}万円）付近の価格帯です。`;
   if(diff<.15)return`中央値（${stats.median}万円）よりやや高めの価格帯です。`;
   return`中央値（${stats.median}万円）より大幅に高めの価格帯です。`;
+}
+// カードに載せる、開かなくても分かる1〜2行の要約。「この条件では
+// 390〜680万円（中央値450万円）が中心です。この物件は大幅に高めです。」
+// のように、価格の分布と、この物件がその中でどのあたりに位置するかを
+// 一目で示す。詳しい文章（buildPriceBandComment）はモーダル側で使う。
+function buildPriceBandTeaser(target,m){
+  const price=priceOf(target);
+  const range=`${m.min}〜${m.max}万円（中央値${m.median}万円）`;
+  if(price===null||m.count<=1)return`この条件では${range}が中心です。`;
+  const diff=(price-m.median)/m.median;
+  return`この条件では${range}が中心です。この物件は${priceBandQualitative(diff)}です。`;
 }
 // The single entry point every screen calls, mirroring evaluateProperty()'s
 // role for Feature #006 — one function, one return shape, everything else
@@ -1484,6 +1504,7 @@ function analyzeMarket(target,group){
     broadened:found.broadened,
     ...stats,
     comment:buildPriceBandComment(target,stats),
+    teaser:buildPriceBandTeaser(target,stats),
     matched:found.matched
   };
 }
@@ -2134,9 +2155,7 @@ marketModalBd.addEventListener("click",e=>{ if(e.target===marketModalBd)closeMar
 function renderMarketTeaser(p){
   const m=analyzeMarket(p);
   const el=document.getElementById("marketTeaser");
-  el.textContent=m.available
-    ? `${m.conditionLabel} ・ ${m.count}件 ・ 中央値${m.median}万円 ・ ${m.comment}`
-    : m.message;
+  el.textContent=m.available?m.teaser:m.message;
 }
 function renderMarketModal(p){
   const m=analyzeMarket(p);
@@ -2164,8 +2183,8 @@ function renderMarketModal(p){
   }).join("");
 }
 function renderStats(p){
-  const{pct,unc}=calcStats(p);
-  document.getElementById("dSub").textContent=`情報完成度 ${pct}% ・ 未確認 ${unc}件${p.reason?" ・ 見送り理由："+p.reason:""}`;
+  const{pct,unc,total}=calcStats(p);
+  document.getElementById("dSub").textContent=`調査完了率 ${pct}%（${total}項目中${total-unc}項目確認済み）${p.reason?" ・ 見送り理由："+p.reason:""}`;
   document.getElementById("progFill").style.width=pct+"%";
   document.getElementById("progPct").textContent=pct+"%";
   document.getElementById("unconfN").textContent=unc+"件";
