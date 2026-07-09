@@ -924,15 +924,13 @@ const CK={
   "境界":[["未確認","bu"],["境界確定","bg"],["越境なし","bg"],["越境あり","bb"]],
   "再建築可否":[["未確認","bu"],["可能","bg"],["要調査","bw"],["不可","bb"]],
   "接道状況":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]],
-  "修繕履歴":[["未確認","bu"],["良好","bg"],["一部修繕済","bw"],["要修繕","bb"]],
   "給排水設備":[["未確認","bu"],["問題なし","bg"],["老朽化","bw"],["交換済","bg"]],
   "空室理由":[["未確認","bu"],["判明","bg"],["不明","bw"]],
   "家賃根拠":[["未確認","bu"],["妥当","bg"],["やや高め","bw"],["やや低め","bw"]],
   "固定資産税":[["未確認","bu"],["確認済","bg"],["要確認","bw"]],
   "周辺環境":[["未確認","bu"],["良好","bg"],["騒音あり","bw"],["臭気あり","bw"]],
   "災害リスク":[["未確認","bu"],["リスクなし","bg"],["浸水域","bb"],["土砂災害域","bb"]],
-  "その他法令":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]],
-  "リフォーム":[["未確認","bu"],["未実施","bw"],["一部リフォーム済","bg"],["フルリフォーム済","bg"]]
+  "その他法令":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]]
 };
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
@@ -1022,8 +1020,8 @@ const props=[
  reformHistory:[{part:"屋根",year:"2021年"},{part:"外壁",year:"2022年"},{part:"キッチン",year:"2023年"},{part:"浴室",year:""},{part:"トイレ",year:"2020年"},{part:"給排水",year:""},{part:"内装",year:""},{part:"外構",year:""}],
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"修繕履歴",i:2},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1},{l:"リフォーム",i:2}],
- todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",t:"修繕履歴",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
+ todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
  memos:[{date:"2026/6/29 21:10",text:"内見時、駐車場の地面に若干の傾斜あり。要再確認。"}],
  photos:[],
  logs:[{d:"2026/6/30 10:18",t:"🏠 物件登録"},{d:"2026/6/30 10:32",t:"⭐ Score 76 → 88"},{d:"2026/6/30 10:41",t:"🟢 ステータス変更：調査中 → 候補"}]},
@@ -1034,8 +1032,8 @@ const props=[
  reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#接道確認","#修繕履歴不明"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"修繕履歴",i:0},{l:"給排水設備",i:2},{l:"空室理由",i:0},{l:"リフォーム",i:0}],
- todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",t:"修繕履歴",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
+ checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
+ todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
  memos:[],photos:[],
  logs:[{d:"2026/6/24 09:02",t:"🏠 物件登録"},{d:"2026/6/27 18:40",t:"⭐ Score 65 → 72"},{d:"2026/6/29 21:05",t:"🟡 ステータス変更：候補 → 調査中"}]},
 {id:3,title:"C町 空き家",address:"山形県酒田市□□町",status:"見送り",fav:false,
@@ -1045,8 +1043,8 @@ const props=[
  reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
  zoning:"用途地域外",source:"athome",
  tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
- checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3},{l:"修繕履歴",i:0},{l:"リフォーム",i:1}],
- todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",t:"修繕履歴",done:false}],
+ checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3}],
+ todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",done:false}],
  memos:[{date:"2026/6/20 08:40",text:"床下に蟻害の痕跡あり。解体前提でないと厳しい。"}],
  photos:[],
  logs:[{d:"2026/6/18 13:11",t:"🏠 物件登録"},{d:"2026/6/20 08:30",t:"⭐ Score 61 → 54"},{d:"2026/6/22 19:50",t:"⚫ ステータス変更：調査中 → 見送り"}]}
@@ -1279,7 +1277,7 @@ function axisBuilding(p){
     else if(age<=30){points+=1;reasons.push(`築${age}年で一般的な範囲内ですが、経年劣化の確認は必要です。`);}
     else{points-=4;reasons.push(`築${age}年と経年が進んでおり、修繕費用がかさむ可能性があります。`);}
   }
-  const{delta,details}=checkGroupDelta(p,["雨漏り","シロアリ","給排水設備","修繕履歴"],3);
+  const{delta,details}=checkGroupDelta(p,["雨漏り","シロアリ","給排水設備"],3);
   points+=delta;
   details.forEach(d=>reasons.push(d.tone==="good"?`${d.label}は「${d.state}」で問題ありません。`:`${d.label}が「${d.state}」のため注意が必要です。`));
   points=Math.max(0,Math.min(20,Math.round(points)));
@@ -2177,8 +2175,8 @@ function renderMarketModal(p){
     <div><b>${m.max}万円</b><span>最高</span></div>`;
   comment.textContent=m.comment;
   list.innerHTML=m.matched.map(mp=>{
-    const reform=getCheckState(mp,"リフォーム");
-    const reformTag=reform&&reform.color!=="bu"?`（${reform.state}）`:"";
+    const reformedCount=(mp.reformHistory||[]).filter(r=>r.year).length;
+    const reformTag=reformedCount?`（リフォーム${reformedCount}件）`:"";
     return`<li>${mp.title}${mp===p?"（この物件）":""}：<b>${priceOf(mp)}万円</b>${reformTag}</li>`;
   }).join("");
 }
@@ -2286,7 +2284,7 @@ function renderChecks(p){
     const o=ck(c.l)[c.i];
     return`<button class="check-btn" data-key="${c.l}"><p class="cr-label">${c.l}</p><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
   }).join("");
-  document.querySelectorAll(".check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
+  document.querySelectorAll("#checkRows .check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
 }
 function renderMemos(p){
   const el=document.getElementById("memoList");
