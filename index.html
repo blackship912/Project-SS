@@ -126,6 +126,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .chips::-webkit-scrollbar{display:none}
 .chip{white-space:nowrap;border:0;border-radius:999px;padding:8px 14px;background:#edf2ee;color:#4d5c51;font-weight:700;font-size:12.5px}
 .chip.active{background:var(--g);color:#fff}
+.np-preset-label{font-size:11.5px;font-weight:800;color:var(--g);margin:4px 0 8px}
+.np-preset-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;-webkit-overflow-scrolling:touch}
+.np-preset-row .chip{flex:none}
 
 /* ── property list card ── */
 .prop-card{display:flex;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s}
@@ -292,6 +295,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .check-row-view{display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px 6px;border-bottom:1px solid #eef2ef}
 .check-row-view:last-child{border-bottom:0}
 .cr-label{font-size:13px;font-weight:700}
+.cr-hint{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
 .cr-note{font-size:10.5px;color:#9aa6a0;margin-top:2px}
 .check-btn.hi{background:#fff6da;box-shadow:0 0 0 2px #ffd866 inset;animation:pulse 1s 2}
 @keyframes pulse{50%{transform:scale(1.015)}}
@@ -800,6 +804,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px">
     未入力の項目があっても登録できます。あとから編集できます。
   </p>
+  <p class="np-preset-label">見ているサイトに合わせて入力順を変更</p>
+  <div class="np-preset-row" id="npPresetRow"></div>
   <div id="npFields"></div>
   <button class="modal-save" id="npSaveBtn" style="width:100%;border:0;background:var(--g);color:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:14px;margin-top:6px">この内容で登録する</button>
   <button class="sh-cancel" id="npCancelBtn">キャンセル</button>
@@ -922,7 +928,7 @@ const SO=["候補","調査中","保留","見送り","購入済"];
 // screen HTML). Update this single value when starting a new Feature —
 // nothing else needs to change. Set to null to hide the badge entirely
 // (e.g. right before a stable release).
-const CURRENT_FEATURE="#007";
+const CURRENT_FEATURE="#008";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -937,6 +943,24 @@ const CK={
   "周辺環境":[["未確認","bu"],["良好","bg"],["騒音あり","bw"],["臭気あり","bw"]],
   "災害リスク":[["未確認","bu"],["リスクなし","bg"],["浸水域","bb"],["土砂災害域","bb"]],
   "その他法令":[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["違反","bb"]]
+};
+// Issue008-04: a short, concrete "how to actually check this on-site" tip
+// per item — the goal PM stated is letting a beginner do the inspection
+// themselves, not just record a result they don't know how to arrive at.
+const CK_HINTS={
+  "雨漏り":"天井裏の点検口からシミ・変色を確認",
+  "シロアリ":"床下の点検口から蟻道（土のトンネル状の跡）を確認",
+  "傾き":"スマホの水平器アプリで各部屋を計測",
+  "境界":"境界標の有無を現地で確認し、公図と照合",
+  "再建築可否":"役所の建築指導課で接道要件を確認",
+  "接道状況":"役所の道路課・建築指導課で道路の種別を確認",
+  "給排水設備":"蛇口をひねって通水を確認し、配管の更新歴を確認",
+  "空室理由":"管理会社・仲介業者へ直接ヒアリング",
+  "家賃根拠":"客付け業者へ周辺の成約事例を確認",
+  "固定資産税":"固定資産税評価証明書を取得して確認",
+  "周辺環境":"昼夜・平日休日を変えて現地を歩いて確認",
+  "災害リスク":"ハザードマップポータルで確認",
+  "その他法令":"役所窓口で都市計画・条例の内容を確認"
 };
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
@@ -972,7 +996,7 @@ const PROPERTY_FIELDS=[
   {k:"parking",l:"駐車場",icon:"🚗",group:"立地・その他",numeric:true,unit:["台"]},
   {k:"road",l:"接道",icon:"🛣️",group:"立地・その他"},
   {k:"zoning",l:"用途地域",icon:"🏙️",group:"立地・その他",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
-  {k:"source",l:"情報源",icon:"🌐",group:"立地・その他",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","レインズ","その他"],allowOther:true}
+  {k:"source",l:"情報源",icon:"🌐",group:"立地・その他",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","楽待","レインズ","その他"],allowOther:true}
 ];
 // Groups, in display/step order, derived from PROPERTY_FIELDS itself rather
 // than listed a second time — adding a field with a new `group` name is
@@ -1000,6 +1024,44 @@ const NEW_PROPERTY_EXTRA_FIELDS=[
   {k:"status",l:"ステータス",sel:["候補","調査中","保留","見送り","購入済"]}
 ];
 const NEW_PROPERTY_FIELDS=[...NEW_PROPERTY_EXTRA_FIELDS,...PROPERTY_FIELDS];
+
+/* ─── input presets (Feature #008, Issue008-02/03) ───
+   Each preset is an ordering of the same 15 PROPERTY_FIELDS keys, matching
+   the order that field tends to appear when scrolling down that site's own
+   listing page (derived from real listing pages: SUUMO/アットホーム/LIFULL
+   HOME'S/不動産ジャパン/楽待). Fields those sites don't show at all
+   (yieldRate/rent for the four sale-listing sites) are placed at their most
+   natural position — directly after price, since that's their financial
+   home even when the source page has nothing to anchor them to. 「その他」
+   is the average rank of each field across the five site-specific orders,
+   not a hand-picked compromise (see README for the calculation).
+   This ONLY reorders the new-property input form — PROPERTY_FIELDS itself
+   (and therefore the detail screen, edit wizard, compare table, and AI
+   evaluation) never changes order.
+*/
+const PRESET_FIELD_ORDERS={
+  "SUUMO":["price","floorPlan","landArea","buildingArea","age","address","station","structure","zoning","road","occupancy","parking","yieldRate","rent","source"],
+  "アットホーム":["price","floorPlan","age","buildingArea","landArea","address","station","parking","structure","zoning","road","occupancy","yieldRate","rent","source"],
+  "LIFULL HOME'S":["floorPlan","price","buildingArea","landArea","age","address","station","structure","road","zoning","occupancy","parking","yieldRate","rent","source"],
+  "不動産ジャパン":["price","landArea","age","floorPlan","buildingArea","address","station","structure","zoning","road","parking","occupancy","yieldRate","rent","source"],
+  "楽待":["price","yieldRate","rent","address","station","structure","floorPlan","parking","zoning","road","occupancy","age","landArea","buildingArea","source"],
+  "その他":["price","floorPlan","landArea","address","age","buildingArea","station","structure","zoning","road","parking","yieldRate","occupancy","rent","source"]
+};
+const PRESET_LIST=["SUUMO","アットホーム","LIFULL HOME'S","不動産ジャパン","楽待","その他"];
+// Judgment call beyond the literal ask: picking a preset also pre-fills
+// 情報源 with the matching value, since the choice already answers that
+// field — reduces one more tap without touching what gets saved or how.
+const PRESET_SOURCE_MAP={"SUUMO":"SUUMO","アットホーム":"athome","LIFULL HOME'S":"LIFULL HOME'S","不動産ジャパン":"不動産ジャパン","楽待":"楽待","その他":""};
+let npPreset="その他";
+// Builds the field list for the new-property form only, in the selected
+// preset's order. title/status aren't part of any listing page, so they
+// stay pinned first regardless of preset — you name the property, then
+// read down the source listing.
+function orderedNewPropertyFields(){
+  const order=PRESET_FIELD_ORDERS[npPreset]||PRESET_FIELD_ORDERS["その他"];
+  const byKey={}; PROPERTY_FIELDS.forEach(f=>{ byKey[f.k]=f; });
+  return [...NEW_PROPERTY_EXTRA_FIELDS, ...order.map(k=>byKey[k]).filter(Boolean)];
+}
 
 function parseNumericField(value){
   const v=String(value||"");
@@ -1642,6 +1704,7 @@ function createBlankProperty(){
 let npDraft=null;
 function openNewPropertySheet(){
   npDraft=createBlankProperty();
+  npPreset="その他";
   renderNpFields();
   // Belt-and-braces against iOS Safari's own form-value memory: even
   // though the freshly-built markup has value="" for every field, some
@@ -1651,9 +1714,22 @@ function openNewPropertySheet(){
   // guarantees the DOM actually reflects the blank draft.
   resetNpFieldValues();
   openSh("npBd","npSheet");
+  // Issue008-01: always start a new property from the very top, even if
+  // a previous registration session left this sheet scrolled down. The
+  // sheet itself is the scrollable element (.sheet has overflow-y:auto).
+  // A single synchronous reset isn't reliable on real iOS Safari — same
+  // class of issue as the AI modal's scroll reset — so it's repeated on
+  // the next frame and once more after the sheet's open transition
+  // (.34s, see .sheet CSS) has settled. This does not touch the edit
+  // wizard's sheet (eSheet) at all, as requested.
+  const sheetEl=document.getElementById("npSheet");
+  const resetScroll=()=>{ sheetEl.scrollTop=0; sheetEl.scrollTo(0,0); };
+  resetScroll();
+  requestAnimationFrame(resetScroll);
+  setTimeout(resetScroll,380);
 }
 function resetNpFieldValues(){
-  NEW_PROPERTY_FIELDS.forEach(f=>{
+  orderedNewPropertyFields().forEach(f=>{
     if(f.numeric){
       const numEl=document.getElementById(`np_${f.k}_num`);
       const unitEl=document.getElementById(`np_${f.k}_unit`);
@@ -1669,9 +1745,27 @@ function resetNpFieldValues(){
     }
   });
 }
+function renderNpPresetRow(){
+  document.getElementById("npPresetRow").innerHTML=PRESET_LIST.map(name=>
+    `<button class="chip${name===npPreset?" active":""}" data-preset="${name}">${name}</button>`
+  ).join("");
+  document.querySelectorAll("#npPresetRow .chip").forEach(b=>b.addEventListener("click",()=>selectNpPreset(b.dataset.preset)));
+}
+function selectNpPreset(preset){
+  // Capture whatever's already typed, in the OLD field order, before the
+  // form gets rebuilt in the new order — nothing the person already
+  // entered should be lost just from switching presets.
+  captureNpFields();
+  npPreset=preset;
+  const src=PRESET_SOURCE_MAP[preset];
+  if(src)npDraft.source=src;
+  renderNpFields();
+}
 function renderNpFields(){
-  document.getElementById("npFields").innerHTML=NEW_PROPERTY_FIELDS.map(f=>fieldHtml(f,npDraft,"np")).join("");
-  NEW_PROPERTY_FIELDS.forEach(f=>{
+  renderNpPresetRow();
+  const fields=orderedNewPropertyFields();
+  document.getElementById("npFields").innerHTML=fields.map(f=>fieldHtml(f,npDraft,"np")).join("");
+  fields.forEach(f=>{
     if(f.numeric){
       const unitSel=document.getElementById(`np_${f.k}_unit`);
       if(unitSel)unitSel.addEventListener("change",()=>{
@@ -2328,7 +2422,8 @@ function renderChecks(p){
   if(checksEditMode){
     document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
       const o=ck(c.l)[c.i];
-      return`<button class="check-btn" data-key="${c.l}"><p class="cr-label">${c.l}</p><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
+      const hint=CK_HINTS[c.l];
+      return`<button class="check-btn" data-key="${c.l}"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
     }).join("");
     document.querySelectorAll("#checkRows .check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
   } else {
@@ -2337,7 +2432,8 @@ function renderChecks(p){
     // edit while just browsing the カルテ.
     document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
       const o=ck(c.l)[c.i];
-      return`<div class="check-row-view"><p class="cr-label">${c.l}</p><span class="badge ${o[1]}">${o[0]}</span></div>`;
+      const hint=CK_HINTS[c.l];
+      return`<div class="check-row-view"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}</span></div>`;
     }).join("");
   }
 }
