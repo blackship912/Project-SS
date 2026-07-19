@@ -69,6 +69,20 @@ h1{font-size:19px;font-weight:800}
 .card-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;margin:0 0 12px}
 .ctrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .link-btn{border:1.5px solid #cfe6d7;background:#fff;color:var(--g);font-size:12px;font-weight:800;border-radius:999px;padding:6px 13px}
+.reform-status-row{display:flex;gap:8px;margin-bottom:10px}
+.reform-status-row .chip{flex:1;text-align:center}
+.reform-event-row{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;text-align:left;padding:10px 6px;border-bottom:1px solid #eef2ef}
+.reform-event-row:last-child{border-bottom:0}
+.reform-event-row .re-when{font-size:13px;font-weight:700}
+.reform-event-row .re-parts{font-size:12.5px;color:var(--g);font-weight:800;margin-top:2px}
+.reform-empty-note{font-size:12px;color:var(--muted);padding:6px 2px 10px}
+.reform-add-btn{width:100%;margin-top:6px;text-align:center}
+.ff-row{display:flex;gap:10px}
+.ff-row .ff{flex:1}
+.reform-parts-label{font-size:12px;font-weight:700;color:var(--ink);margin:10px 0 6px}
+.reform-parts-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.reform-parts-row .chip{border:1.5px solid #dbe6dd;background:#fff;color:#4d5c51}
+.reform-parts-row .chip.active{border-color:var(--g);background:var(--g);color:#fff}
 .danger-zone{margin:20px 0 8px;text-align:center}
 .delete-prop-btn{border:0;background:none;color:var(--muted);font-size:12.5px;font-weight:700;padding:10px 16px;display:inline-flex;align-items:center;gap:6px}
 .delete-prop-btn:active{color:#a23131}
@@ -129,6 +143,10 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .np-preset-label{font-size:11.5px;font-weight:800;color:var(--g);margin:4px 0 8px}
 .np-preset-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;-webkit-overflow-scrolling:touch}
 .np-preset-row .chip{flex:none}
+.np-section-label{font-size:13px;font-weight:800;color:var(--ink);margin:22px 0 10px;padding-top:16px;border-top:1px solid #eef2ef}
+.np-section-note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px}
+.np-survey-status-row{display:flex;gap:8px;margin-bottom:14px}
+.np-survey-status-row .chip{flex:1;text-align:center}
 
 /* ── property list card ── */
 .prop-card{display:flex;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s}
@@ -166,7 +184,8 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .gal-meta div{flex:1;text-align:center;font-size:11.5px;color:#3c473f}
 .gal-meta div+div{border-left:1px solid #eef2ef}
 .gal-meta b{display:block;font-size:13.5px}
-.gal-mode-row{display:flex;justify-content:flex-end;align-items:center;padding:11px 14px 10px}
+.gal-mode-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px 10px}
+.gal-listing-link{border:1.5px solid #cfe6d7;background:#fff;color:var(--g);font-size:11.5px;font-weight:800;border-radius:999px;padding:6px 13px;display:flex;align-items:center;gap:5px;text-decoration:none}
 .gal-mode-label{font-size:11px;color:var(--muted);font-weight:700}
 .gal-edit-toggle{border:1.5px solid #cfe6d7;background:#fff;color:var(--g);font-size:11.5px;font-weight:800;border-radius:999px;padding:6px 13px;display:flex;align-items:center;gap:5px}
 .gal-edit-toggle.on{background:var(--g);color:#fff;border-color:var(--g)}
@@ -296,6 +315,7 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 .check-row-view:last-child{border-bottom:0}
 .cr-label{font-size:13px;font-weight:700}
 .cr-hint{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.cr-memo{font-size:11px;color:#3c473f;margin-top:3px;line-height:1.4;background:#f0f5f1;border-radius:8px;padding:4px 7px}
 .cr-note{font-size:10.5px;color:#9aa6a0;margin-top:2px}
 .check-btn.hi{background:#fff6da;box-shadow:0 0 0 2px #ffd866 inset;animation:pulse 1s 2}
 @keyframes pulse{50%{transform:scale(1.015)}}
@@ -353,6 +373,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 #hiBd{z-index:32;background:rgba(15,30,20,0)}
 #hiBd.show{background:rgba(15,30,20,0);pointer-events:auto}
 #hiSheet{z-index:33}
+#cBd{z-index:34;background:rgba(15,30,20,0)}
+#cBd.show{background:rgba(15,30,20,.32);pointer-events:auto}
+#cSheet{z-index:35}
 /* The photo-delete confirmation can be opened from inside the fullscreen
    photo viewer (z-index:60), so it needs to sit above that layer or it
    would render hidden behind it until the fullscreen view is closed. */
@@ -577,7 +600,9 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
         </div>
         <div class="card">
           <p class="card-title">🔨 リフォーム・修繕履歴</p>
+          <div class="reform-status-row" id="reformStatusRow"></div>
           <div id="reformList"></div>
+          <button class="link-btn reform-add-btn" id="reformAddBtn">＋ 施工履歴を追加</button>
         </div>
       </div>
 
@@ -728,14 +753,22 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
 <div class="sheet" id="cSheet">
   <div class="sh-handle" id="cHandle"></div><p class="sh-title" id="cShTitle">調査項目</p>
   <div id="cOpts"></div>
+  <div class="ff" style="margin-top:4px"><label>詳細メモ（任意）</label><textarea id="cMemoInput" placeholder="気づいたことをメモできます" rows="2" style="width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:10px;font-size:16px;outline:none;resize:vertical"></textarea></div>
   <button class="sh-cancel" id="cCancelBtn">キャンセル</button>
 </div>
 <div class="bd" id="reformBd"></div>
 <div class="sheet" id="reformSheet">
-  <div class="sh-handle" id="reformHandle"></div><p class="sh-title" id="reformShTitle">リフォーム時期</p>
-  <div class="ff"><input id="reformYearInput" placeholder="例：2021年" autocomplete="off"></div>
+  <div class="sh-handle" id="reformHandle"></div><p class="sh-title" id="reformShTitle">施工履歴を追加</p>
+  <div class="ff-row">
+    <div class="ff"><label>施工年（必須）</label><input id="reformYearInput" placeholder="例：2021" inputmode="numeric" autocomplete="off"></div>
+    <div class="ff"><label>施工月（任意）</label><input id="reformMonthInput" placeholder="例：6" inputmode="numeric" autocomplete="off"></div>
+  </div>
+  <p class="reform-parts-label">施工箇所（複数選択可）</p>
+  <div class="reform-parts-row" id="reformPartsRow"></div>
+  <div class="ff" id="reformOtherWrap" style="display:none"><label>その他の箇所</label><input id="reformOtherInput" placeholder="例：物置" autocomplete="off"></div>
+  <div class="ff"><label>メモ</label><textarea id="reformMemoInput" placeholder="工事内容・業者名など" rows="2" style="width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:10px;font-size:16px;outline:none;resize:vertical"></textarea></div>
   <button class="sh-opt" id="reformSaveBtn"><span class="dot" style="background:#1f7a45"></span>保存</button>
-  <button class="sh-opt" id="reformClearBtn"><span class="dot" style="background:#9aa6a0"></span>未実施にする</button>
+  <button class="sh-opt" id="reformDeleteBtn" style="color:#c0392b"><span class="dot" style="background:#c0392b"></span>この履歴を削除</button>
   <button class="sh-cancel" id="reformCancelBtn">キャンセル</button>
 </div>
 <div class="bd" id="eBd"></div>
@@ -807,6 +840,25 @@ input.search{width:100%;border:0;background:#f0f5f1;padding:13px 14px;border-rad
   <p class="np-preset-label">見ているサイトに合わせて入力順を変更</p>
   <div class="np-preset-row" id="npPresetRow"></div>
   <div id="npFields"></div>
+  <p class="np-section-label">🔨 リフォーム情報</p>
+  <div class="reform-status-row" id="npReformStatusRow"></div>
+  <div id="npReformDetail" style="display:none">
+    <div class="ff-row">
+      <div class="ff"><label>施工年（必須）</label><input id="np_reform_year" placeholder="例：2021" inputmode="numeric" autocomplete="off"></div>
+      <div class="ff"><label>施工月（任意）</label><input id="np_reform_month" placeholder="例：6" inputmode="numeric" autocomplete="off"></div>
+    </div>
+    <p class="reform-parts-label">施工箇所（複数選択可）</p>
+    <div class="reform-parts-row" id="npReformPartsRow"></div>
+    <div class="ff" id="npReformOtherWrap" style="display:none"><label>その他の箇所</label><input id="np_reform_other" placeholder="例：物置" autocomplete="off"></div>
+    <div class="ff"><label>メモ</label><textarea id="np_reform_memo" placeholder="工事内容・業者名など" rows="2" style="width:100%;border:0;background:#f0f5f1;border-radius:13px;padding:10px;font-size:16px;outline:none;resize:vertical"></textarea></div>
+    <p class="np-section-note">続けて追加したい施工履歴があれば、登録後に「🔨 リフォーム・修繕履歴」から追加できます。</p>
+  </div>
+  <p class="np-section-label">📋 調査情報</p>
+  <div class="np-survey-status-row" id="npSurveyStatusRow"></div>
+  <div id="npSurveyDetail" style="display:none">
+    <div id="npSurveyList"></div>
+    <p class="np-section-note">未確認のまま登録しても構いません。あとから「調査」タブでいつでも入力できます。</p>
+  </div>
   <button class="modal-save" id="npSaveBtn" style="width:100%;border:0;background:var(--g);color:#fff;border-radius:16px;padding:14px;font-weight:800;font-size:14px;margin-top:6px">この内容で登録する</button>
   <button class="sh-cancel" id="npCancelBtn">キャンセル</button>
 </div>
@@ -928,7 +980,7 @@ const SO=["候補","調査中","保留","見送り","購入済"];
 // screen HTML). Update this single value when starting a new Feature —
 // nothing else needs to change. Set to null to hide the badge entirely
 // (e.g. right before a stable release).
-const CURRENT_FEATURE="#008";
+const CURRENT_FEATURE="#009";
 const CK={
   "雨漏り":[["未確認","bu"],["雨漏りなし","bg"],["修繕済","bg"],["現在あり","bb"]],
   "シロアリ":[["未確認","bu"],["被害なし","bg"],["防蟻処理済","bg"],["被害あり","bb"]],
@@ -964,11 +1016,12 @@ const CK_HINTS={
 };
 function ck(l){return CK[l]||[["未確認","bu"],["問題なし","bg"],["要確認","bw"],["問題あり","bb"]];}
 function dotCol(c){return c==="bg"?"#1f7a45":c==="bw"?"#d99a1f":c==="bb"?"#c0392b":"#9aa6a0";}
-// リフォーム履歴（Feature #007 修正）で扱う箇所の固定カタログ。CKと同じ
+// リフォーム履歴（Feature #009 修正）で扱う箇所の固定カタログ。CKと同じ
 // 考え方で、ここに1行足すだけで新規登録・既存物件表示の両方に反映される
-// （ただし既存サンプルの`reformHistory`配列は、CKのcheckesと同様に手動で
-// 追記が必要 — 詳しくはREADMEを参照）。
-const REFORM_PARTS=["屋根","外壁","キッチン","浴室","トイレ","給排水","内装","外構"];
+// （ただし既存サンプルの`reformEvents`配列は、CKのchecksと同様に手動で
+// 追記が必要 — 詳しくはREADMEを参照）。「その他」は自由入力のため、この
+// 配列には含めず、選択UI側で別枠として扱う。
+const REFORM_PARTS=["キッチン","浴室","トイレ","洗面","外壁","屋根","床","壁","給湯器"];
 const PTAGS=["🏠 外観","🛋 リビング","🍳 キッチン","🛁 浴室","🚽 トイレ","🅿 駐車場","🌿 庭","⚡ 設備","📦 その他"];
 /* ─── unified property field master ───
    This single list drives all three screens that deal with a property's
@@ -984,19 +1037,21 @@ const PTAGS=["🏠 外観","🛋 リビング","🍳 キッチン","🛁 浴室"
 const PROPERTY_FIELDS=[
   {k:"address",l:"所在地",icon:"📍",group:"物件概要"},
   {k:"station",l:"最寄駅・徒歩",icon:"🚉",group:"物件概要"},
+  {k:"url",l:"掲載URL",icon:"🔗",group:"物件概要"},
   {k:"price",l:"価格",icon:"¥",group:"価格・収益",numeric:true,unit:["万円","円"]},
   {k:"yieldRate",l:"利回り（表面）",icon:"%",group:"価格・収益",numeric:true,unit:["%"]},
   {k:"rent",l:"家賃（満室想定）",icon:"🏠",group:"価格・収益",numeric:true,unit:["円/月","万円/月"]},
   {k:"age",l:"築年数",icon:"📅",group:"価格・収益",numeric:true,unit:["年"]},
   {k:"structure",l:"構造",icon:"🏗️",group:"建物情報",sel:["木造","軽量鉄骨","重量鉄骨","RC造","SRC造"],allowOther:true},
+  {k:"floors",l:"階数",icon:"🏢",group:"建物情報",numeric:true,unit:["階建"],mergeInto:"structure"},
   {k:"occupancy",l:"現況",icon:"👤",group:"建物情報",sel:["賃貸中","空室","空家","自己使用"]},
   {k:"landArea",l:"土地面積",icon:"⛰️",group:"建物情報",numeric:true,unit:["㎡","坪"]},
   {k:"buildingArea",l:"建物面積",icon:"🏢",group:"建物情報",numeric:true,unit:["㎡","坪"]},
   {k:"floorPlan",l:"間取り",icon:"🪟",group:"建物情報",sel:["1K","1DK","1LDK","2DK","2LDK","3DK","3LDK","4DK","4LDK","5LDK以上"],allowOther:true},
   {k:"parking",l:"駐車場",icon:"🚗",group:"立地・その他",numeric:true,unit:["台"]},
   {k:"road",l:"接道",icon:"🛣️",group:"立地・その他"},
-  {k:"zoning",l:"用途地域",icon:"🏙️",group:"立地・その他",sel:["第一種住居地域","第二種住居地域","第一種低層住居専用地域","第一種中高層住居専用地域","近隣商業地域","商業地域","用途地域外"],allowOther:true},
-  {k:"source",l:"情報源",icon:"🌐",group:"立地・その他",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","楽待","レインズ","その他"],allowOther:true}
+  {k:"zoning",l:"用途地域",icon:"🏙️",group:"立地・その他",sel:["第一種低層住居専用地域","第二種低層住居専用地域","第一種中高層住居専用地域","第二種中高層住居専用地域","第一種住居地域","第二種住居地域","準住居地域","近隣商業地域","商業地域","準工業地域","工業地域","工業専用地域","市街化調整区域","その他"],allowOther:true},
+  {k:"source",l:"情報源",icon:"🌐",group:"立地・その他",sel:["SUUMO","athome","LIFULL HOME'S","不動産ジャパン","楽待","その他"],allowOther:true}
 ];
 // Groups, in display/step order, derived from PROPERTY_FIELDS itself rather
 // than listed a second time — adding a field with a new `group` name is
@@ -1040,18 +1095,18 @@ const NEW_PROPERTY_FIELDS=[...NEW_PROPERTY_EXTRA_FIELDS,...PROPERTY_FIELDS];
    evaluation) never changes order.
 */
 const PRESET_FIELD_ORDERS={
-  "SUUMO":["price","floorPlan","landArea","buildingArea","age","address","station","structure","zoning","road","occupancy","parking","yieldRate","rent","source"],
-  "アットホーム":["price","floorPlan","age","buildingArea","landArea","address","station","parking","structure","zoning","road","occupancy","yieldRate","rent","source"],
-  "LIFULL HOME'S":["floorPlan","price","buildingArea","landArea","age","address","station","structure","road","zoning","occupancy","parking","yieldRate","rent","source"],
-  "不動産ジャパン":["price","landArea","age","floorPlan","buildingArea","address","station","structure","zoning","road","parking","occupancy","yieldRate","rent","source"],
-  "楽待":["price","yieldRate","rent","address","station","structure","floorPlan","parking","zoning","road","occupancy","age","landArea","buildingArea","source"],
-  "その他":["price","floorPlan","landArea","address","age","buildingArea","station","structure","zoning","road","parking","yieldRate","occupancy","rent","source"]
+  "SUUMO":["url","price","floorPlan","landArea","buildingArea","age","address","station","structure","floors","zoning","road","occupancy","parking","yieldRate","rent","source"],
+  "アットホーム":["url","price","floorPlan","age","buildingArea","landArea","address","station","parking","structure","floors","zoning","road","occupancy","yieldRate","rent","source"],
+  "LIFULL HOME'S":["url","floorPlan","price","buildingArea","landArea","age","address","station","structure","floors","road","zoning","occupancy","parking","yieldRate","rent","source"],
+  "不動産ジャパン":["url","price","landArea","age","floorPlan","buildingArea","address","station","structure","floors","zoning","road","parking","occupancy","yieldRate","rent","source"],
+  "楽待":["url","price","yieldRate","rent","address","station","structure","floors","floorPlan","parking","zoning","road","occupancy","age","landArea","buildingArea","source"],
+  "その他":["url","price","floorPlan","landArea","address","age","buildingArea","station","structure","floors","zoning","road","parking","yieldRate","occupancy","rent","source"]
 };
 const PRESET_LIST=["SUUMO","アットホーム","LIFULL HOME'S","不動産ジャパン","楽待","その他"];
 // Judgment call beyond the literal ask: picking a preset also pre-fills
 // 情報源 with the matching value, since the choice already answers that
 // field — reduces one more tap without touching what gets saved or how.
-const PRESET_SOURCE_MAP={"SUUMO":"SUUMO","アットホーム":"athome","LIFULL HOME'S":"LIFULL HOME'S","不動産ジャパン":"不動産ジャパン","楽待":"楽待","その他":""};
+const PRESET_SOURCE_MAP={"SUUMO":"SUUMO","アットホーム":"athome","LIFULL HOME'S":"LIFULL HOME'S","不動産ジャパン":"不動産ジャパン","楽待":"楽待","その他":"その他"};
 let npPreset="その他";
 // Builds the field list for the new-property form only, in the selected
 // preset's order. title/status aren't part of any listing page, so they
@@ -1083,35 +1138,35 @@ function buildNumericValue(num,unit,suffix){
 const props=[
 {id:1,title:"A町 戸建て",address:"山形県鶴岡市○○町",status:"候補",fav:false,
  price:"680万円",yieldRate:"12.4%",rent:"70,000円/月",station:"羽前大山駅 徒歩9分",
- age:"28年（H8年）",structure:"木造",occupancy:"賃貸中",buildingArea:"120.07㎡（36.3坪）",
+ age:"28年（H8年）",structure:"木造",floors:"2階建",occupancy:"賃貸中",buildingArea:"120.07㎡（36.3坪）",
  floorPlan:"4LDK",landArea:"198.34㎡（60坪）",parking:"2台",road:"両側4.0m公道",
- reformHistory:[{part:"屋根",year:"2021年"},{part:"外壁",year:"2022年"},{part:"キッチン",year:"2023年"},{part:"浴室",year:""},{part:"トイレ",year:"2020年"},{part:"給排水",year:""},{part:"内装",year:""},{part:"外構",year:""}],
+ reformStatus:"あり",reformEvents:[{year:"2020",month:"",parts:["トイレ"],memo:""},{year:"2021",month:"",parts:["屋根"],memo:""},{year:"2022",month:"",parts:["外壁"],memo:""},{year:"2023",month:"",parts:["キッチン"],memo:""}],
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#駐車場2台","#高利回り","#内見候補"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:2},{l:"傾き",i:1},{l:"境界",i:0},{l:"再建築可否",i:1},{l:"接道状況",i:1},{l:"給排水設備",i:1},{l:"空室理由",i:0},{l:"家賃根拠",i:2},{l:"固定資産税",i:0},{l:"周辺環境",i:1},{l:"災害リスク",i:1}],
+ checks:[{l:"雨漏り",i:1,memo:""},{l:"シロアリ",i:2,memo:""},{l:"傾き",i:1,memo:""},{l:"境界",i:0,memo:""},{l:"再建築可否",i:1,memo:""},{l:"接道状況",i:1,memo:""},{l:"給排水設備",i:1,memo:""},{l:"空室理由",i:0,memo:""},{l:"家賃根拠",i:2,memo:"近隣の類似物件は6.5万円が中心。7万円はやや強気な設定"},{l:"固定資産税",i:0,memo:""},{l:"周辺環境",i:1,memo:""},{l:"災害リスク",i:1,memo:""}],
  todos:[{l:"境界確認",t:"境界",done:false},{l:"修繕履歴を仲介へ確認",done:false},{l:"固定資産税を確認",t:"固定資産税",done:false}],
  memos:[{date:"2026/6/29 21:10",text:"内見時、駐車場の地面に若干の傾斜あり。要再確認。"}],
  photos:[],
  logs:[{d:"2026/6/30 10:18",t:"🏠 物件登録"},{d:"2026/6/30 10:32",t:"⭐ Score 76 → 88"},{d:"2026/6/30 10:41",t:"🟢 ステータス変更：調査中 → 候補"}]},
 {id:2,title:"B地区 中古戸建",address:"山形県鶴岡市△△町",status:"調査中",fav:false,
  price:"450万円",yieldRate:"10.8%",rent:"55,000円/月",station:"羽前水沢駅 徒歩15分",
- age:"32年（H6年）",structure:"木造",occupancy:"空室",buildingArea:"95.20㎡（28.8坪）",
+ age:"32年（H6年）",structure:"木造",floors:"2階建",occupancy:"空室",buildingArea:"95.20㎡（28.8坪）",
  floorPlan:"3LDK",landArea:"165.00㎡（50坪）",parking:"2台",road:"南側4.0m公道",
- reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
+ reformStatus:"",reformEvents:[],
  zoning:"第一種住居地域",source:"SUUMO",
  tags:["#接道確認","#修繕履歴不明"],reason:null,
- checks:[{l:"雨漏り",i:1},{l:"シロアリ",i:0},{l:"傾き",i:0},{l:"境界",i:1},{l:"再建築可否",i:1},{l:"接道状況",i:2},{l:"給排水設備",i:2},{l:"空室理由",i:0}],
+ checks:[{l:"雨漏り",i:1,memo:""},{l:"シロアリ",i:0,memo:""},{l:"傾き",i:0,memo:""},{l:"境界",i:1,memo:""},{l:"再建築可否",i:1,memo:""},{l:"接道状況",i:2,memo:""},{l:"給排水設備",i:2,memo:""},{l:"空室理由",i:0,memo:""}],
  todos:[{l:"空室理由を確認",t:"空室理由",done:false},{l:"修繕見積もりを依頼",done:false},{l:"シロアリ調査を手配",t:"シロアリ",done:false}],
  memos:[],photos:[],
  logs:[{d:"2026/6/24 09:02",t:"🏠 物件登録"},{d:"2026/6/27 18:40",t:"⭐ Score 65 → 72"},{d:"2026/6/29 21:05",t:"🟡 ステータス変更：候補 → 調査中"}]},
 {id:3,title:"C町 空き家",address:"山形県酒田市□□町",status:"見送り",fav:false,
  price:"390万円",yieldRate:"14.1%",rent:"50,000円/月",station:"酒田駅 徒歩22分",
- age:"41年（H15年）",structure:"軽量鉄骨",occupancy:"空家",buildingArea:"88.00㎡（26.6坪）",
+ age:"41年（H15年）",structure:"軽量鉄骨",floors:"1階建",occupancy:"空家",buildingArea:"88.00㎡（26.6坪）",
  floorPlan:"3DK",landArea:"140.00㎡（42坪）",parking:"1台",road:"接道義務未確認",
- reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
+ reformStatus:"",reformEvents:[],
  zoning:"用途地域外",source:"athome",
  tags:["#再建築不可","#修繕費高額"],reason:"再建築不可＋修繕費が読めないため見送り",
- checks:[{l:"雨漏り",i:3},{l:"シロアリ",i:3},{l:"傾き",i:3},{l:"境界",i:0},{l:"再建築可否",i:3},{l:"接道状況",i:3}],
+ checks:[{l:"雨漏り",i:3,memo:""},{l:"シロアリ",i:3,memo:""},{l:"傾き",i:3,memo:""},{l:"境界",i:0,memo:""},{l:"再建築可否",i:3,memo:""},{l:"接道状況",i:3,memo:""}],
  todos:[{l:"近隣の取引事例を確認",t:"境界",done:true},{l:"解体費用の見積もりを取得",done:false}],
  memos:[{date:"2026/6/20 08:40",text:"床下に蟻害の痕跡あり。解体前提でないと厳しい。"}],
  photos:[],
@@ -1249,6 +1304,21 @@ function loadPersistedProps(){
 let ap=null;
 function now(){const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;}
 function log(p,t){p.logs.unshift({d:now(),t});if(ap===p)document.getElementById("logList").innerHTML=p.logs.map(l=>`<div class="log-item"><b>${l.d}</b><p>${l.t}</p></div>`).join("");schedulePersist();}
+// Issue①: identify which listing site a URL is from, purely from its
+// domain, so the "掲載ページを開く" link can show e.g. "掲載ページを開く
+// （SUUMO）" when recognizable. Returns null for anything else — the link
+// still works, it just won't have a media name attached.
+function detectListingMedia(url){
+  if(!url)return null;
+  let host;
+  try{ host=new URL(url).hostname; }catch(e){ return null; }
+  if(host.includes("suumo.jp"))return"SUUMO";
+  if(host.includes("athome.co.jp"))return"アットホーム";
+  if(host.includes("homes.co.jp"))return"LIFULL HOME'S";
+  if(host.includes("fudousan.or.jp"))return"不動産ジャパン";
+  if(host.includes("rakumachi.jp"))return"楽待";
+  return null;
+}
 function calcStats(p){const total=p.checks.length,unc=p.checks.filter(c=>c.i===0).length;return{pct:total?Math.round((total-unc)/total*100):0,unc,total};}
 
 /* ═══════════ AI評価エンジン (Feature #006) ═══════════
@@ -1686,14 +1756,14 @@ function renderSettingsScreen(){
 function createBlankProperty(){
   const nextId=props.length?Math.max(...props.map(p=>p.id))+1:1;
   return{
-    id:nextId,title:"",address:"",status:"候補",fav:false,
+    id:nextId,title:"",address:"",url:"",status:"候補",fav:false,
     price:"",yieldRate:"",rent:"",station:"",
-    age:"",structure:"",occupancy:"",buildingArea:"",
+    age:"",structure:"",floors:"",occupancy:"",buildingArea:"",
     floorPlan:"",landArea:"",parking:"",road:"",
-    reformHistory:REFORM_PARTS.map(part=>({part,year:""})),
+    reformStatus:"",reformEvents:[],
     zoning:"",source:"",
     tags:[],reason:null,
-    checks:Object.keys(CK).map(l=>({l,i:0})),
+    checks:Object.keys(CK).map(l=>({l,i:0,memo:""})),
     todos:[],
     memos:[],
     photos:[],
@@ -1705,7 +1775,10 @@ let npDraft=null;
 function openNewPropertySheet(){
   npDraft=createBlankProperty();
   npPreset="その他";
+  npSurveyStatus="なし";
   renderNpFields();
+  renderNpReformSection();
+  renderNpSurveySection();
   // Belt-and-braces against iOS Safari's own form-value memory: even
   // though the freshly-built markup has value="" for every field, some
   // WebKit versions can still repopulate an <input> from its own recent
@@ -1820,9 +1893,94 @@ function captureNpFields(){
     if(el)npDraft[f.k]=el.value;
   });
 }
+/* ─── new-registration リフォーム section (Issue②) ───
+   Mirrors renderReformStatusRow/renderReformPartsRow from the 基本 tab's
+   card, but writes into npDraft directly instead of ap. Only one event
+   can be entered here (matching "new registration" being a single pass);
+   further history is added later from the 基本 tab, per Kuro's direction.
+*/
+function renderNpReformSection(){
+  const opts=["なし","あり","不明"];
+  document.getElementById("npReformStatusRow").innerHTML=opts.map(o=>
+    `<button type="button" class="chip${npDraft.reformStatus===o?" active":""}" data-status="${o}">${o}</button>`
+  ).join("");
+  document.querySelectorAll("#npReformStatusRow .chip").forEach(b=>b.addEventListener("click",()=>{
+    npDraft.reformStatus=b.dataset.status;
+    renderNpReformSection();
+  }));
+  const showDetail=npDraft.reformStatus==="あり";
+  document.getElementById("npReformDetail").style.display=showDetail?"":"none";
+  if(showDetail)renderNpReformPartsRow();
+}
+function renderNpReformPartsRow(){
+  document.getElementById("npReformPartsRow").innerHTML=REFORM_PARTS.map(part=>
+    `<button type="button" class="chip" data-part="${part}">${part}</button>`
+  ).join("")+`<button type="button" class="chip" data-part="__other__">その他</button>`;
+  document.querySelectorAll("#npReformPartsRow .chip").forEach(b=>b.addEventListener("click",()=>{
+    if(b.dataset.part==="__other__"){
+      const wrap=document.getElementById("npReformOtherWrap");
+      const showing=wrap.style.display!=="none";
+      wrap.style.display=showing?"none":"";
+      b.classList.toggle("active",!showing);
+      if(showing)document.getElementById("np_reform_other").value="";
+    } else {
+      b.classList.toggle("active");
+    }
+  }));
+}
+// Builds a reformEvents entry from whatever's currently in the リフォーム
+// section, or null if there's nothing valid to save (施工年 is required —
+// same rule as the 基本 tab's add/edit sheet).
+function collectNpReformEvent(){
+  if(npDraft.reformStatus!=="あり")return null;
+  const year=document.getElementById("np_reform_year").value.trim();
+  if(!year)return null;
+  const month=document.getElementById("np_reform_month").value.trim();
+  const memo=document.getElementById("np_reform_memo").value.trim();
+  const parts=[...document.querySelectorAll("#npReformPartsRow .chip.active")].map(b=>b.dataset.part).filter(x=>x!=="__other__");
+  const other=document.getElementById("np_reform_other").value.trim();
+  if(other)parts.push(...other.split(/[・,、]/).map(s=>s.trim()).filter(Boolean));
+  return{year,month,parts,memo};
+}
+
+/* ─── new-registration 調査 section (Issue③) ───
+   Reuses the same 13 CK items with their own specific choices (per Kuro's
+   answer: keep item-specific options, not a generic 4-state), and the same
+   openCheckSheet used by the 調査 tab — writing straight into
+   npDraft.checks, which is the exact array that becomes the saved
+   property's checks. Nothing here is a separate/parallel data structure.
+*/
+let npSurveyStatus="なし";
+function renderNpSurveySection(){
+  const opts=["なし","あり"];
+  document.getElementById("npSurveyStatusRow").innerHTML=opts.map(o=>
+    `<button type="button" class="chip${npSurveyStatus===o?" active":""}" data-status="${o}">${o}</button>`
+  ).join("");
+  document.querySelectorAll("#npSurveyStatusRow .chip").forEach(b=>b.addEventListener("click",()=>{
+    npSurveyStatus=b.dataset.status;
+    renderNpSurveySection();
+  }));
+  const showDetail=npSurveyStatus==="あり";
+  document.getElementById("npSurveyDetail").style.display=showDetail?"":"none";
+  if(showDetail)renderNpSurveyList();
+}
+function renderNpSurveyList(){
+  document.getElementById("npSurveyList").innerHTML=npDraft.checks.map(c=>{
+    const o=ck(c.l)[c.i];
+    const hint=CK_HINTS[c.l];
+    return`<button type="button" class="check-btn" data-key="${c.l}"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}${c.memo?`<p class="cr-memo">📝 ${c.memo}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
+  }).join("");
+  document.querySelectorAll("#npSurveyList .check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(npDraft,b.dataset.key,renderNpSurveyList)));
+}
 function saveNewProperty(){
   captureNpFields();
   if(!npDraft.title.trim())npDraft.title="無題の物件";
+  // Issue②: fold whatever's in the リフォーム section into reformEvents.
+  // 調査情報 needs no equivalent step here — openCheckSheet already wrote
+  // straight into npDraft.checks as each item was edited, so there's
+  // nothing left to collect for it.
+  const reformEvent=collectNpReformEvent();
+  if(reformEvent)npDraft.reformEvents.push(reformEvent);
   // Strip the internal "is currently showing the hand-typed input" /
   // "which unit is currently chosen" tracking flags before persisting —
   // they're only meant to drive the form's own re-rendering, not to live
@@ -2309,7 +2467,7 @@ function renderMarketModal(p){
     <div><b>${m.max}万円</b><span>最高</span></div>`;
   comment.textContent=m.comment;
   list.innerHTML=m.matched.map(mp=>{
-    const reformedCount=(mp.reformHistory||[]).filter(r=>r.year).length;
+    const reformedCount=(mp.reformEvents||[]).length;
     const reformTag=reformedCount?`（リフォーム${reformedCount}件）`:"";
     return`<li>${mp.title}${mp===p?"（この物件）":""}：<b>${priceOf(mp)}万円</b>${reformTag}</li>`;
   }).join("");
@@ -2375,6 +2533,16 @@ function infoDisplayValue(f,raw){
   }
   return raw||"";
 }
+// Combines a field's own value with any field that declares
+// mergeInto:<this key> (currently just 階数→構造), producing "木造2階建"
+// from structure:"木造" + floors:"2階建" — Issue④. Input keeps both as
+// separate fields everywhere; only this read-only combined string changes.
+function mergedDisplayValue(p,key){
+  const own=infoDisplayValue(PROPERTY_FIELDS.find(f=>f.k===key),p[key]);
+  const extra=PROPERTY_FIELDS.filter(f=>f.mergeInto===key)
+    .map(f=>infoDisplayValue(f,p[f.k])).filter(Boolean).join("");
+  return own+extra;
+}
 // Same rule as infoDisplayValue, but looked up by field key alone — this is
 // the version to reach for anywhere outside the basic-info grid itself
 // (the photo-strip metadata, the compare screen, anywhere else that shows
@@ -2383,9 +2551,9 @@ function infoDisplayValue(f,raw){
 // to the raw value as-is for keys that aren't part of PROPERTY_FIELDS.
 function propFieldValue(p,key){
   const f=PROPERTY_FIELDS.find(x=>x.k===key);
-  const raw=p[key];
-  if(!f)return raw||"";
-  return infoDisplayValue(f,raw)||"";
+  if(!f)return p[key]||"";
+  if(PROPERTY_FIELDS.some(x=>x.mergeInto===key))return mergedDisplayValue(p,key);
+  return infoDisplayValue(f,p[key])||"";
 }
 // Same, but returns the unified empty placeholder ("－") instead of an
 // empty string when there's nothing to show — for spots that always want
@@ -2394,7 +2562,10 @@ function propFieldValueOrDash(p,key){
   return propFieldValue(p,key)||"－";
 }
 function renderInfo(p){
-  const items=PROPERTY_FIELDS.map(f=>[f.icon,f.l,infoDisplayValue(f,p[f.k])]);
+  // Fields that merge their display into another field's row (階数 into
+  // 構造) don't get a row of their own here.
+  const items=PROPERTY_FIELDS.filter(f=>!f.mergeInto)
+    .map(f=>[f.icon,f.l,PROPERTY_FIELDS.some(x=>x.mergeInto===f.k)?mergedDisplayValue(p,f.k):infoDisplayValue(f,p[f.k])]);
   document.getElementById("infoGrid").innerHTML=items.map(([ico,l,v],i)=>{
     const long=v&&v.length>INFO_VALUE_TAP_THRESHOLD;
     // Unified empty-state rule: every field shows either its real value, or
@@ -2423,7 +2594,7 @@ function renderChecks(p){
     document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
       const o=ck(c.l)[c.i];
       const hint=CK_HINTS[c.l];
-      return`<button class="check-btn" data-key="${c.l}"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
+      return`<button class="check-btn" data-key="${c.l}"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}${c.memo?`<p class="cr-memo">📝 ${c.memo}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}<span class="badge-caret">▾</span></span></button>`;
     }).join("");
     document.querySelectorAll("#checkRows .check-btn").forEach(b=>b.addEventListener("click",()=>openCheckSheet(ap,b.dataset.key)));
   } else {
@@ -2433,7 +2604,7 @@ function renderChecks(p){
     document.getElementById("checkRows").innerHTML=p.checks.map(c=>{
       const o=ck(c.l)[c.i];
       const hint=CK_HINTS[c.l];
-      return`<div class="check-row-view"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}</span></div>`;
+      return`<div class="check-row-view"><div><p class="cr-label">${c.l}</p>${hint?`<p class="cr-hint">${hint}</p>`:""}${c.memo?`<p class="cr-memo">📝 ${c.memo}</p>`:""}</div><span class="badge ${o[1]}">${o[0]}</span></div>`;
     }).join("");
   }
 }
@@ -2570,13 +2741,18 @@ window.addEventListener("resize",()=>{if(ap)setPanel(panelIdx,false);if(document
 })();
 
 /* ─── check sheet ─── */
-function openCheckSheet(p,label){
+function openCheckSheet(p,label,onSaved){
   document.getElementById("cShTitle").textContent=`調査項目：${label}`;
   const opts=ck(label),cur=p.checks.find(c=>c.l===label);
+  document.getElementById("cMemoInput").value=cur.memo||"";
   document.getElementById("cOpts").innerHTML=opts.map((o,i)=>`<button class="sh-opt ${i===cur.i?"cur":""}" data-i="${i}"><span class="dot" style="background:${dotCol(o[1])}"></span>${o[0]}</button>`).join("");
   document.querySelectorAll("#cOpts .sh-opt").forEach(b=>b.addEventListener("click",()=>{
     const idx=Number(b.dataset.i);
-    if(idx!==cur.i){const bef=opts[cur.i][0];cur.i=idx;log(p,`🔍 調査変更：${label}：${bef} → ${opts[idx][0]}`);renderChecks(p);renderStats(p);}
+    const newMemo=document.getElementById("cMemoInput").value.trim();
+    let changed=false;
+    if(idx!==cur.i){const bef=opts[cur.i][0];cur.i=idx;if(p===ap)log(p,`🔍 調査変更：${label}：${bef} → ${opts[idx][0]}`);changed=true;}
+    if(newMemo!==(cur.memo||"")){cur.memo=newMemo;if(p===ap)log(p,`📝 調査メモ：${label}`);changed=true;}
+    if(changed){ if(p===ap){renderChecks(p);renderStats(p);} if(onSaved)onSaved(); }
     closeSh("cBd","cSheet");
   }));
   openSh("cBd","cSheet");
@@ -2585,41 +2761,99 @@ document.getElementById("cCancelBtn").addEventListener("click",()=>closeSh("cBd"
 document.getElementById("cBd").addEventListener("click",()=>closeSh("cBd","cSheet"));
 bindHandleClose("cHandle",()=>closeSh("cBd","cSheet"));
 
-/* ─── reform history (Feature #007 修正: 箇所と時期をセットで表示) ───
-   リフォーム箇所ごとに実施時期（自由記述）を紐づけて保持・表示する。
-   調査チェックと違って時期は固定の選択肢ではなく自由入力のため、
-   openCheckSheetのような選択肢ボタン一覧ではなく、テキスト入力＋
-   「未実施にする」で1件ずつ編集する専用シートにしている。
+/* ─── reform history (Feature #009 修正: 年月＋複数箇所＋メモのイベント形式) ───
+   1件の施工（年月＋メモ）に対して複数の箇所をまとめて登録できる構成。
+   カードには実際に登録された施工履歴だけを表示し（空の箇所一覧を毎回
+   全部並べていた旧方式より見た目をすっきりさせている）、「＋施工履歴を
+   追加」から新規追加、既存の行をタップすれば編集・削除できる。
+   新規登録画面のリフォームセクション（後述）も、この同じ
+   reformStatus／reformEvents をそのまま編集する — データの二重管理はしない。
 */
 function renderReformHistory(p){
-  document.getElementById("reformList").innerHTML=p.reformHistory.map(r=>{
-    const has=!!r.year;
-    return`<button class="check-btn" data-part="${r.part}"><p class="cr-label">${r.part}</p><span class="badge ${has?"bg":"bu"}">${has?r.year:"未実施"}<span class="badge-caret">▾</span></span></button>`;
+  renderReformStatusRow(p);
+  if(!p.reformEvents.length){
+    document.getElementById("reformList").innerHTML=`<p class="reform-empty-note">まだ施工履歴がありません。</p>`;
+    return;
+  }
+  const sorted=p.reformEvents.map((r,i)=>({...r,_i:i})).sort((a,b)=>(b.year+String(b.month).padStart(2,"0")).localeCompare(a.year+String(a.month).padStart(2,"0")));
+  document.getElementById("reformList").innerHTML=sorted.map(r=>{
+    const when=r.year+"年"+(r.month?r.month+"月":"");
+    return`<button class="reform-event-row" data-i="${r._i}"><div><p class="re-when">${when}</p><p class="re-parts">${r.parts.join("・")||"箇所未選択"}</p></div><span class="badge-caret">▾</span></button>`;
   }).join("");
-  document.querySelectorAll("#reformList .check-btn").forEach(b=>b.addEventListener("click",()=>openReformSheet(ap,b.dataset.part)));
+  document.querySelectorAll("#reformList .reform-event-row").forEach(b=>b.addEventListener("click",()=>openReformSheet(ap,Number(b.dataset.i))));
 }
-let reformEditPart=null;
-function openReformSheet(p,part){
-  reformEditPart=part;
-  const entry=p.reformHistory.find(r=>r.part===part);
-  document.getElementById("reformShTitle").textContent=`リフォーム時期：${part}`;
+function renderReformStatusRow(p){
+  const opts=["なし","あり","不明"];
+  document.getElementById("reformStatusRow").innerHTML=opts.map(o=>
+    `<button class="chip${p.reformStatus===o?" active":""}" data-status="${o}">${o}</button>`
+  ).join("");
+  document.querySelectorAll("#reformStatusRow .chip").forEach(b=>b.addEventListener("click",()=>{
+    const v=b.dataset.status;
+    if(p.reformStatus!==v){log(p,`🔨 リフォーム：${p.reformStatus||"未確認"} → ${v}`);p.reformStatus=v;renderReformHistory(p);}
+  }));
+}
+function renderReformPartsRow(selected,otherActive){
+  document.getElementById("reformPartsRow").innerHTML=REFORM_PARTS.map(part=>
+    `<button class="chip${selected.includes(part)?" active":""}" data-part="${part}">${part}</button>`
+  ).join("")+`<button class="chip${otherActive?" active":""}" data-part="__other__">その他</button>`;
+  document.querySelectorAll("#reformPartsRow .chip").forEach(b=>b.addEventListener("click",()=>{
+    if(b.dataset.part==="__other__"){
+      const wrap=document.getElementById("reformOtherWrap");
+      const showing=wrap.style.display!=="none";
+      wrap.style.display=showing?"none":"";
+      b.classList.toggle("active",!showing);
+      if(showing)document.getElementById("reformOtherInput").value="";
+    } else {
+      b.classList.toggle("active");
+    }
+  }));
+}
+let reformEditIndex=null; // null = adding a new entry; a number = editing that index in p.reformEvents
+function openReformSheet(p,index){
+  reformEditIndex=index;
+  const entry=index!==null?p.reformEvents[index]:{year:"",month:"",parts:[],memo:""};
+  document.getElementById("reformShTitle").textContent=index!==null?"施工履歴を編集":"施工履歴を追加";
   document.getElementById("reformYearInput").value=entry.year||"";
+  document.getElementById("reformMonthInput").value=entry.month||"";
+  document.getElementById("reformMemoInput").value=entry.memo||"";
+  const knownParts=entry.parts.filter(x=>REFORM_PARTS.includes(x));
+  const otherParts=entry.parts.filter(x=>!REFORM_PARTS.includes(x));
+  renderReformPartsRow(knownParts,otherParts.length>0);
+  document.getElementById("reformOtherWrap").style.display=otherParts.length?"":"none";
+  document.getElementById("reformOtherInput").value=otherParts.join("・");
+  document.getElementById("reformDeleteBtn").style.display=index!==null?"":"none";
   openSh("reformBd","reformSheet");
 }
-function closeReformSheet(){ closeSh("reformBd","reformSheet"); reformEditPart=null; }
+function closeReformSheet(){ closeSh("reformBd","reformSheet"); reformEditIndex=null; }
+document.getElementById("reformAddBtn").addEventListener("click",()=>openReformSheet(ap,null));
 document.getElementById("reformSaveBtn").addEventListener("click",()=>{
-  const p=ap,part=reformEditPart;
-  if(!part)return;
-  const entry=p.reformHistory.find(r=>r.part===part);
-  const v=document.getElementById("reformYearInput").value.trim();
-  if(entry.year!==v){log(p,`🔨 リフォーム時期：${part}：${entry.year||"未実施"} → ${v||"未実施"}`);entry.year=v;renderReformHistory(p);}
+  const p=ap;
+  const year=document.getElementById("reformYearInput").value.trim();
+  if(!year){ document.getElementById("reformYearInput").focus(); return; } // 施工年は必須
+  const month=document.getElementById("reformMonthInput").value.trim();
+  const memo=document.getElementById("reformMemoInput").value.trim();
+  const parts=[...document.querySelectorAll("#reformPartsRow .chip.active")].map(b=>b.dataset.part).filter(x=>x!=="__other__");
+  const other=document.getElementById("reformOtherInput").value.trim();
+  if(other)parts.push(...other.split(/[・,、]/).map(s=>s.trim()).filter(Boolean));
+  const entry={year,month,parts,memo};
+  if(reformEditIndex!==null){
+    p.reformEvents[reformEditIndex]=entry;
+    log(p,`🔨 施工履歴を編集：${year}年${month?month+"月":""}（${parts.join("・")||"箇所未選択"}）`);
+  } else {
+    p.reformEvents.push(entry);
+    log(p,`🔨 施工履歴を追加：${year}年${month?month+"月":""}（${parts.join("・")||"箇所未選択"}）`);
+  }
+  if(p.reformStatus!=="あり")p.reformStatus="あり";
+  renderReformHistory(p);
   closeReformSheet();
 });
-document.getElementById("reformClearBtn").addEventListener("click",()=>{
-  const p=ap,part=reformEditPart;
-  if(!part)return;
-  const entry=p.reformHistory.find(r=>r.part===part);
-  if(entry.year){log(p,`🔨 リフォーム時期：${part}：${entry.year} → 未実施`);entry.year="";renderReformHistory(p);}
+document.getElementById("reformDeleteBtn").addEventListener("click",()=>{
+  const p=ap;
+  if(reformEditIndex===null)return;
+  const removed=p.reformEvents[reformEditIndex];
+  p.reformEvents.splice(reformEditIndex,1);
+  log(p,`🔨 施工履歴を削除：${removed.year}年${removed.month?removed.month+"月":""}（${removed.parts.join("・")||"箇所未選択"}）`);
+  renderReformHistory(p);
   closeReformSheet();
 });
 document.getElementById("reformCancelBtn").addEventListener("click",closeReformSheet);
@@ -3134,11 +3368,25 @@ fileInputReplace.addEventListener("change",e=>{
   fileInputReplace.removeAttribute("capture");
 });
 
+// Issue①: the "掲載ページを開く" link/button, reused in both gallery
+// states. Returns "" (Issue① — "URL未登録の場合は非表示") when the
+// property has no url, but callers still need a same-sized placeholder
+// so the layout next to it doesn't shift — see galListingSlot().
+function listingLinkHtml(p){
+  if(!p.url)return"";
+  const media=detectListingMedia(p.url);
+  const label=media?`掲載ページを開く（${media}）`:"掲載ページを開く";
+  const safeUrl=String(p.url).replace(/"/g,"&quot;");
+  return`<a class="gal-listing-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">🔗 ${label}</a>`;
+}
+function galListingSlot(p){
+  return listingLinkHtml(p)||"<span></span>";
+}
 let galEditOpen=false;
 function renderGallery(p){
   const el=document.getElementById("gallery");
   if(!p.photos.length){
-    el.innerHTML=`<div class="gal-empty"><button class="gal-empty-btn" id="galEmptyBtn">＋ 写真を追加</button><p>外観・室内などの写真を登録できます</p></div>`;
+    el.innerHTML=`<div class="gal-empty">${listingLinkHtml(p)}<button class="gal-empty-btn" id="galEmptyBtn">＋ 写真を追加</button><p>外観・室内などの写真を登録できます</p></div>`;
     document.getElementById("galEmptyBtn").addEventListener("click",()=>{triggerPhotoAdd(p);});
     return;
   }
@@ -3157,6 +3405,7 @@ function renderGallery(p){
       <div><b>${propFieldValueOrDash(p,"price")}</b>価格</div><div><b>${propFieldValueOrDash(p,"yieldRate")}</b>利回り</div><div><b>${propFieldValue(p,"age").split("（")[0]||"－"}</b>築年数</div>
     </div>
     <div class="gal-mode-row">
+      ${galListingSlot(p)}
       <button class="gal-edit-toggle ${galEditOpen?"on":""}" id="galEditToggle">${galEditOpen?"✓ 保存":"✎ 写真を編集"}</button>
     </div>
     <div class="gal-view-memo" id="galViewMemo"></div>
